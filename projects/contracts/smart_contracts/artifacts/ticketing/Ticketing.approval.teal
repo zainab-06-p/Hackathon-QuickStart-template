@@ -1,0 +1,322 @@
+#pragma version 10
+#pragma typetrack false
+
+// smart_contracts.ticketing.contract.Ticketing.__algopy_entrypoint_with_init() -> uint64:
+main:
+    intcblock 0 1
+    bytecblock "is_sale_active" "sold_count" "ticket_price" "max_supply" 0x151f7c75 "organizer"
+    txn ApplicationID
+    bnz main_after_if_else@2
+    // smart_contracts/ticketing/contract.py:18
+    // self.ticket_price = UInt64(0)
+    bytec_2 // "ticket_price"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/ticketing/contract.py:19
+    // self.max_supply = UInt64(0)
+    bytec_3 // "max_supply"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/ticketing/contract.py:20
+    // self.sold_count = UInt64(0)
+    bytec_1 // "sold_count"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/ticketing/contract.py:21
+    // self.is_sale_active = False
+    bytec_0 // "is_sale_active"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/ticketing/contract.py:22
+    // self.organizer = Txn.sender
+    bytec 5 // "organizer"
+    txn Sender
+    app_global_put
+
+main_after_if_else@2:
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@9
+    pushbytess 0xd2c82415 0x71ef5bd3 0x0a19c048 0x18c61763 // method "create_event(uint64,uint64)uint64", method "buy_ticket(pay)uint64", method "toggle_sale()bool", method "get_event_info()(uint64,uint64,uint64,bool)"
+    txna ApplicationArgs 0
+    match main_create_event_route@5 main_buy_ticket_route@6 main_toggle_sale_route@7 main_get_event_info_route@8
+
+main_after_if_else@11:
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    intc_0 // 0
+    return
+
+main_get_event_info_route@8:
+    // smart_contracts/ticketing/contract.py:52
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_event_info
+    uncover 3
+    itob
+    uncover 3
+    itob
+    uncover 3
+    itob
+    pushbytes 0x00
+    intc_0 // 0
+    uncover 5
+    setbit
+    uncover 3
+    uncover 3
+    concat
+    uncover 2
+    concat
+    swap
+    concat
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_toggle_sale_route@7:
+    // smart_contracts/ticketing/contract.py:45
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub toggle_sale
+    pushbytes 0x00
+    intc_0 // 0
+    uncover 2
+    setbit
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_buy_ticket_route@6:
+    // smart_contracts/ticketing/contract.py:34
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    txn GroupIndex
+    intc_1 // 1
+    -
+    dup
+    gtxns TypeEnum
+    intc_1 // pay
+    ==
+    assert // transaction type is pay
+    // smart_contracts/ticketing/contract.py:34
+    // @abimethod()
+    callsub buy_ticket
+    itob
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_create_event_route@5:
+    // smart_contracts/ticketing/contract.py:24
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    txna ApplicationArgs 2
+    btoi
+    // smart_contracts/ticketing/contract.py:24
+    // @abimethod()
+    callsub create_event
+    itob
+    bytec 4 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_bare_routing@9:
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    txn OnCompletion
+    bnz main_after_if_else@11
+    txn ApplicationID
+    !
+    assert // can only call when creating
+    intc_1 // 1
+    return
+
+
+// smart_contracts.ticketing.contract.Ticketing.create_event(price: uint64, supply: uint64) -> uint64:
+create_event:
+    // smart_contracts/ticketing/contract.py:24-25
+    // @abimethod()
+    // def create_event(self, price: UInt64, supply: UInt64) -> UInt64:
+    proto 2 1
+    // smart_contracts/ticketing/contract.py:27
+    // assert not self.ticket_price, "Event already created"
+    intc_0 // 0
+    bytec_2 // "ticket_price"
+    app_global_get_ex
+    assert // check self.ticket_price exists
+    !
+    assert // Event already created
+    // smart_contracts/ticketing/contract.py:28
+    // self.ticket_price = price
+    bytec_2 // "ticket_price"
+    frame_dig -2
+    app_global_put
+    // smart_contracts/ticketing/contract.py:29
+    // self.max_supply = supply
+    bytec_3 // "max_supply"
+    frame_dig -1
+    app_global_put
+    // smart_contracts/ticketing/contract.py:30
+    // self.organizer = Txn.sender
+    bytec 5 // "organizer"
+    txn Sender
+    app_global_put
+    // smart_contracts/ticketing/contract.py:31
+    // self.is_sale_active = True
+    bytec_0 // "is_sale_active"
+    intc_1 // 1
+    app_global_put
+    // smart_contracts/ticketing/contract.py:32
+    // return UInt64(1)
+    intc_1 // 1
+    retsub
+
+
+// smart_contracts.ticketing.contract.Ticketing.buy_ticket(payment: uint64) -> uint64:
+buy_ticket:
+    // smart_contracts/ticketing/contract.py:34-35
+    // @abimethod()
+    // def buy_ticket(self, payment: gtxn.PaymentTransaction) -> UInt64:
+    proto 1 1
+    // smart_contracts/ticketing/contract.py:37
+    // assert self.is_sale_active, "Sale not active"
+    intc_0 // 0
+    bytec_0 // "is_sale_active"
+    app_global_get_ex
+    assert // check self.is_sale_active exists
+    assert // Sale not active
+    // smart_contracts/ticketing/contract.py:38
+    // assert self.sold_count < self.max_supply, "Sold out"
+    intc_0 // 0
+    bytec_1 // "sold_count"
+    app_global_get_ex
+    assert // check self.sold_count exists
+    intc_0 // 0
+    bytec_3 // "max_supply"
+    app_global_get_ex
+    assert // check self.max_supply exists
+    <
+    assert // Sold out
+    // smart_contracts/ticketing/contract.py:39
+    // assert payment.receiver == Global.current_application_address
+    frame_dig -1
+    gtxns Receiver
+    global CurrentApplicationAddress
+    ==
+    assert
+    // smart_contracts/ticketing/contract.py:40
+    // assert payment.amount >= self.ticket_price, "Insufficient payment"
+    frame_dig -1
+    gtxns Amount
+    intc_0 // 0
+    bytec_2 // "ticket_price"
+    app_global_get_ex
+    assert // check self.ticket_price exists
+    >=
+    assert // Insufficient payment
+    // smart_contracts/ticketing/contract.py:42
+    // self.sold_count += UInt64(1)
+    intc_0 // 0
+    bytec_1 // "sold_count"
+    app_global_get_ex
+    assert // check self.sold_count exists
+    intc_1 // 1
+    +
+    bytec_1 // "sold_count"
+    swap
+    app_global_put
+    // smart_contracts/ticketing/contract.py:43
+    // return self.sold_count
+    intc_0 // 0
+    bytec_1 // "sold_count"
+    app_global_get_ex
+    assert // check self.sold_count exists
+    retsub
+
+
+// smart_contracts.ticketing.contract.Ticketing.toggle_sale() -> uint64:
+toggle_sale:
+    // smart_contracts/ticketing/contract.py:48
+    // assert Txn.sender == self.organizer, "Only organizer can toggle"
+    txn Sender
+    intc_0 // 0
+    bytec 5 // "organizer"
+    app_global_get_ex
+    assert // check self.organizer exists
+    ==
+    assert // Only organizer can toggle
+    // smart_contracts/ticketing/contract.py:49
+    // self.is_sale_active = not self.is_sale_active
+    intc_0 // 0
+    bytec_0 // "is_sale_active"
+    app_global_get_ex
+    assert // check self.is_sale_active exists
+    !
+    bytec_0 // "is_sale_active"
+    swap
+    app_global_put
+    // smart_contracts/ticketing/contract.py:50
+    // return self.is_sale_active
+    intc_0 // 0
+    bytec_0 // "is_sale_active"
+    app_global_get_ex
+    assert // check self.is_sale_active exists
+    retsub
+
+
+// smart_contracts.ticketing.contract.Ticketing.get_event_info() -> uint64, uint64, uint64, uint64:
+get_event_info:
+    // smart_contracts/ticketing/contract.py:55
+    // return self.ticket_price, self.max_supply, self.sold_count, self.is_sale_active
+    intc_0 // 0
+    bytec_2 // "ticket_price"
+    app_global_get_ex
+    assert // check self.ticket_price exists
+    intc_0 // 0
+    bytec_3 // "max_supply"
+    app_global_get_ex
+    assert // check self.max_supply exists
+    intc_0 // 0
+    bytec_1 // "sold_count"
+    app_global_get_ex
+    assert // check self.sold_count exists
+    intc_0 // 0
+    bytec_0 // "is_sale_active"
+    app_global_get_ex
+    assert // check self.is_sale_active exists
+    retsub

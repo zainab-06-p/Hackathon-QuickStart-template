@@ -1,0 +1,1905 @@
+{
+  "version": 3,
+  "sources": [
+    "../../fundraiser/contract.py"
+  ],
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAkBQ;AAAmB;AAAnB;AACA;AAAqB;AAArB;AACA;;AAAuB;;AAAvB;AACA;AAAyB;AAAzB;AACA;;AAAiB;AAAjB;AACA;;AAAe;;AAAf;AAnBR;;AAAA;;;AAAA;;;;;;;;;;;;;;;;;;;;;;AAAA;;;AAAA;;;;;;;;;;AAAA;;AAiDK;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;;AAAA;AAAA;;AAAA;;AAAA;AAAA;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AATA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAVA;;AAAA;AAAA;AAAA;;AAAA;AA9BL;;AAAA;AAAA;AAAA;AAAA;;AAAA;AAAA;AAAA;AA8BK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AATA;;AAAA;AAAA;AAAA;;AAAA;AArBL;;;AAAA;AAAA;;;AAAA;AAqBK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AArBL;;AAAA;;;;;;;;;AAqBA;;;AAGmB;AAAA;AAAA;AAAA;AAAJ;AAAP;AACA;AAAA;;AAAA;AACA;;AAAA;;AAAA;AACA;;AAAe;;AAAf;AACO;AAAP;AAER;;;AAGe;AAAA;;AAAA;AAAA;AAAP;AACO;AAAA;AAAA;AAAA;AAAqB;AAAA;AAAA;AAAA;AAArB;AAAP;AACO;;AAAA;;AAAoB;;AAApB;AAAP;AAEA;AAAA;AAAA;AAAA;AAAsB;;AAAA;;AAAtB;AAAA;AAAA;AAAA;AACO;AAAA;AAAA;AAAA;AAAP;AAKO;;AAAc;AAAA;;AAAA;AAAA;AAAd;AAAP;AACO;AAAA;AAAA;AAAA;AAAyB;AAAA;;AAAA;AAAA;AAAzB;AAAP;AAEA;AAAA;AAAA;AAAA;AAA0B;AAA1B;AAAA;AAAA;AAAA;AACO;AAAA;AAAA;AAAA;AAAP;AAKO;AAAA;AAAA;AAAA;AAAkB;AAAA;AAAA;AAAA;AAAoB;AAAA;AAAA;AAAA;AAAwB;AAAA;;AAAA;AAAA;AAArE",
+  "op_pc_offset": 0,
+  "pc_events": {
+    "1": {
+      "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.__algopy_entrypoint_with_init",
+      "params": {},
+      "block": "main",
+      "stack_in": [],
+      "op": "intcblock 0 1"
+    },
+    "5": {
+      "op": "bytecblock \"raised_amount\" \"current_milestone\" \"goal_amount\" 0x151f7c75 \"milestone_count\" \"is_active\" \"creator\""
+    },
+    "90": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "92": {
+      "op": "bnz main_after_if_else@2",
+      "stack_out": []
+    },
+    "95": {
+      "op": "bytec_2 // \"goal_amount\"",
+      "defined_out": [
+        "\"goal_amount\""
+      ],
+      "stack_out": [
+        "\"goal_amount\""
+      ]
+    },
+    "96": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "\"goal_amount\"",
+        "0"
+      ],
+      "stack_out": [
+        "\"goal_amount\"",
+        "0"
+      ]
+    },
+    "97": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "98": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "defined_out": [
+        "\"raised_amount\""
+      ],
+      "stack_out": [
+        "\"raised_amount\""
+      ]
+    },
+    "99": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "\"raised_amount\"",
+        "0"
+      ]
+    },
+    "100": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "101": {
+      "op": "bytec 4 // \"milestone_count\"",
+      "defined_out": [
+        "\"milestone_count\""
+      ],
+      "stack_out": [
+        "\"milestone_count\""
+      ]
+    },
+    "103": {
+      "op": "pushint 3 // 3",
+      "defined_out": [
+        "\"milestone_count\"",
+        "3"
+      ],
+      "stack_out": [
+        "\"milestone_count\"",
+        "3"
+      ]
+    },
+    "105": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "106": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "defined_out": [
+        "\"current_milestone\""
+      ],
+      "stack_out": [
+        "\"current_milestone\""
+      ]
+    },
+    "107": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "\"current_milestone\"",
+        "0"
+      ]
+    },
+    "108": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "109": {
+      "op": "bytec 5 // \"is_active\"",
+      "defined_out": [
+        "\"is_active\""
+      ],
+      "stack_out": [
+        "\"is_active\""
+      ]
+    },
+    "111": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "\"is_active\"",
+        "1"
+      ],
+      "stack_out": [
+        "\"is_active\"",
+        "1"
+      ]
+    },
+    "112": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "113": {
+      "op": "bytec 6 // \"creator\"",
+      "defined_out": [
+        "\"creator\""
+      ],
+      "stack_out": [
+        "\"creator\""
+      ]
+    },
+    "115": {
+      "op": "txn Sender",
+      "defined_out": [
+        "\"creator\"",
+        "new_state_value%0#0"
+      ],
+      "stack_out": [
+        "\"creator\"",
+        "new_state_value%0#0"
+      ]
+    },
+    "117": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "118": {
+      "block": "main_after_if_else@2",
+      "stack_in": [],
+      "op": "txn NumAppArgs",
+      "defined_out": [
+        "tmp%0#2"
+      ],
+      "stack_out": [
+        "tmp%0#2"
+      ]
+    },
+    "120": {
+      "op": "bz main_bare_routing@9",
+      "stack_out": []
+    },
+    "123": {
+      "op": "pushbytess 0x940c5841 0xe4c3e010 0xc221c051 0xf4723357 // method \"create_campaign(uint64,uint64)uint64\", method \"donate(pay)uint64\", method \"release_milestone()uint64\", method \"get_status()(uint64,uint64,uint64,bool)\"",
+      "defined_out": [
+        "Method(create_campaign(uint64,uint64)uint64)",
+        "Method(donate(pay)uint64)",
+        "Method(get_status()(uint64,uint64,uint64,bool))",
+        "Method(release_milestone()uint64)"
+      ],
+      "stack_out": [
+        "Method(create_campaign(uint64,uint64)uint64)",
+        "Method(donate(pay)uint64)",
+        "Method(release_milestone()uint64)",
+        "Method(get_status()(uint64,uint64,uint64,bool))"
+      ]
+    },
+    "145": {
+      "op": "txna ApplicationArgs 0",
+      "defined_out": [
+        "Method(create_campaign(uint64,uint64)uint64)",
+        "Method(donate(pay)uint64)",
+        "Method(get_status()(uint64,uint64,uint64,bool))",
+        "Method(release_milestone()uint64)",
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "Method(create_campaign(uint64,uint64)uint64)",
+        "Method(donate(pay)uint64)",
+        "Method(release_milestone()uint64)",
+        "Method(get_status()(uint64,uint64,uint64,bool))",
+        "tmp%2#0"
+      ]
+    },
+    "148": {
+      "op": "match main_create_campaign_route@5 main_donate_route@6 main_release_milestone_route@7 main_get_status_route@8",
+      "stack_out": []
+    },
+    "158": {
+      "block": "main_after_if_else@11",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "159": {
+      "op": "return",
+      "stack_out": []
+    },
+    "160": {
+      "block": "main_get_status_route@8",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%21#0"
+      ],
+      "stack_out": [
+        "tmp%21#0"
+      ]
+    },
+    "162": {
+      "op": "!",
+      "defined_out": [
+        "tmp%22#0"
+      ],
+      "stack_out": [
+        "tmp%22#0"
+      ]
+    },
+    "163": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "164": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%23#0"
+      ],
+      "stack_out": [
+        "tmp%23#0"
+      ]
+    },
+    "166": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "167": {
+      "callsub": "smart_contracts.fundraiser.contract.Fundraiser.get_status",
+      "op": "callsub get_status",
+      "defined_out": [
+        "elements_to_encode%0#0",
+        "elements_to_encode%1#0",
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%0#0",
+        "elements_to_encode%1#0",
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0"
+      ]
+    },
+    "170": {
+      "op": "uncover 3",
+      "stack_out": [
+        "elements_to_encode%1#0",
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "elements_to_encode%0#0"
+      ]
+    },
+    "172": {
+      "op": "itob",
+      "defined_out": [
+        "elements_to_encode%1#0",
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%1#0",
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0"
+      ]
+    },
+    "173": {
+      "op": "uncover 3",
+      "stack_out": [
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "elements_to_encode%1#0"
+      ]
+    },
+    "175": {
+      "op": "itob",
+      "defined_out": [
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%2#0",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0"
+      ]
+    },
+    "176": {
+      "op": "uncover 3",
+      "stack_out": [
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "elements_to_encode%2#0"
+      ]
+    },
+    "178": {
+      "op": "itob",
+      "defined_out": [
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0"
+      ]
+    },
+    "179": {
+      "op": "pushbytes 0x00",
+      "defined_out": [
+        "0x00",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0",
+        "0x00"
+      ]
+    },
+    "182": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0",
+        "0x00",
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0"
+      ],
+      "stack_out": [
+        "elements_to_encode%3#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0",
+        "0x00",
+        "0"
+      ]
+    },
+    "183": {
+      "op": "uncover 5",
+      "stack_out": [
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0",
+        "0x00",
+        "0",
+        "elements_to_encode%3#0"
+      ]
+    },
+    "185": {
+      "op": "setbit",
+      "defined_out": [
+        "encoded_bool%0#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0",
+        "encoded_bool%0#0"
+      ]
+    },
+    "186": {
+      "op": "uncover 3",
+      "stack_out": [
+        "val_as_bytes%4#0",
+        "val_as_bytes%5#0",
+        "encoded_bool%0#0",
+        "val_as_bytes%3#0"
+      ]
+    },
+    "188": {
+      "op": "uncover 3",
+      "stack_out": [
+        "val_as_bytes%5#0",
+        "encoded_bool%0#0",
+        "val_as_bytes%3#0",
+        "val_as_bytes%4#0"
+      ]
+    },
+    "190": {
+      "op": "concat",
+      "defined_out": [
+        "encoded_bool%0#0",
+        "encoded_tuple_buffer%2#0",
+        "val_as_bytes%5#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%5#0",
+        "encoded_bool%0#0",
+        "encoded_tuple_buffer%2#0"
+      ]
+    },
+    "191": {
+      "op": "uncover 2",
+      "stack_out": [
+        "encoded_bool%0#0",
+        "encoded_tuple_buffer%2#0",
+        "val_as_bytes%5#0"
+      ]
+    },
+    "193": {
+      "op": "concat",
+      "defined_out": [
+        "encoded_bool%0#0",
+        "encoded_tuple_buffer%3#0"
+      ],
+      "stack_out": [
+        "encoded_bool%0#0",
+        "encoded_tuple_buffer%3#0"
+      ]
+    },
+    "194": {
+      "op": "swap",
+      "stack_out": [
+        "encoded_tuple_buffer%3#0",
+        "encoded_bool%0#0"
+      ]
+    },
+    "195": {
+      "op": "concat",
+      "defined_out": [
+        "encoded_tuple_buffer%4#0"
+      ],
+      "stack_out": [
+        "encoded_tuple_buffer%4#0"
+      ]
+    },
+    "196": {
+      "op": "bytec_3 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "encoded_tuple_buffer%4#0"
+      ],
+      "stack_out": [
+        "encoded_tuple_buffer%4#0",
+        "0x151f7c75"
+      ]
+    },
+    "197": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "encoded_tuple_buffer%4#0"
+      ]
+    },
+    "198": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%25#0"
+      ],
+      "stack_out": [
+        "tmp%25#0"
+      ]
+    },
+    "199": {
+      "op": "log",
+      "stack_out": []
+    },
+    "200": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "201": {
+      "op": "return",
+      "stack_out": []
+    },
+    "202": {
+      "block": "main_release_milestone_route@7",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%16#0"
+      ],
+      "stack_out": [
+        "tmp%16#0"
+      ]
+    },
+    "204": {
+      "op": "!",
+      "defined_out": [
+        "tmp%17#0"
+      ],
+      "stack_out": [
+        "tmp%17#0"
+      ]
+    },
+    "205": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "206": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%18#0"
+      ],
+      "stack_out": [
+        "tmp%18#0"
+      ]
+    },
+    "208": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "209": {
+      "callsub": "smart_contracts.fundraiser.contract.Fundraiser.release_milestone",
+      "op": "callsub release_milestone",
+      "defined_out": [
+        "to_encode%2#0"
+      ],
+      "stack_out": [
+        "to_encode%2#0"
+      ]
+    },
+    "212": {
+      "op": "itob",
+      "defined_out": [
+        "val_as_bytes%2#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%2#0"
+      ]
+    },
+    "213": {
+      "op": "bytec_3 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "val_as_bytes%2#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%2#0",
+        "0x151f7c75"
+      ]
+    },
+    "214": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "val_as_bytes%2#0"
+      ]
+    },
+    "215": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%20#0"
+      ],
+      "stack_out": [
+        "tmp%20#0"
+      ]
+    },
+    "216": {
+      "op": "log",
+      "stack_out": []
+    },
+    "217": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "218": {
+      "op": "return",
+      "stack_out": []
+    },
+    "219": {
+      "block": "main_donate_route@6",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%10#0"
+      ],
+      "stack_out": [
+        "tmp%10#0"
+      ]
+    },
+    "221": {
+      "op": "!",
+      "defined_out": [
+        "tmp%11#0"
+      ],
+      "stack_out": [
+        "tmp%11#0"
+      ]
+    },
+    "222": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "223": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%12#0"
+      ],
+      "stack_out": [
+        "tmp%12#0"
+      ]
+    },
+    "225": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "226": {
+      "op": "txn GroupIndex",
+      "defined_out": [
+        "tmp%14#0"
+      ],
+      "stack_out": [
+        "tmp%14#0"
+      ]
+    },
+    "228": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1",
+        "tmp%14#0"
+      ],
+      "stack_out": [
+        "tmp%14#0",
+        "1"
+      ]
+    },
+    "229": {
+      "op": "-",
+      "defined_out": [
+        "gtxn_idx%0#0"
+      ],
+      "stack_out": [
+        "gtxn_idx%0#0"
+      ]
+    },
+    "230": {
+      "op": "dup",
+      "defined_out": [
+        "gtxn_idx%0#0",
+        "gtxn_idx%0#0 (copy)"
+      ],
+      "stack_out": [
+        "gtxn_idx%0#0",
+        "gtxn_idx%0#0 (copy)"
+      ]
+    },
+    "231": {
+      "op": "gtxns TypeEnum",
+      "defined_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type%0#0"
+      ],
+      "stack_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type%0#0"
+      ]
+    },
+    "233": {
+      "op": "intc_1 // pay",
+      "defined_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type%0#0",
+        "pay"
+      ],
+      "stack_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type%0#0",
+        "pay"
+      ]
+    },
+    "234": {
+      "op": "==",
+      "defined_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type_matches%0#0"
+      ],
+      "stack_out": [
+        "gtxn_idx%0#0",
+        "gtxn_type_matches%0#0"
+      ]
+    },
+    "235": {
+      "error": "transaction type is pay",
+      "op": "assert // transaction type is pay",
+      "stack_out": [
+        "gtxn_idx%0#0"
+      ]
+    },
+    "236": {
+      "callsub": "smart_contracts.fundraiser.contract.Fundraiser.donate",
+      "op": "callsub donate",
+      "defined_out": [
+        "to_encode%1#0"
+      ],
+      "stack_out": [
+        "to_encode%1#0"
+      ]
+    },
+    "239": {
+      "op": "itob",
+      "defined_out": [
+        "val_as_bytes%1#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%1#0"
+      ]
+    },
+    "240": {
+      "op": "bytec_3 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "val_as_bytes%1#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%1#0",
+        "0x151f7c75"
+      ]
+    },
+    "241": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "val_as_bytes%1#0"
+      ]
+    },
+    "242": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%15#0"
+      ],
+      "stack_out": [
+        "tmp%15#0"
+      ]
+    },
+    "243": {
+      "op": "log",
+      "stack_out": []
+    },
+    "244": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "245": {
+      "op": "return",
+      "stack_out": []
+    },
+    "246": {
+      "block": "main_create_campaign_route@5",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%3#0"
+      ],
+      "stack_out": [
+        "tmp%3#0"
+      ]
+    },
+    "248": {
+      "op": "!",
+      "defined_out": [
+        "tmp%4#0"
+      ],
+      "stack_out": [
+        "tmp%4#0"
+      ]
+    },
+    "249": {
+      "error": "OnCompletion is not NoOp",
+      "op": "assert // OnCompletion is not NoOp",
+      "stack_out": []
+    },
+    "250": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%5#0"
+      ],
+      "stack_out": [
+        "tmp%5#0"
+      ]
+    },
+    "252": {
+      "error": "can only call when not creating",
+      "op": "assert // can only call when not creating",
+      "stack_out": []
+    },
+    "253": {
+      "op": "txna ApplicationArgs 1",
+      "defined_out": [
+        "reinterpret_bytes[8]%0#0"
+      ],
+      "stack_out": [
+        "reinterpret_bytes[8]%0#0"
+      ]
+    },
+    "256": {
+      "op": "btoi",
+      "defined_out": [
+        "tmp%7#0"
+      ],
+      "stack_out": [
+        "tmp%7#0"
+      ]
+    },
+    "257": {
+      "op": "txna ApplicationArgs 2",
+      "defined_out": [
+        "reinterpret_bytes[8]%1#0",
+        "tmp%7#0"
+      ],
+      "stack_out": [
+        "tmp%7#0",
+        "reinterpret_bytes[8]%1#0"
+      ]
+    },
+    "260": {
+      "op": "btoi",
+      "defined_out": [
+        "tmp%7#0",
+        "tmp%8#0"
+      ],
+      "stack_out": [
+        "tmp%7#0",
+        "tmp%8#0"
+      ]
+    },
+    "261": {
+      "callsub": "smart_contracts.fundraiser.contract.Fundraiser.create_campaign",
+      "op": "callsub create_campaign",
+      "defined_out": [
+        "to_encode%0#0"
+      ],
+      "stack_out": [
+        "to_encode%0#0"
+      ]
+    },
+    "264": {
+      "op": "itob",
+      "defined_out": [
+        "val_as_bytes%0#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%0#0"
+      ]
+    },
+    "265": {
+      "op": "bytec_3 // 0x151f7c75",
+      "defined_out": [
+        "0x151f7c75",
+        "val_as_bytes%0#0"
+      ],
+      "stack_out": [
+        "val_as_bytes%0#0",
+        "0x151f7c75"
+      ]
+    },
+    "266": {
+      "op": "swap",
+      "stack_out": [
+        "0x151f7c75",
+        "val_as_bytes%0#0"
+      ]
+    },
+    "267": {
+      "op": "concat",
+      "defined_out": [
+        "tmp%9#0"
+      ],
+      "stack_out": [
+        "tmp%9#0"
+      ]
+    },
+    "268": {
+      "op": "log",
+      "stack_out": []
+    },
+    "269": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "270": {
+      "op": "return",
+      "stack_out": []
+    },
+    "271": {
+      "block": "main_bare_routing@9",
+      "stack_in": [],
+      "op": "txn OnCompletion",
+      "defined_out": [
+        "tmp%26#0"
+      ],
+      "stack_out": [
+        "tmp%26#0"
+      ]
+    },
+    "273": {
+      "op": "bnz main_after_if_else@11",
+      "stack_out": []
+    },
+    "276": {
+      "op": "txn ApplicationID",
+      "defined_out": [
+        "tmp%27#0"
+      ],
+      "stack_out": [
+        "tmp%27#0"
+      ]
+    },
+    "278": {
+      "op": "!",
+      "defined_out": [
+        "tmp%28#0"
+      ],
+      "stack_out": [
+        "tmp%28#0"
+      ]
+    },
+    "279": {
+      "error": "can only call when creating",
+      "op": "assert // can only call when creating",
+      "stack_out": []
+    },
+    "280": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "281": {
+      "op": "return",
+      "stack_out": []
+    },
+    "282": {
+      "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.create_campaign",
+      "params": {
+        "goal#0": "uint64",
+        "milestones#0": "uint64"
+      },
+      "block": "create_campaign",
+      "stack_in": [],
+      "op": "proto 2 1"
+    },
+    "285": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "286": {
+      "op": "bytec_2 // \"goal_amount\"",
+      "defined_out": [
+        "\"goal_amount\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"goal_amount\""
+      ]
+    },
+    "287": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "288": {
+      "error": "check self.goal_amount exists",
+      "op": "assert // check self.goal_amount exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "289": {
+      "op": "!",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "290": {
+      "error": "Campaign already created",
+      "op": "assert // Campaign already created",
+      "stack_out": []
+    },
+    "291": {
+      "op": "bytec_2 // \"goal_amount\"",
+      "stack_out": [
+        "\"goal_amount\""
+      ]
+    },
+    "292": {
+      "op": "frame_dig -2",
+      "defined_out": [
+        "\"goal_amount\"",
+        "goal#0 (copy)"
+      ],
+      "stack_out": [
+        "\"goal_amount\"",
+        "goal#0 (copy)"
+      ]
+    },
+    "294": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "295": {
+      "op": "bytec 4 // \"milestone_count\"",
+      "defined_out": [
+        "\"milestone_count\""
+      ],
+      "stack_out": [
+        "\"milestone_count\""
+      ]
+    },
+    "297": {
+      "op": "frame_dig -1",
+      "defined_out": [
+        "\"milestone_count\"",
+        "milestones#0 (copy)"
+      ],
+      "stack_out": [
+        "\"milestone_count\"",
+        "milestones#0 (copy)"
+      ]
+    },
+    "299": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "300": {
+      "op": "bytec 6 // \"creator\"",
+      "defined_out": [
+        "\"creator\""
+      ],
+      "stack_out": [
+        "\"creator\""
+      ]
+    },
+    "302": {
+      "op": "txn Sender",
+      "defined_out": [
+        "\"creator\"",
+        "new_state_value%0#0"
+      ],
+      "stack_out": [
+        "\"creator\"",
+        "new_state_value%0#0"
+      ]
+    },
+    "304": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "305": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1"
+      ],
+      "stack_out": [
+        "1"
+      ]
+    },
+    "306": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "307": {
+      "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.donate",
+      "params": {
+        "payment#0": "uint64"
+      },
+      "block": "donate",
+      "stack_in": [],
+      "op": "proto 1 1"
+    },
+    "310": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "311": {
+      "op": "bytec 5 // \"is_active\"",
+      "defined_out": [
+        "\"is_active\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"is_active\""
+      ]
+    },
+    "313": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "314": {
+      "error": "check self.is_active exists",
+      "op": "assert // check self.is_active exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "315": {
+      "error": "Campaign not active",
+      "op": "assert // Campaign not active",
+      "stack_out": []
+    },
+    "316": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "317": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "defined_out": [
+        "\"raised_amount\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"raised_amount\""
+      ]
+    },
+    "318": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%1#0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_exists%1#0"
+      ]
+    },
+    "319": {
+      "error": "check self.raised_amount exists",
+      "op": "assert // check self.raised_amount exists",
+      "stack_out": [
+        "maybe_value%1#0"
+      ]
+    },
+    "320": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "maybe_value%1#0",
+        "0"
+      ]
+    },
+    "321": {
+      "op": "bytec_2 // \"goal_amount\"",
+      "defined_out": [
+        "\"goal_amount\"",
+        "0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "0",
+        "\"goal_amount\""
+      ]
+    },
+    "322": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%2#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_exists%2#0"
+      ]
+    },
+    "323": {
+      "error": "check self.goal_amount exists",
+      "op": "assert // check self.goal_amount exists",
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ]
+    },
+    "324": {
+      "op": "<",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "325": {
+      "error": "Goal already reached",
+      "op": "assert // Goal already reached",
+      "stack_out": []
+    },
+    "326": {
+      "op": "frame_dig -1",
+      "defined_out": [
+        "payment#0 (copy)"
+      ],
+      "stack_out": [
+        "payment#0 (copy)"
+      ]
+    },
+    "328": {
+      "op": "gtxns Receiver",
+      "defined_out": [
+        "tmp%1#0"
+      ],
+      "stack_out": [
+        "tmp%1#0"
+      ]
+    },
+    "330": {
+      "op": "global CurrentApplicationAddress",
+      "defined_out": [
+        "tmp%1#0",
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "tmp%1#0",
+        "tmp%2#0"
+      ]
+    },
+    "332": {
+      "op": "==",
+      "defined_out": [
+        "tmp%3#0"
+      ],
+      "stack_out": [
+        "tmp%3#0"
+      ]
+    },
+    "333": {
+      "op": "assert",
+      "stack_out": []
+    },
+    "334": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "335": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "stack_out": [
+        "0",
+        "\"raised_amount\""
+      ]
+    },
+    "336": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%3#0",
+        "maybe_value%3#0"
+      ],
+      "stack_out": [
+        "maybe_value%3#0",
+        "maybe_exists%3#0"
+      ]
+    },
+    "337": {
+      "error": "check self.raised_amount exists",
+      "op": "assert // check self.raised_amount exists",
+      "stack_out": [
+        "maybe_value%3#0"
+      ]
+    },
+    "338": {
+      "op": "frame_dig -1",
+      "stack_out": [
+        "maybe_value%3#0",
+        "payment#0 (copy)"
+      ]
+    },
+    "340": {
+      "op": "gtxns Amount",
+      "defined_out": [
+        "maybe_value%3#0",
+        "tmp%4#0"
+      ],
+      "stack_out": [
+        "maybe_value%3#0",
+        "tmp%4#0"
+      ]
+    },
+    "342": {
+      "op": "+",
+      "defined_out": [
+        "new_state_value%0#0"
+      ],
+      "stack_out": [
+        "new_state_value%0#0"
+      ]
+    },
+    "343": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "stack_out": [
+        "new_state_value%0#0",
+        "\"raised_amount\""
+      ]
+    },
+    "344": {
+      "op": "swap",
+      "stack_out": [
+        "\"raised_amount\"",
+        "new_state_value%0#0"
+      ]
+    },
+    "345": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "346": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "347": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "stack_out": [
+        "0",
+        "\"raised_amount\""
+      ]
+    },
+    "348": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%4#0",
+        "maybe_value%4#0"
+      ],
+      "stack_out": [
+        "maybe_value%4#0",
+        "maybe_exists%4#0"
+      ]
+    },
+    "349": {
+      "error": "check self.raised_amount exists",
+      "op": "assert // check self.raised_amount exists",
+      "stack_out": [
+        "maybe_value%4#0"
+      ]
+    },
+    "350": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "351": {
+      "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.release_milestone",
+      "params": {},
+      "block": "release_milestone",
+      "stack_in": [],
+      "op": "txn Sender",
+      "defined_out": [
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0"
+      ]
+    },
+    "353": {
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "0"
+      ]
+    },
+    "354": {
+      "op": "bytec 6 // \"creator\"",
+      "defined_out": [
+        "\"creator\"",
+        "0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "0",
+        "\"creator\""
+      ]
+    },
+    "356": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0",
+        "tmp%0#0"
+      ],
+      "stack_out": [
+        "tmp%0#0",
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "357": {
+      "error": "check self.creator exists",
+      "op": "assert // check self.creator exists",
+      "stack_out": [
+        "tmp%0#0",
+        "maybe_value%0#0"
+      ]
+    },
+    "358": {
+      "op": "==",
+      "defined_out": [
+        "tmp%1#0"
+      ],
+      "stack_out": [
+        "tmp%1#0"
+      ]
+    },
+    "359": {
+      "error": "Only creator can release",
+      "op": "assert // Only creator can release",
+      "stack_out": []
+    },
+    "360": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "361": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "defined_out": [
+        "\"current_milestone\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"current_milestone\""
+      ]
+    },
+    "362": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%1#0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_exists%1#0"
+      ]
+    },
+    "363": {
+      "error": "check self.current_milestone exists",
+      "op": "assert // check self.current_milestone exists",
+      "stack_out": [
+        "maybe_value%1#0"
+      ]
+    },
+    "364": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "maybe_value%1#0",
+        "0"
+      ]
+    },
+    "365": {
+      "op": "bytec 4 // \"milestone_count\"",
+      "defined_out": [
+        "\"milestone_count\"",
+        "0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "0",
+        "\"milestone_count\""
+      ]
+    },
+    "367": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%2#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ],
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_exists%2#0"
+      ]
+    },
+    "368": {
+      "error": "check self.milestone_count exists",
+      "op": "assert // check self.milestone_count exists",
+      "stack_out": [
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ]
+    },
+    "369": {
+      "op": "<",
+      "defined_out": [
+        "tmp%2#0"
+      ],
+      "stack_out": [
+        "tmp%2#0"
+      ]
+    },
+    "370": {
+      "error": "All milestones completed",
+      "op": "assert // All milestones completed",
+      "stack_out": []
+    },
+    "371": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "372": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "stack_out": [
+        "0",
+        "\"current_milestone\""
+      ]
+    },
+    "373": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%3#0",
+        "maybe_value%3#0"
+      ],
+      "stack_out": [
+        "maybe_value%3#0",
+        "maybe_exists%3#0"
+      ]
+    },
+    "374": {
+      "error": "check self.current_milestone exists",
+      "op": "assert // check self.current_milestone exists",
+      "stack_out": [
+        "maybe_value%3#0"
+      ]
+    },
+    "375": {
+      "op": "intc_1 // 1",
+      "defined_out": [
+        "1",
+        "maybe_value%3#0"
+      ],
+      "stack_out": [
+        "maybe_value%3#0",
+        "1"
+      ]
+    },
+    "376": {
+      "op": "+",
+      "defined_out": [
+        "new_state_value%0#0"
+      ],
+      "stack_out": [
+        "new_state_value%0#0"
+      ]
+    },
+    "377": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "stack_out": [
+        "new_state_value%0#0",
+        "\"current_milestone\""
+      ]
+    },
+    "378": {
+      "op": "swap",
+      "stack_out": [
+        "\"current_milestone\"",
+        "new_state_value%0#0"
+      ]
+    },
+    "379": {
+      "op": "app_global_put",
+      "stack_out": []
+    },
+    "380": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "0"
+      ]
+    },
+    "381": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "stack_out": [
+        "0",
+        "\"current_milestone\""
+      ]
+    },
+    "382": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%4#0",
+        "maybe_value%4#0"
+      ],
+      "stack_out": [
+        "maybe_value%4#0",
+        "maybe_exists%4#0"
+      ]
+    },
+    "383": {
+      "error": "check self.current_milestone exists",
+      "op": "assert // check self.current_milestone exists",
+      "stack_out": [
+        "maybe_value%4#0"
+      ]
+    },
+    "384": {
+      "retsub": true,
+      "op": "retsub"
+    },
+    "385": {
+      "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.get_status",
+      "params": {},
+      "block": "get_status",
+      "stack_in": [],
+      "op": "intc_0 // 0",
+      "defined_out": [
+        "0"
+      ],
+      "stack_out": [
+        "0"
+      ]
+    },
+    "386": {
+      "op": "bytec_2 // \"goal_amount\"",
+      "defined_out": [
+        "\"goal_amount\"",
+        "0"
+      ],
+      "stack_out": [
+        "0",
+        "\"goal_amount\""
+      ]
+    },
+    "387": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%0#0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_exists%0#0"
+      ]
+    },
+    "388": {
+      "error": "check self.goal_amount exists",
+      "op": "assert // check self.goal_amount exists",
+      "stack_out": [
+        "maybe_value%0#0"
+      ]
+    },
+    "389": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "maybe_value%0#0",
+        "0"
+      ]
+    },
+    "390": {
+      "op": "bytec_0 // \"raised_amount\"",
+      "defined_out": [
+        "\"raised_amount\"",
+        "0",
+        "maybe_value%0#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "0",
+        "\"raised_amount\""
+      ]
+    },
+    "391": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%1#0",
+        "maybe_value%0#0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_exists%1#0"
+      ]
+    },
+    "392": {
+      "error": "check self.raised_amount exists",
+      "op": "assert // check self.raised_amount exists",
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0"
+      ]
+    },
+    "393": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "0"
+      ]
+    },
+    "394": {
+      "op": "bytec_1 // \"current_milestone\"",
+      "defined_out": [
+        "\"current_milestone\"",
+        "0",
+        "maybe_value%0#0",
+        "maybe_value%1#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "0",
+        "\"current_milestone\""
+      ]
+    },
+    "395": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%2#0",
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_exists%2#0"
+      ]
+    },
+    "396": {
+      "error": "check self.current_milestone exists",
+      "op": "assert // check self.current_milestone exists",
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ]
+    },
+    "397": {
+      "op": "intc_0 // 0",
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "0"
+      ]
+    },
+    "398": {
+      "op": "bytec 5 // \"is_active\"",
+      "defined_out": [
+        "\"is_active\"",
+        "0",
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "0",
+        "\"is_active\""
+      ]
+    },
+    "400": {
+      "op": "app_global_get_ex",
+      "defined_out": [
+        "maybe_exists%3#0",
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_value%3#0"
+      ],
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_value%3#0",
+        "maybe_exists%3#0"
+      ]
+    },
+    "401": {
+      "error": "check self.is_active exists",
+      "op": "assert // check self.is_active exists",
+      "stack_out": [
+        "maybe_value%0#0",
+        "maybe_value%1#0",
+        "maybe_value%2#0",
+        "maybe_value%3#0"
+      ]
+    },
+    "402": {
+      "retsub": true,
+      "op": "retsub"
+    }
+  }
+}

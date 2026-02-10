@@ -1,7 +1,7 @@
 import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { useEffect, useState } from 'react'
-import { CounterClient } from '../contracts/Counter'
+import { CounterClient, CounterFactory } from '../contracts/Counter'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 
@@ -12,9 +12,8 @@ interface AppCallsInterface {
 
 const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
   const [loading, setLoading] = useState<boolean>(false)
-  // Fixed deployed application ID so users don't need to deploy repeatedly
-  const FIXED_APP_ID = 747652603
-  const [appId, setAppId] = useState<number | null>(FIXED_APP_ID)
+  const [deploying, setDeploying] = useState<boolean>(false)
+  const [appId, setAppId] = useState<number | null>(null)
   const [currentCount, setCurrentCount] = useState<number>(0)
   const { enqueueSnackbar } = useSnackbar()
   const { activeAccount, activeAddress, transactionSigner: TransactionSigner } = useWallet()
@@ -47,33 +46,26 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
     }
   }
 
-  // Deploy function kept for future use; commented out per request
-  // const [deploying, setDeploying] = useState<boolean>(false)
-  // const deployContract = async () => {
-  //   setDeploying(true)
-  //   try {
-  //     const factory = new CounterFactory({
-  //       defaultSender: activeAddress ?? undefined,
-  //       algorand,
-  //     })
-  //     // Deploy multiple addresses with the same contract
-  //     const deployResult = await factory.send.create.bare()
-  //     // If you want idempotent deploy from one address
-  //     // const deployResult = await factory.deploy({
-  //     //   onSchemaBreak: OnSchemaBreak.AppendApp,
-  //     //   onUpdate: OnUpdate.AppendApp,
-  //     // })
-  //     const deployedAppId = Number(deployResult.appClient.appId)
-  //     setAppId(deployedAppId)
-  //     const count = await fetchCount(deployedAppId)
-  //     setCurrentCount(count)
-  //     enqueueSnackbar(`Contract deployed with App ID: ${deployedAppId}. Initial count: ${count}`, { variant: 'success' })
-  //   } catch (e) {
-  //     enqueueSnackbar(`Error deploying contract: ${(e as Error).message}`, { variant: 'error' })
-  //   } finally {
-  //     setDeploying(false)
-  //   }
-  // }
+  const deployContract = async () => {
+    setDeploying(true)
+    try {
+      const factory = new CounterFactory({
+        defaultSender: activeAddress ?? undefined,
+        algorand,
+      })
+      // Deploy multiple addresses with the same contract
+      const deployResult = await factory.send.create.bare()
+      const deployedAppId = Number(deployResult.appClient.appId)
+      setAppId(deployedAppId)
+      const count = await fetchCount(deployedAppId)
+      setCurrentCount(count)
+      enqueueSnackbar(`Contract deployed with App ID: ${deployedAppId}. Initial count: ${count}`, { variant: 'success' })
+    } catch (e) {
+      enqueueSnackbar(`Error deploying contract: ${(e as Error).message}`, { variant: 'error' })
+    } finally {
+      setDeploying(false)
+    }
+  }
 
   // Auto-load current count for the fixed app ID
   useEffect(() => {
@@ -132,20 +124,18 @@ const AppCalls = ({ openModal, setModalState }: AppCallsInterface) => {
             </div>
           )}
           
-          {/*
           <div className="flex flex-col gap-2">
             <button 
               className={`btn btn-primary ${deploying ? 'loading' : ''}`}
               onClick={deployContract}
-              disabled={deploying || loading}
+              disabled={deploying || loading || !activeAccount}
             >
-              {deploying ? 'Deploying...' : 'Deploy Contract'}
+              {deploying ? 'Deploying...' : 'Deploy Counter Contract'}
             </button>
-            <p className="text-sm">Run this once to deploy the contract</p>
+            <p className="text-sm">Deploy a new counter contract to LocalNet</p>
           </div>
           
           <div className="divider">OR</div>
-          */}
           
           <div className="flex flex-col gap-2">
             <button 

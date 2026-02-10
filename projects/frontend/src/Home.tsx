@@ -8,6 +8,8 @@ import MintNFT from './components/MintNFT'
 import CreateASA from './components/CreateASA'
 import AssetOptIn from './components/AssetOptIn'
 import Bank from './components/Bank'
+import Fundraiser from './components/Fundraiser'
+import Ticketing from './components/Ticketing'
 
 interface HomeProps {}
 
@@ -19,6 +21,8 @@ const Home: React.FC<HomeProps> = () => {
   const [createAsaModal, setCreateAsaModal] = useState<boolean>(false)
   const [assetOptInModal, setAssetOptInModal] = useState<boolean>(false)
   const [bankModal, setBankModal] = useState<boolean>(false)
+  const [fundraiserModal, setFundraiserModal] = useState<boolean>(false)
+  const [ticketingModal, setTicketingModal] = useState<boolean>(false)
   const { activeAddress } = useWallet()
 
   const toggleWalletModal = () => {
@@ -91,7 +95,7 @@ const Home: React.FC<HomeProps> = () => {
 
             <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl md:col-span-2 lg:col-span-1">
               <div className="card-body">
-                <h2 className="card-title">Counter (App ID 747652603)</h2>
+                <h2 className="card-title">Counter</h2>
                 <p>Interact with the shared on-chain counter app.</p>
                 <div className="card-actions justify-end">
                   <button
@@ -115,6 +119,26 @@ const Home: React.FC<HomeProps> = () => {
                 </div>
               </div>
             </div>
+
+            <div className="card bg-gradient-to-br from-purple-500 to-violet-500 text-white shadow-xl md:col-span-2 lg:col-span-1">
+              <div className="card-body">
+                <h2 className="card-title">🏦 Campus Fundraiser</h2>
+                <p>Milestone-based crowdfunding for campus activities</p>
+                <div className="card-actions justify-end">
+                  <button className="btn btn-outline" disabled={!activeAddress} onClick={() => setFundraiserModal(true)}>Open</button>
+                </div>
+              </div>
+            </div>
+
+            <div className="card bg-gradient-to-br from-blue-600 to-cyan-600 text-white shadow-xl md:col-span-2 lg:col-span-1">
+              <div className="card-body">
+                <h2 className="card-title">🎫 Event Ticketing</h2>
+                <p>Blockchain tickets with anti-scalping protection</p>
+                <div className="card-actions justify-end">
+                  <button className="btn btn-outline" disabled={!activeAddress} onClick={() => setTicketingModal(true)}>Open</button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -126,6 +150,8 @@ const Home: React.FC<HomeProps> = () => {
       <CreateASA openModal={createAsaModal} closeModal={() => setCreateAsaModal(false)} />
       <AssetOptIn openModal={assetOptInModal} closeModal={() => setAssetOptInModal(false)} />
       <Bank openModal={bankModal} closeModal={() => setBankModal(false)} />
+      <Fundraiser openModal={fundraiserModal} setModalState={setFundraiserModal} />
+      <Ticketing openModal={ticketingModal} setModalState={setTicketingModal} />
     </div>
   )
 }
