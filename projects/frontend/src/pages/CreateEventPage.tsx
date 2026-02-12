@@ -94,8 +94,8 @@ const CreateEventPage = () => {
 
       // Check account balance before deployment
       const accountInfo = await algorand.client.algod.accountInformation(activeAddress).do()
-      const balance = accountInfo.amount
-      const minBalance = accountInfo['min-balance']
+      const balance = Number(accountInfo.amount)
+      const minBalance = Number(accountInfo.minBalance)
       
       if (balance < minBalance + 1000000) {
         enqueueSnackbar(

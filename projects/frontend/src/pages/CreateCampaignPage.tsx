@@ -84,8 +84,8 @@ const CreateCampaignPage = () => {
 
       // Check account balance first
       const accountInfo = await algorand.client.algod.accountInformation(activeAddress).do()
-      const balance = accountInfo.amount
-      const minBalance = accountInfo['min-balance']
+      const balance = Number(accountInfo.amount)
+      const minBalance = Number(accountInfo.minBalance)
       
       if (balance < minBalance + 1000000) { // Need at least 1 ALGO extra for contract creation
         enqueueSnackbar(
