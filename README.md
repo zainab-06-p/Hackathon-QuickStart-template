@@ -231,20 +231,22 @@ Compiled contracts output to `smart_contracts/artifacts/`
 
 ### Project Structure
 ```
-projects/
-â”œâ”€â”€ contracts/                # Smart contract code
-â”‚   â”œâ”€â”€ smart_contracts/
-â”‚   â”‚   â”œâ”€â”€ fundraiser/      # Fundraising contract
-â”‚   â”‚   â”œâ”€â”€ ticketing/       # Ticketing contract
-â”‚   â”‚   â””â”€â”€ bank/            # Banking contract
-â”‚   â””â”€â”€ pyproject.toml
-â”œâ”€â”€ frontend/                 # React application
-â”‚   â”œâ”€â”€ src/
-â”‚   â”‚   â”œâ”€â”€ pages/           # Route components
-â”‚   â”‚   â”œâ”€â”€ components/      # Reusable UI components
-â”‚   â”‚   â”œâ”€â”€ contracts/       # Generated TypeScript clients
-â”‚   â”‚   â””â”€â”€ utils/           # Helper functions
-â”‚   â””â”€â”€ package.json
+CampusChain/
+  projects/
+    contracts/                        # Smart contracts (Python)
+      smart_contracts/
+        fundraiser/                    # Fundraising contract
+        ticketing/                     # Ticketing contract
+        bank/                          # Banking contract
+      pyproject.toml
+    
+    frontend/                          # React application
+      src/
+        pages/                         # Route components
+        components/                    # Reusable UI components
+        contracts/                     # Generated TypeScript clients
+        utils/                         # Helper functions
+      package.json
 ```
 
 ### Key Frontend Files
@@ -367,3 +369,5 @@ For questions or issues:
 ---
 
 **Built with â¤ï¸ on Algorand blockchain**
+
+
