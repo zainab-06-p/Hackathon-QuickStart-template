@@ -140,24 +140,6 @@ const FederationPage = () => {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Demo Mode Notice */}
-        <div className="alert alert-warning shadow-lg mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" className="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-          <div>
-            <h3 className="font-bold">🎭 Demonstration Mode - Mock Data</h3>
-            <div className="text-sm">
-              This page demonstrates <strong>Cross-Campus Federation</strong> with simulated events (VIT+MIT+SRM+SASTRA partnerships). 
-              In production, this would deploy:
-              <ul className="list-disc list-inside mt-1 ml-4">
-                <li>Multi-signature contracts for shared funding pools</li>
-                <li>Portable reputation tracking across college networks</li>
-                <li>Cross-campus event ticketing and verification</li>
-              </ul>
-              <p className="mt-2 font-semibold">✅ Individual campaigns/events are LIVE with REAL contracts. Federation layer is conceptual UI.</p>
-            </div>
-          </div>
-        </div>
-
         {/* Info Banner */}
         <div className="alert bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-2xl mb-8">
           <div>

@@ -46,7 +46,7 @@ const Home: React.FC<HomeProps> = () => {
       <div className="flex items-center justify-center min-h-screen px-4">
         <div className="backdrop-blur-xl bg-white/80 rounded-3xl p-10 shadow-2xl max-w-6xl w-full border-4 border-white/50 hover:border-purple-300 transition-all duration-500">
           <h1 className="text-5xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-4 text-center animate-pulse">
-            ⛓️ Algorand Workshop
+            CampusChain: Simple Campus Finance on Algorand
           </h1>
           <p className="text-gray-700 mb-10 text-center text-xl font-semibold">Blockchain operations, decentralized and powerful. 🚀</p>
 
