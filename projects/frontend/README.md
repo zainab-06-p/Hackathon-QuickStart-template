@@ -1,124 +1,369 @@
-# OnChain-Counter-frontend
+# CampusChain: Simple Campus Finance on Algorand
 
-This starter React project has been generated using AlgoKit. See below for default getting started instructions.
+**A decentralized platform for campus fundraising, event ticketing, and financial governance powered by Algorand blockchain.**
 
-# Setup
+CampusChain revolutionizes how campus communities manage finances, organize events, and collaborate across institutions. Built with fully decentralized smart contracts, every campaign and event exists as its own on-chain application - no central database, no intermediaries.
 
-### Initial Setup
+---
 
-#### 1. Clone the Repository
-Start by cloning this repository to your local machine.
+## 🎯 Key Features
 
-#### 2. Install Pre-requisites
-Ensure the following pre-requisites are installed and properly configured:
+### 1. **Milestone-Based Fundraising** 
+Create crowdfunding campaigns with goal-based fund release. Funds are locked in smart contracts and released ONLY when fundraising goals are met, ensuring accountability and trust.
 
-- **npm**: Node package manager. Install from [Node.js Installation Guide](https://nodejs.org/en/download/). Verify with `npm -v` to see version `18.12`+.
-- **AlgoKit CLI**: Essential for project setup and operations. Install the latest version from [AlgoKit CLI Installation Guide](https://github.com/algorandfoundation/algokit-cli#install). Verify installation with `algokit --version`, expecting `2.0.0` or later.
+- **Goal Tracking**: Set target amounts and deadlines
+- **Milestone Unlocking**: Release funds in stages as milestones complete
+- **Transparent Donations**: All contributions tracked on-chain
+- **Real-time Updates**: Live progress tracking via blockchain state
 
-#### 3. Bootstrap Your Local Environment
-Run the following commands within the project folder:
+### 2. **NFT Event Ticketing**
+Blockchain-powered event tickets as NFTs with built-in verification and anti-scalping features.
 
-- **Install Project Dependencies**: With `algokit project bootstrap all`, ensure all dependencies are ready.
+- **NFT Minting**: Each ticket is a unique Algorand Standard Asset (ASA)
+- **QR Code Verification**: Scan tickets at entry with built-in authenticity checks
+- **Anti-Double-Entry**: Box storage prevents ticket reuse
+- **Transferable**: Tickets can be traded on secondary markets
+- **On-Chain Ownership**: Provable ticket ownership
 
-### Development Workflow
+### 3. **Federation & Cross-Campus DAO**
+Multi-university governance system for collaborative initiatives and resource sharing.
 
-#### Terminal
-Directly manage and interact with your project using AlgoKit commands:
+- **University Network**: Connect multiple campuses in one ecosystem
+- **Shared Treasuries**: Pool resources for inter-campus projects
+- **Voting Rights**: Token-weighted governance proposals
+- **Impact Metrics**: Track cross-campus collaboration
 
-1. **Build Contracts**: `algokit project run build` builds react web app and links with smart contracts in workspace, if any.
-2. Remaining set of command for linting, testing and deployment can be found in respective [package.json](./package.json) file and [.algokit.toml](./.algokit.toml) files.
+### 4. **Reputation System** (Concept UI)
+Machine learning-driven reputation scoring based on on-chain activity.
 
-#### VS Code
-For a seamless experience with breakpoint debugging and other features:
+- **Trust Scores**: Build reputation through successful campaigns
+- **Predictive Analytics**: Success probability calculations
+- **Tiered Benefits**: Unlock features based on reputation level
+- **Historical Tracking**: Comprehensive activity dashboard
 
-1. **Open Project**: In VS Code, open the repository root.
-2. **Install Extensions**: Follow prompts to install recommended extensions.
-3. **Debugging**:
-   - Use `F5` to start debugging.
-   - **Windows Users**: Select the Python interpreter at `./.venv/Scripts/python.exe` via `Ctrl/Cmd + Shift + P` > `Python: Select Interpreter` before the first run.
+### 5. **NFT Evolution System** (Gamification)
+Pokémon-style leveling system where campus participation NFTs evolve over time.
 
-#### Other IDEs
-While primarily optimized for VS Code, Jetbrains WebStorm has base support for this project:
+- **XP Points**: Earn experience through platform activities
+- **Tier Progression**: Bronze → Silver → Gold → Platinum → Diamond
+- **Visual Evolution**: NFT artwork changes with levels
+- **Achievement Badges**: Unlock special NFTs for milestones
 
-1. **Open Project**: In your JetBrains IDE, open the repository root.
-2. **Automatic Setup**: The IDE should configure the Python interpreter and virtual environment.
-3. **Debugging**: Use `Shift+F10` or `Ctrl+R` to start debugging. Note: Windows users may encounter issues with pre-launch tasks due to a known bug. See [JetBrains forums](https://youtrack.jetbrains.com/issue/IDEA-277486/Shell-script-configuration-cannot-run-as-before-launch-task) for workarounds.
+---
 
-## AlgoKit Workspaces and Project Management
-This project supports both standalone and monorepo setups through AlgoKit workspaces. Leverage [`algokit project run`](https://github.com/algorandfoundation/algokit-cli/blob/main/docs/features/project/run.md) commands for efficient monorepo project orchestration and management across multiple projects within a workspace.
+## 🏗️ Architecture
 
-> Please note, by default frontend is pre configured to run against Algorand LocalNet. If you want to run against TestNet or MainNet, comment out the current environment variable and uncomment the relevant one in [`.env`](.env) file that is created after running bootstrap command and based on [`.env.template`](.env.template).
+### Fully Decentralized Design
+Unlike traditional platforms, CampusChain deploys **separate smart contract instances** for each campaign and event:
 
-### Continuous Integration
+```
+Create Campaign → Deploy New Contract → Unique App ID
+Create Event → Deploy New Contract → Unique App ID
+```
 
-This project uses [GitHub Actions](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions) to define CI workflows, which are located in the [.github/workflows](`../../.github/workflows`) folder.
+**Benefits:**
+- ✅ No central point of failure
+- ✅ Each creator owns their contract
+- ✅ Permissionless participation
+- ✅ Immutable transaction history
+- ✅ Transparent fund management
 
-For pull requests and pushes to `main` branch against this repository the following checks are automatically performed by GitHub Actions:
+### Smart Contracts (Python/PyTeal)
 
-- `install`: Installs dependencies using `npm`
-- `lint`: Lints the codebase using `ESLint`
-- `build`: Builds the codebase using `vite`
+**Fundraiser Contract** (`smart_contracts/fundraiser/contract.py`)
+- Goal-based fund locking
+- Milestone release mechanism
+- Contributor tracking
+- Automatic refunds if goal not met
 
-> Please note, if you instantiated the project via `algokit init` without explicitly specifying the `--no-workspace` flag, we will automatically attempt to move the contents of the `.github` folder to the root of the workspace.
+**Ticketing Contract** (`smart_contracts/ticketing/contract.py`)
+- NFT ticket minting (ASA creation)
+- Box storage for check-in status
+- Entry verification logic
+- Sales toggle functionality
 
-### Continuous Deployment
+**Bank Contract** (`smart_contracts/bank/contract.py`)
+- Escrow deposits/withdrawals
+- Transaction ledger
+- Multi-user account system
 
-The project template provides base Github Actions workflows for continuous deployment to [Netlify](https://www.netlify.com/) or [Vercel](https://vercel.com/). These workflows are located in the [`.github/workflows`](./.github/workflows) folder.
+---
 
-**Please note**: when configuring the github repository for the first time. Depending on selected provider you will need to set the provider secrets in the repository settings. Default setup provided by the template allows you to manage the secrets via environment variables and secrets on your github repository.
+## 🛠️ Tech Stack
 
+**Frontend:**
+- React 18 + TypeScript
+- Tailwind CSS + DaisyUI
+- Vite build system
+- React Router v7
 
-#### Setting up environment variables and secrets for webapp deployment
+**Blockchain:**
+- Algorand TestNet
+- AlgoKit Utils for transaction building
+- algosdk for cryptographic operations
+- Multiple wallet support (Pera, Defly, Exodus, Daffi)
 
-For Vercel:
-1. Retrieve your [Vercel Access Token](https://vercel.com/support/articles/how-do-i-use-a-vercel-api-access-token)
-2. Install the [Vercel CLI](https://vercel.com/cli) and run `vercel login`
-3. Inside your folder, run `vercel link` to create a new Vercel project
-4. Inside the generated `.vercel` folder, save the `projectId` and `orgId` from the `project.json`
-5. Inside GitHub, add `VERCEL_TOKEN`, `VERCEL_ORG_ID`, and `VERCEL_PROJECT_ID` as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
-6. Create an .env file containing ENV vars for the project (pointing to testnet or mainnet), drag and drop the .env file to upload initial batch of default environment variables to your vercel project.
-7. Upon invocation, CD pipeline will pull the VITE_ prefixed environment variables, build the project and deploy to the specified environment.
+**Smart Contracts:**
+- Python + AlgoPy framework
+- ARC-4 compliant ABIs
+- Box storage for state management
+- Atomic transaction compositions
 
-For Netlify:
-1. Retrieve your [Netlify Access Token](https://docs.netlify.com/cli/get-started/#obtain-a-token-in-the-netlify-ui)
-2. Inside your folder run `netlify login`
-3. Inside your folder run `netlify sites:create` to create a new site, obtain NETLIFY_SITE_ID from the output
-4. Inside GitHub, add `NETLIFY_AUTH_TOKEN` and `NETLIFY_SITE_ID` as [secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets).
-5. Define the VITE_ prefixed environment variables in netlify environment variables under site settings.
-6. Upon invocation, CD pipeline will build the project and deploy to the specified environment.
+**Deployment:**
+- Vercel hosting
+- Public Algorand nodes (AlgoNode)
+- Environment-based configuration
 
-> If you prefer alternative deployment methods, you can modify the relevant workflow files from the [`.github/workflows`](./.github/workflows) folder or modify deploy scripts in `.algokit.toml`.
+---
 
+## 🚀 Quick Start
 
-# Algorand Wallet integrations
+### Prerequisites
+- Node.js 18+
+- AlgoKit CLI (`npm install -g @algorandfoundation/algokit`)
+- Algorand wallet (Pera recommended)
+- TestNet ALGO (free from [dispenser](https://bank.testnet.algorand.network/))
 
-The template comes with [`use-wallet`](https://github.com/txnlab/use-wallet) integration, which provides a React hook for connecting to an Algorand wallet providers. The following wallet providers are included by default:
-- LocalNet:
-- - [KMD/Local Wallet](https://github.com/TxnLab/use-wallet#kmd-algorand-key-management-daemon) - Algorand's Key Management Daemon (KMD) is a service that manages Algorand private keys and signs transactions. Works best with AlgoKit LocalNet and allows you to easily test and interact with your dApps locally.
-- TestNet and others:
-- - [Pera Wallet](https://perawallet.app).
-- - [Defly Wallet](https://defly.app).
-- - [Exodus Wallet](https://www.exodus.com).
-- - [Daffi Wallet](https://www.daffi.me).
+### Installation
 
-Refer to official [`use-wallet`](https://github.com/txnlab/use-wallet) documentation for detailed guidelines on how to integrate with other wallet providers (such as WalletConnect v2). Too see implementation details on the use wallet hook and initialization of extra wallet providers refer to [`App.tsx`](./src/App.tsx).
+1. **Clone Repository**
+```bash
+git clone <your-repo-url>
+cd Hackathon-QuickStart-template
+```
 
-# Tools
+2. **Install Dependencies**
+```bash
+# Boostrap entire workspace (contracts + frontend)
+algokit project bootstrap all
 
-This project makes use of React and Tailwind to provider a base project configuration to develop frontends for your Algorand dApps and interactions with smart contracts. The following tools are in use:
+# Or install frontend only
+cd projects/frontend
+npm install
+```
 
-- [AlgoKit Utils](https://github.com/algorandfoundation/algokit-utils-ts) - Various TypeScript utilities to simplify interactions with Algorand and AlgoKit.
-- [React](https://reactjs.org/) - A JavaScript library for building user interfaces.
-- [Tailwind CSS](https://tailwindcss.com/) - A utility-first CSS framework for rapidly building custom designs.
-- [daisyUI](https://daisyui.com/) - A component library for Tailwind CSS.
-- [use-wallet](https://github.com/txnlab/use-wallet) - A React hook for connecting to an Algorand wallet providers.
-- [npm](https://www.npmjs.com/): Node.js package manager
-- [jest](https://jestjs.io/): JavaScript testing framework
-- [playwright](https://playwright.dev/): Browser automation library
-- [Prettier](https://prettier.io/): Opinionated code formatter
-- [ESLint](https://eslint.org/): Tool for identifying and reporting on patterns in JavaScript
-- Github Actions workflows for build validation
-It has also been configured to have a productive dev experience out of the box in [VS Code](https://code.visualstudio.com/), see the [.vscode](./.vscode) folder.
-# Integrating with smart contracts and application clients
+3. **Environment Setup**
+Create `projects/frontend/.env`:
+```env
+VITE_ENVIRONMENT=testnet
+VITE_ALGOD_SERVER=https://testnet-api.algonode.cloud
+VITE_ALGOD_PORT=
+VITE_ALGOD_TOKEN=
+VITE_ALGOD_NETWORK=testnet
+VITE_INDEXER_SERVER=https://testnet-idx.algonode.cloud
+VITE_INDEXER_PORT=
+VITE_INDEXER_TOKEN=
+```
 
-Refer to the detailed guidance on [integrating with smart contracts and application clients](./src/contracts/README.md). In essence, for any smart contract codebase generated with AlgoKit or other tools that produce compile contracts into ARC34 compliant app specifications, you can use the `algokit generate` command to generate TypeScript or Python typed client. Once generated simply drag and drop the generated client into `./src/contracts` and import it into your React components as you see fit.
+4. **Run Development Server**
+```bash
+cd projects/frontend
+npm run dev
+```
+
+Visit `http://localhost:5173`
+
+### Building Smart Contracts
+
+```bash
+cd projects/contracts
+algokit project run build
+```
+
+Compiled contracts output to `smart_contracts/artifacts/`
+
+---
+
+## 📖 Usage Guide
+
+### Creating a Fundraising Campaign
+
+1. **Connect Wallet**: Click "Connect Wallet" (top-right) and select provider
+2. **Navigate**: Go to "Fundraising (On-Chain)" page
+3. **Click**: "Create New Campaign" button
+4. **Fill Details**:
+   - Campaign title and description
+   - Goal amount (in ALGO)
+   - Number of milestones
+   - Deadline date
+5. **Deploy**: Sign the deployment transaction (~0.3 ALGO fee)
+6. **Success**: Campaign appears with unique App ID
+
+### Donating to Campaigns
+
+1. Browse active campaigns on Fundraising page
+2. Click "View Details" on any campaign
+3. Enter donation amount
+4. Click "Donate" and sign transaction
+5. View updated progress bar and contributor count
+
+### Creating Event Tickets
+
+1. Navigate to " Ticketing (On-Chain)" page
+2. Click "Create New Event"
+3. Fill event details:
+   - Event name and description
+   - Ticket price (in ALGO)
+   - Max supply (number of tickets)
+   - Event date and sales end date
+4. Deploy contract and await confirmation
+5. Event appears in list with App ID
+
+### Buying Tickets
+
+1. Browse events on Ticketing page
+2. Click "Buy Ticket" on desired event
+3. Confirm payment transaction (Step 1/3)
+4. Approve opt-in for ticket NFT (Step 2/3)
+5. Receive ticket automatically (Step 3/3)
+6. View your tickets in "My Tickets" tab
+
+### Verifying Tickets at Entry
+
+1. Event organizers can scan QR codes shown on ticket holders' screens
+2. Scanner verifies NFT ownership on-chain
+3. Marks ticket as "checked-in" in box storage
+4. Prevents double-entry attempts
+
+---
+
+## 🔧 Development
+
+### Project Structure
+```
+projects/
+├── contracts/                # Smart contract code
+│   ├── smart_contracts/
+│   │   ├── fundraiser/      # Fundraising contract
+│   │   ├── ticketing/       # Ticketing contract
+│   │   └── bank/            # Banking contract
+│   └── pyproject.toml
+├── frontend/                 # React application
+│   ├── src/
+│   │   ├── pages/           # Route components
+│   │   ├── components/      # Reusable UI components
+│   │   ├── contracts/       # Generated TypeScript clients
+│   │   └── utils/           # Helper functions
+│   └── package.json
+```
+
+### Key Frontend Files
+
+- `src/pages/FundraisingPageDecentralized.tsx` - Campaign management
+- `src/pages/TicketingPageDecentralized.tsx` - Event ticketing
+- `src/contracts/FundraiserClient.ts` - Generated contract client
+- `src/contracts/TicketingClient.ts` - Generated contract client
+- `src/utils/blockchainData.ts` - State query helpers
+- `src/utils/contractRegistry.ts` - App ID tracking
+
+### Testing
+
+```bash
+# Run frontend tests
+cd projects/frontend
+npm run test
+
+# Run E2E tests
+npm run test:e2e
+
+# Lint code
+npm run lint
+```
+
+---
+
+## 🌐 Supported Wallets
+
+- **Pera Wallet** - Mobile and browser extension
+- **Defly Wallet** - Mobile wallet with DeFi features
+- **Exodus Wallet** - Multi-chain desktop/mobile
+- **Daffi Wallet** - Algorand-focused mobile wallet
+
+All wallets support:
+- Transaction signing
+- Asset opt-ins
+- Multi-transaction grouping
+- WalletConnect v2
+
+---
+
+## 📊 Smart Contract Interactions
+
+### Box Storage
+Contracts use box storage for scalable state management:
+- **Campaign Donations**: Track individual contributors
+- **Ticket Check-ins**: Prevent double-entry
+- **Key Format**: Uses decoded 32-byte addresses
+
+### Atomic Transactions
+Multi-step operations grouped atomically:
+- Payment + Contract Call (donations)
+- NFT Mint + Opt-in + Transfer (ticket purchase)
+- Ensures all-or-nothing execution
+
+### Resource Management
+- `populateAppCallResources: false` - Manual resource specification
+- `boxReferences` - Explicit box access declarations
+- `assetReferences` - Foreign asset array for NFTs
+- `coverAppCallInnerTransactionFees: true` - Fee coverage
+
+---
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+**"Transaction pool error" / Box Reference Invalid**
+- Ensure box references use decoded address bytes:
+  ```typescript
+  boxReferences: [{
+    appId: BigInt(appId),
+    name: algosdk.decodeAddress(address).publicKey
+  }]
+  ```
+
+**"Asset not found" / Opt-in Required**
+- User must opt-in to ASA before receiving:
+  ```typescript
+  await algorand.send.assetOptIn({ sender, assetId })
+  ```
+
+**"Insufficient ALGO Balance"**
+- Minimum balance requirement increases with:
+  - Opted-in assets (+0.1 ALGO each)
+  - Created contracts (+0.1 ALGO base + storage)
+  - Box storage (dynamic based on size)
+
+**Environment Variables Not Loading**
+- Restart dev server after editing `.env`
+- Ensure variables prefixed with `VITE_`
+- Check browser console for config errors
+
+---
+
+## 📄 License
+
+This project is open source. Contributions welcome!
+
+---
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing-feature`)
+5. Open Pull Request
+
+---
+
+## 📞 Support
+
+For questions or issues:
+- Open a GitHub issue
+- Check Algorand Developer Portal: https://developer.algorand.org/
+- Join Algorand Discord: https://discord.gg/algorand
+
+---
+
+**Built with ❤️ on Algorand blockchain**
