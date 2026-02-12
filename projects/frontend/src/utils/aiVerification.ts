@@ -4,8 +4,8 @@
  */
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCrwVdY3i0W0AoiL3rY6EZS2cm12yUul28'
-// Use Gemini 1.5 Pro (latest) for vision/image analysis - Flash doesn't support vision
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro-latest:generateContent?key=${GEMINI_API_KEY}`
+// Use Gemini 1.5 Pro for vision/image analysis (no -latest suffix)
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=${GEMINI_API_KEY}`
 
 export interface ReceiptVerificationResult {
   isValid: boolean

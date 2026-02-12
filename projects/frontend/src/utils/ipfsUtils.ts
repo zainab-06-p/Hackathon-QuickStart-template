@@ -4,12 +4,12 @@
  */
 
 export const IPFS_GATEWAYS = [
-  'https://gateway.pinata.cloud/ipfs/',
-  'https://ipfs.io/ipfs/',
-  'https://cloudflare-ipfs.com/ipfs/',
-  'https://dweb.link/ipfs/',
   'https://nftstorage.link/ipfs/',
   'https://w3s.link/ipfs/',
+  'https://gateway.pinata.cloud/ipfs/',
+  'https://dweb.link/ipfs/',
+  'https://cloudflare-ipfs.com/ipfs/',
+  'https://ipfs.io/ipfs/',
 ]
 
 /**
