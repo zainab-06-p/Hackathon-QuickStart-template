@@ -4,8 +4,8 @@
  */
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'AIzaSyCrwVdY3i0W0AoiL3rY6EZS2cm12yUul28'
-// Use v1beta with gemini-1.5-flash-latest model (correct model name)
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`
+// Use v1 API with gemini-1.5-flash (stable)
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`
 
 export interface ReceiptVerificationResult {
   isValid: boolean

@@ -57,43 +57,25 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
     setLoading(false)
   }
 
-  if (!url || (error && gatewayIndex >= IPFS_GATEWAYS.length - 1)) {
-    // All gateways failed - show compact error with current gateway attempt
+  if (!url) {
     return (
-      <div className={`bg-gray-100 rounded-xl overflow-hidden ${className}`}>
-        {/* Show the image anyway - browser might load it eventually */}
-        <div className="relative">
-          {mediaType === 'image' ? (
-            <img
-              src={currentUrl}
-              alt={alt}
-              className="w-full max-h-96 object-contain opacity-30"
-            />
-          ) : mediaType === 'video' ? (
-            <video
-              src={currentUrl}
-              className="w-full max-h-96 opacity-30"
-              controls
-            />
-          ) : null}
-          
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 text-white p-4">
-            <div className="text-center">
-              <div className="text-4xl mb-2">🖼️</div>
-              <p className="text-sm font-bold mb-1">Loading from IPFS...</p>
-              <p className="text-xs opacity-75">Gateway {gatewayIndex + 1}/{IPFS_GATEWAYS.length}</p>
-            </div>
-          </div>
-        </div>
+      <div className={`bg-gray-100 rounded-xl p-8 text-center ${className}`}>
+        <div className="text-6xl mb-2">🖼️</div>
+        <p className="text-gray-600 text-sm">No media provided</p>
       </div>
     )
   }
 
+  // Always try to show the image/video, even if previous attempts failed
+  // Browser will keep trying to load from different gateways
   return (
     <div className={`relative bg-gray-100 rounded-xl overflow-hidden ${className}`}>
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse">
-          <span className="loading loading-spinner loading-lg"></span>
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-200 animate-pulse z-10">
+          <div className="text-center">
+            <span className="loading loading-spinner loading-lg"></span>
+            <p className="text-xs mt-2 text-gray-600">Loading from IPFS gateway {gatewayIndex + 1}/{IPFS_GATEWAYS.length}...</p>
+          </div>
         </div>
       )}
 
@@ -117,16 +99,15 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
         />
       ) : (
         <div className="p-4 text-center">
-          <p className="text-sm text-gray-600 mb-2">Unknown media type</p>
-          <p className="text-xs text-gray-500 break-all mb-2">{url}</p>
-          <a 
-            href={currentUrl} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="btn btn-sm btn-outline"
-          >
-            Open in New Tab ↗️
-          </a>
+          <p className="text-sm text-gray-600 mb-2">Media type: {mediaType}</p>
+          <img
+            src={currentUrl}
+            alt={alt}
+            className="w-full max-h-96 object-contain"
+            onError={handleError}
+            onLoad={handleLoad}
+            crossOrigin="anonymous"
+          />
         </div>
       )}
     </div>

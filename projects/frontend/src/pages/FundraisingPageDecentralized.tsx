@@ -193,25 +193,18 @@ const FundraisingPageDecentralized = () => {
             </button>
             <button 
               onClick={() => navigate('/fundraising/reputation')} 
-              className="btn btn-sm bg-gradient-to-r from-blue-600 to-purple-700 text-white border-0 hover:scale-110 transition-transform"
+              className="btn btn-xs sm:btn-sm bg-gradient-to-r from-blue-600 to-purple-700 text-white border-0 hover:scale-110 transition-transform"
             >
-              🏛️ Reputation DAO
-            </button>
-            <button 
-              onClick={loadCampaigns} 
-              className="btn btn-sm btn-ghost hover:btn-primary"
-              disabled={loading}
-            >
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : '🔄'} Refresh
+              🏛️ <span className="hidden sm:inline">DAO</span>
             </button>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-info">TestNet • Live Data</div>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
             {lastUpdated && (
-              <div className="badge badge-ghost text-xs">Updated: {lastUpdated.toLocaleTimeString()}</div>
+              <div className="badge badge-ghost badge-xs hidden sm:inline-flex">Updated: {lastUpdated.toLocaleTimeString()}</div>
             )}
             {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
+              <div className="badge badge-success badge-xs sm:badge-sm hidden md:inline-flex">{formatAddress(activeAddress)}</div>
             )}
           </div>
         </div>

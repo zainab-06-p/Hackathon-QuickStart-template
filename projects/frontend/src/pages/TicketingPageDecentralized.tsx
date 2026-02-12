@@ -340,43 +340,52 @@ const TicketingPageDecentralized = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 animate-gradient-shift">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-pink-500">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/')} 
-              className="btn btn-ghost btn-sm"
-            >
-              ← Back
-            </button>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">🎫 Decentralized Event Ticketing</h1>
-            <button 
-              onClick={() => navigate('/ticketing/create')} 
-              className="btn btn-primary btn-sm hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-purple-500 to-pink-500 border-0"
-            >
-              ✨ Create Event
-            </button>
-            <button 
-              onClick={() => navigate('/ticketing/nft-evolution')} 
-              className="btn btn-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 hover:scale-110 transition-transform"
-            >
-              ⚡ NFT Evolution
-            </button>
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-5">
+          {/* Top row: Back button + Title + Refresh */}
+          <div className="flex justify-between items-center mb-3">
+            <div className="flex items-center gap-2 md:gap-4 flex-1">
+              <button 
+                onClick={() => navigate('/')} 
+                className="btn btn-ghost btn-xs sm:btn-sm"
+              >
+                ← Back
+              </button>
+              <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">🎫 Ticketing</h1>
+            </div>
             <button 
               onClick={loadEvents} 
-              className="btn btn-sm btn-ghost hover:btn-primary"
+              className="btn btn-xs sm:btn-sm btn-ghost hover:btn-primary"
               disabled={loading}
             >
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : '🔄'} Refresh
+              {loading ? <span className="loading loading-spinner loading-sm"></span> : '🔄'} <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-info">TestNet • Live Data</div>
-            {lastUpdated && (
-              <div className="badge badge-ghost text-xs">Updated: {lastUpdated.toLocaleTimeString()}</div>
-            )}
-            {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
-            )}
+          
+          {/* Bottom row: Action buttons + Status badges */}
+          <div className="flex flex-wrap justify-between items-center gap-2">
+            <div className="flex flex-wrap gap-2">
+              <button 
+                onClick={() => navigate('/ticketing/create')} 
+                className="btn btn-primary btn-xs sm:btn-sm hover:scale-110 transition-transform duration-300 shadow-lg bg-gradient-to-r from-purple-500 to-pink-500 border-0"
+              >
+                ✨ Create
+              </button>
+              <button 
+                onClick={() => navigate('/ticketing/nft-evolution')} 
+                className="btn btn-xs sm:btn-sm bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 hover:scale-110 transition-transform"
+              >
+                ⚡ <span className="hidden sm:inline">Evolution</span>
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
+              {lastUpdated && (
+                <div className="badge badge-ghost badge-xs hidden sm:inline-flex">Updated: {lastUpdated.toLocaleTimeString()}</div>
+              )}
+              {activeAddress && (
+                <div className="badge badge-success badge-xs sm:badge-sm hidden md:inline-flex">{formatAddress(activeAddress)}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
