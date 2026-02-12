@@ -10,7 +10,6 @@ import { ContractRegistry } from '../utils/contractRegistry'
 import { getEventState, type EventState } from '../utils/blockchainData'
 import { QRCodeSVG } from 'qrcode.react'
 import TicketScanner from '../components/TicketScanner'
-import { MediaDisplay } from '../components/MediaDisplay'
 
 const TicketingPageDecentralized = () => {
   const navigate = useNavigate()
@@ -572,15 +571,6 @@ const TicketingPageDecentralized = () => {
               
               <h3 className="font-bold text-xl md:text-2xl mb-2">{selectedEvent.title}</h3>
               <p className="text-sm md:text-base text-gray-600 mb-4">{selectedEvent.description}</p>
-              
-              {/* Event Media */}
-              {selectedEvent.imageUrl && (
-                <MediaDisplay
-                  url={selectedEvent.imageUrl}
-                  alt={selectedEvent.title}
-                  className="mb-4 shadow-lg"
-                />
-              )}
               
               {/* Event Info Card */}
               <div className="card bg-gradient-to-r from-blue-500 to-cyan-500 text-white mb-4">

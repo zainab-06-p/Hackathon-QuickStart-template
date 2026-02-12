@@ -7,20 +7,17 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
 import { ContractRegistry } from '../utils/contractRegistry'
-import { pinFileToIPFS, ipfsHttpUrl } from '../utils/pinata'
 
 const CreateCampaignPage = () => {
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
-  const [uploading, setUploading] = useState(false)
   
   const [newCampaign, setNewCampaign] = useState({
     title: '',
     description: '',
     goal: '100',
     milestones: '3',
-    daysUntilDeadline: '30',
-    imageUrl: ''
+    daysUntilDeadline: '30'
   })
 
   const { enqueueSnackbar } = useSnackbar()
@@ -34,35 +31,6 @@ const CreateCampaignPage = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-      enqueueSnackbar('Please upload an image or video file', { variant: 'error' })
-      return
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      enqueueSnackbar('File size must be less than 10MB', { variant: 'error' })
-      return
-    }
-
-    setUploading(true)
-    try {
-      enqueueSnackbar('Uploading to IPFS...', { variant: 'info' })
-      const result = await pinFileToIPFS(file)
-      const url = ipfsHttpUrl(result.IpfsHash)
-      setNewCampaign({ ...newCampaign, imageUrl: url })
-      enqueueSnackbar('✅ Media uploaded successfully!', { variant: 'success' })
-    } catch (e) {
-      console.error('Upload error:', e)
-      enqueueSnackbar(`Upload failed: ${(e as Error).message}`, { variant: 'error' })
-    } finally {
-      setUploading(false)
-    }
-  }
 
   const createCampaign = async () => {
     if (!activeAddress) {
@@ -106,8 +74,7 @@ const CreateCampaignPage = () => {
         note: new TextEncoder().encode(JSON.stringify({
           type: 'campaign',
           title: newCampaign.title,
-          description: newCampaign.description,
-          imageUrl: newCampaign.imageUrl
+          description: newCampaign.description
         })),
         populateAppCallResources: false,
         suppressLog: true
@@ -122,8 +89,7 @@ const CreateCampaignPage = () => {
         creator: activeAddress,
         createdAt: Date.now(),
         title: newCampaign.title,
-        description: newCampaign.description,
-        imageUrl: newCampaign.imageUrl
+        description: newCampaign.description
       })
 
       // Navigate back to campaigns list
@@ -243,34 +209,6 @@ const CreateCampaignPage = () => {
                   placeholder="Describe your campaign..."
                 />
               </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Campaign Image/Video (Optional)</span>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  className="file-input file-input-bordered w-full"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                />
-                {uploading && (
-                  <span className="label-text-alt text-info mt-2">
-                    📤 Uploading to IPFS...
-                  </span>
-                )}
-                {newCampaign.imageUrl && (
-                  <div className="mt-2">
-                    <span className="label-text-alt text-success">✅ Media uploaded!</span>
-                    {newCampaign.imageUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                      <img src={newCampaign.imageUrl} alt="Preview" className="mt-2 max-h-32 rounded" />
-                    ) : (
-                      <video src={newCampaign.imageUrl} className="mt-2 max-h-32 rounded" controls />
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="divider"></div>
@@ -278,7 +216,7 @@ const CreateCampaignPage = () => {
             <button 
               className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 border-0 text-white'}`}
               onClick={createCampaign}
-              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description || uploading}
+              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description}
             >
               {creating ? 'Deploying Contract...' : '⛓️ Deploy Campaign Contract'}
             </button>

@@ -8,9 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 import { getCampaignState, getCampaignContributors, type CampaignState } from '../utils/blockchainData'
-import ReceiptVerifier from '../components/ReceiptVerifier'
 import YieldTracker from '../components/YieldTracker'
-import { MediaDisplay } from '../components/MediaDisplay'
 
 const FundraisingPageDecentralized = () => {
   const navigate = useNavigate()
@@ -356,20 +354,6 @@ const FundraisingPageDecentralized = () => {
               <h3 className="font-bold text-xl md:text-2xl mb-2">{selectedCampaign.title}</h3>
               <p className="text-sm md:text-base text-gray-600 mb-4">{selectedCampaign.description}</p>
               
-              {/* Campaign Media */}
-              {selectedCampaign.imageUrl && (() => {
-                console.log('🖼️ Campaign media URL:', selectedCampaign.imageUrl)
-                return (
-                  <div className="mb-4">
-                    <MediaDisplay
-                      url={selectedCampaign.imageUrl}
-                      alt={selectedCampaign.title}
-                      className="shadow-lg"
-                    />
-                  </div>
-                )
-              })()}
-              
               {/* Campaign Info Card */}
               <div className="card bg-gradient-to-r from-green-500 to-teal-500 text-white mb-4">
                 <div className="card-body">
@@ -495,16 +479,6 @@ const FundraisingPageDecentralized = () => {
                       <p className="text-sm text-center mt-2">All milestones have been released! 🎉</p>
                     )}
                   </div>
-                </div>
-              )}
-
-              {/* AI Receipt Verification (Creator-only) */}
-              {activeAddress === selectedCampaign.creator && (
-                <div className="mb-4">
-                  <ReceiptVerifier 
-                    campaignId={selectedCampaign.appId}
-                    campaignTitle={selectedCampaign.title}
-                  />
                 </div>
               )}
 

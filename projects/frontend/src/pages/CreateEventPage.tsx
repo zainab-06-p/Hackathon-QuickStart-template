@@ -7,12 +7,10 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import { TicketingFactory } from '../contracts/TicketingClient'
 import { ContractRegistry } from '../utils/contractRegistry'
-import { pinFileToIPFS, ipfsHttpUrl } from '../utils/pinata'
 
 const CreateEventPage = () => {
   const navigate = useNavigate()
   const [creating, setCreating] = useState(false)
-  const [uploading, setUploading] = useState(false)
   
   const [newEvent, setNewEvent] = useState({
     title: '',
@@ -21,8 +19,7 @@ const CreateEventPage = () => {
     date: new Date(Date.now() + 604800000).toISOString().substring(0, 16),
     saleEndDate: new Date(Date.now() + 518400000).toISOString().substring(0, 16), // 6 days (1 day before event)
     ticketPrice: '2',
-    maxSupply: '100',
-    imageUrl: ''
+    maxSupply: '100'
   })
 
   const { enqueueSnackbar } = useSnackbar()
@@ -36,35 +33,6 @@ const CreateEventPage = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-      enqueueSnackbar('Please upload an image or video file', { variant: 'error' })
-      return
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      enqueueSnackbar('File size must be less than 10MB', { variant: 'error' })
-      return
-    }
-
-    setUploading(true)
-    try {
-      enqueueSnackbar('Uploading to IPFS...', { variant: 'info' })
-      const result = await pinFileToIPFS(file)
-      const url = ipfsHttpUrl(result.IpfsHash)
-      setNewEvent({ ...newEvent, imageUrl: url })
-      enqueueSnackbar('✅ Media uploaded successfully!', { variant: 'success' })
-    } catch (e) {
-      console.error('Upload error:', e)
-      enqueueSnackbar(`Upload failed: ${(e as Error).message}`, { variant: 'error' })
-    } finally {
-      setUploading(false)
-    }
-  }
 
   const createEvent = async () => {
     if (!activeAddress) {
@@ -118,8 +86,7 @@ const CreateEventPage = () => {
           type: 'event',
           title: newEvent.title,
           description: newEvent.description,
-          venue: newEvent.venue,
-          imageUrl: newEvent.imageUrl
+          venue: newEvent.venue
         })),
         populateAppCallResources: false,
         suppressLog: true
@@ -135,8 +102,7 @@ const CreateEventPage = () => {
         createdAt: Date.now(),
         title: newEvent.title,
         description: newEvent.description,
-        venue: newEvent.venue,
-        imageUrl: newEvent.imageUrl
+        venue: newEvent.venue
       })
 
       setTimeout(() => {
@@ -281,34 +247,6 @@ const CreateEventPage = () => {
                   placeholder="Describe your event..."
                 />
               </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Event Poster (Optional)</span>
-                </label>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  className="file-input file-input-bordered w-full"
-                  onChange={handleImageUpload}
-                  disabled={uploading}
-                />
-                {uploading && (
-                  <span className="label-text-alt text-info mt-2">
-                    📤 Uploading to IPFS...
-                  </span>
-                )}
-                {newEvent.imageUrl && (
-                  <div className="mt-2">
-                    <span className="label-text-alt text-success">✅ Media uploaded!</span>
-                    {newEvent.imageUrl.match(/\.(jpg|jpeg|png|gif|webp)$/i) ? (
-                      <img src={newEvent.imageUrl} alt="Preview" className="mt-2 max-h-32 rounded" />
-                    ) : (
-                      <video src={newEvent.imageUrl} className="mt-2 max-h-32 rounded" controls />
-                    )}
-                  </div>
-                )}
-              </div>
             </div>
 
             <div className="divider"></div>
@@ -316,7 +254,7 @@ const CreateEventPage = () => {
             <button 
               className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:scale-105 border-0 text-white'}`}
               onClick={createEvent}
-              disabled={creating || !activeAddress || !newEvent.title || !newEvent.description || uploading}
+              disabled={creating || !activeAddress || !newEvent.title || !newEvent.description}
             >
               {creating ? 'Deploying Contract...' : '🎭 Deploy Event Contract'}
             </button>

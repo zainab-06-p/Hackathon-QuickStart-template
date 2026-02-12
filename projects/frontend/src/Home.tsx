@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom'
 import ConnectWallet from './components/ConnectWallet'
 import AppCalls from './components/AppCalls'
 import SendAlgo from './components/SendAlgo'
-import MintNFT from './components/MintNFT'
 import CreateASA from './components/CreateASA'
 import AssetOptIn from './components/AssetOptIn'
 import Bank from './components/Bank'
@@ -17,7 +16,6 @@ const Home: React.FC<HomeProps> = () => {
   const [openWalletModal, setOpenWalletModal] = useState<boolean>(false)
   const [appCallsDemoModal, setAppCallsDemoModal] = useState<boolean>(false)
   const [sendAlgoModal, setSendAlgoModal] = useState<boolean>(false)
-  const [mintNftModal, setMintNftModal] = useState<boolean>(false)
   const [createAsaModal, setCreateAsaModal] = useState<boolean>(false)
   const [assetOptInModal, setAssetOptInModal] = useState<boolean>(false)
   const [bankModal, setBankModal] = useState<boolean>(false)
@@ -59,16 +57,6 @@ const Home: React.FC<HomeProps> = () => {
                 <p>Send a payment transaction to any address.</p>
                 <div className="card-actions justify-end">
                   <button className="btn btn-outline" disabled={!activeAddress} onClick={() => setSendAlgoModal(true)}>Open</button>
-                </div>
-              </div>
-            </div>
-
-            <div className="card bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white shadow-xl">
-              <div className="card-body">
-                <h2 className="card-title">Mint NFT (ARC-3)</h2>
-                <p>Upload to IPFS via Pinata and mint a single NFT.</p>
-                <div className="card-actions justify-end">
-                  <button className="btn btn-outline" disabled={!activeAddress} onClick={() => setMintNftModal(true)}>Open</button>
                 </div>
               </div>
             </div>
@@ -156,7 +144,6 @@ const Home: React.FC<HomeProps> = () => {
       <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
       <AppCalls openModal={appCallsDemoModal} setModalState={setAppCallsDemoModal} />
       <SendAlgo openModal={sendAlgoModal} closeModal={() => setSendAlgoModal(false)} />
-      <MintNFT openModal={mintNftModal} closeModal={() => setMintNftModal(false)} />
       <CreateASA openModal={createAsaModal} closeModal={() => setCreateAsaModal(false)} />
       <AssetOptIn openModal={assetOptInModal} closeModal={() => setAssetOptInModal(false)} />
       <Bank openModal={bankModal} closeModal={() => setBankModal(false)} />
