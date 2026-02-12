@@ -1,4 +1,4 @@
-﻿# CampusChain: Simple Campus Finance on Algorand
+# CampusChain: Simple Campus Finance on Algorand
 
 **A decentralized platform for campus fundraising, event ticketing, and financial governance powered by Algorand blockchain.**
 
@@ -6,7 +6,7 @@ CampusChain revolutionizes how campus communities manage finances, organize even
 
 ---
 
-## ðŸŽ¯ Key Features
+## 🎯 Key Features
 
 ### 1. **Milestone-Based Fundraising** 
 Create crowdfunding campaigns with goal-based fund release. Funds are locked in smart contracts and released ONLY when fundraising goals are met, ensuring accountability and trust.
@@ -42,31 +42,31 @@ Machine learning-driven reputation scoring based on on-chain activity.
 - **Historical Tracking**: Comprehensive activity dashboard
 
 ### 5. **NFT Evolution System** (Gamification)
-PokÃ©mon-style leveling system where campus participation NFTs evolve over time.
+Pokémon-style leveling system where campus participation NFTs evolve over time.
 
 - **XP Points**: Earn experience through platform activities
-- **Tier Progression**: Bronze â†’ Silver â†’ Gold â†’ Platinum â†’ Diamond
+- **Tier Progression**: Bronze → Silver → Gold → Platinum → Diamond
 - **Visual Evolution**: NFT artwork changes with levels
 - **Achievement Badges**: Unlock special NFTs for milestones
 
 ---
 
-## ðŸ—ï¸ Architecture
+## 🏗️ Architecture
 
 ### Fully Decentralized Design
 Unlike traditional platforms, CampusChain deploys **separate smart contract instances** for each campaign and event:
 
 ```
-Create Campaign â†’ Deploy New Contract â†’ Unique App ID
-Create Event â†’ Deploy New Contract â†’ Unique App ID
+Create Campaign → Deploy New Contract → Unique App ID
+Create Event → Deploy New Contract → Unique App ID
 ```
 
 **Benefits:**
-- âœ… No central point of failure
-- âœ… Each creator owns their contract
-- âœ… Permissionless participation
-- âœ… Immutable transaction history
-- âœ… Transparent fund management
+- ✅ No central point of failure
+- ✅ Each creator owns their contract
+- ✅ Permissionless participation
+- ✅ Immutable transaction history
+- ✅ Transparent fund management
 
 ### Smart Contracts (Python/PyTeal)
 
@@ -89,7 +89,7 @@ Create Event â†’ Deploy New Contract â†’ Unique App ID
 
 ---
 
-## ðŸ› ï¸ Tech Stack
+## 🛠️ Tech Stack
 
 **Frontend:**
 - React 18 + TypeScript
@@ -116,7 +116,7 @@ Create Event â†’ Deploy New Contract â†’ Unique App ID
 
 ---
 
-## ðŸš€ Quick Start
+## 🚀 Quick Start
 
 ### Prerequisites
 - Node.js 18+
@@ -174,7 +174,7 @@ Compiled contracts output to `smart_contracts/artifacts/`
 
 ---
 
-## ðŸ“– Usage Guide
+## 📖 Usage Guide
 
 ### Creating a Fundraising Campaign
 
@@ -227,26 +227,24 @@ Compiled contracts output to `smart_contracts/artifacts/`
 
 ---
 
-## ðŸ”§ Development
+## 🔧 Development
 
 ### Project Structure
 ```
-CampusChain/
-  projects/
-    contracts/                        # Smart contracts (Python)
-      smart_contracts/
-        fundraiser/                    # Fundraising contract
-        ticketing/                     # Ticketing contract
-        bank/                          # Banking contract
-      pyproject.toml
-    
-    frontend/                          # React application
-      src/
-        pages/                         # Route components
-        components/                    # Reusable UI components
-        contracts/                     # Generated TypeScript clients
-        utils/                         # Helper functions
-      package.json
+projects/
+├── contracts/                # Smart contract code
+│   ├── smart_contracts/
+│   │   ├── fundraiser/      # Fundraising contract
+│   │   ├── ticketing/       # Ticketing contract
+│   │   └── bank/            # Banking contract
+│   └── pyproject.toml
+├── frontend/                 # React application
+│   ├── src/
+│   │   ├── pages/           # Route components
+│   │   ├── components/      # Reusable UI components
+│   │   ├── contracts/       # Generated TypeScript clients
+│   │   └── utils/           # Helper functions
+│   └── package.json
 ```
 
 ### Key Frontend Files
@@ -274,7 +272,7 @@ npm run lint
 
 ---
 
-## ðŸŒ Supported Wallets
+## 🌐 Supported Wallets
 
 - **Pera Wallet** - Mobile and browser extension
 - **Defly Wallet** - Mobile wallet with DeFi features
@@ -289,7 +287,7 @@ All wallets support:
 
 ---
 
-## ðŸ“Š Smart Contract Interactions
+## 📊 Smart Contract Interactions
 
 ### Box Storage
 Contracts use box storage for scalable state management:
@@ -311,7 +309,7 @@ Multi-step operations grouped atomically:
 
 ---
 
-## ðŸ› Troubleshooting
+## 🐛 Troubleshooting
 
 ### Common Issues
 
@@ -343,13 +341,13 @@ Multi-step operations grouped atomically:
 
 ---
 
-## ðŸ“„ License
+## 📄 License
 
 This project is open source. Contributions welcome!
 
 ---
 
-## ðŸ¤ Contributing
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create feature branch (`git checkout -b feature/amazing-feature`)
@@ -359,7 +357,7 @@ This project is open source. Contributions welcome!
 
 ---
 
-## ðŸ“ž Support
+## 📞 Support
 
 For questions or issues:
 - Open a GitHub issue
@@ -368,6 +366,4 @@ For questions or issues:
 
 ---
 
-**Built with â¤ï¸ on Algorand blockchain**
-
-
+**Built with ❤️ on Algorand blockchain**
