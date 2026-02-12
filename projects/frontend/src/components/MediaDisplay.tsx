@@ -98,17 +98,15 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
           crossOrigin="anonymous"
         />
       ) : (
-        <div className="p-4 text-center">
-          <p className="text-sm text-gray-600 mb-2">Media type: {mediaType}</p>
-          <img
-            src={currentUrl}
-            alt={alt}
-            className="w-full max-h-96 object-contain"
-            onError={handleError}
-            onLoad={handleLoad}
-            crossOrigin="anonymous"
-          />
-        </div>
+        // Unknown type - try as image first (most IPFS content is images)
+        <img
+          src={currentUrl}
+          alt={alt}
+          className="w-full max-h-96 object-contain"
+          onError={handleError}
+          onLoad={handleLoad}
+          crossOrigin="anonymous"
+        />
       )}
     </div>
   )
