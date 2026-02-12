@@ -38,14 +38,16 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
   const handleError = () => {
     console.error(`❌ Media load failed (gateway ${gatewayIndex}):`, currentUrl)
 
-    // Try next gateway
+    // Try next gateway automatically
     if (gatewayIndex < IPFS_GATEWAYS.length - 1) {
-      console.log(`🔄 Trying next gateway (${gatewayIndex + 1}/${IPFS_GATEWAYS.length})...`)
+      console.log(`🔄 Auto-trying next gateway (${gatewayIndex + 1}/${IPFS_GATEWAYS.length})...`)
       setGatewayIndex(gatewayIndex + 1)
       setError(false)
+      setLoading(true)
     } else {
-      console.error('❌ All gateways exhausted')
+      console.error('❌ All gateways failed')
       setError(true)
+      setLoading(false)
     }
   }
 
@@ -55,24 +57,34 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
     setLoading(false)
   }
 
-  if (!url || error && gatewayIndex >= IPFS_GATEWAYS.length - 1) {
+  if (!url || (error && gatewayIndex >= IPFS_GATEWAYS.length - 1)) {
+    // All gateways failed - show compact error with current gateway attempt
     return (
-      <div className={`bg-gray-100 rounded-xl p-8 text-center ${className}`}>
-        <div className="text-6xl mb-4">🖼️</div>
-        <p className="text-gray-600 mb-2">Media unavailable</p>
-        {url && (
-          <>
-            <p className="text-xs text-gray-500 mb-2 break-all">{url}</p>
-            <a 
-              href={url} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="btn btn-sm btn-outline"
-            >
-              Try Direct Link ↗️
-            </a>
-          </>
-        )}
+      <div className={`bg-gray-100 rounded-xl overflow-hidden ${className}`}>
+        {/* Show the image anyway - browser might load it eventually */}
+        <div className="relative">
+          {mediaType === 'image' ? (
+            <img
+              src={currentUrl}
+              alt={alt}
+              className="w-full max-h-96 object-contain opacity-30"
+            />
+          ) : mediaType === 'video' ? (
+            <video
+              src={currentUrl}
+              className="w-full max-h-96 opacity-30"
+              controls
+            />
+          ) : null}
+          
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900/50 text-white p-4">
+            <div className="text-center">
+              <div className="text-4xl mb-2">🖼️</div>
+              <p className="text-sm font-bold mb-1">Loading from IPFS...</p>
+              <p className="text-xs opacity-75">Gateway {gatewayIndex + 1}/{IPFS_GATEWAYS.length}</p>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }

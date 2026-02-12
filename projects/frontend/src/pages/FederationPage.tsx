@@ -107,30 +107,34 @@ const FederationPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 animate-gradient-shift">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-indigo-500 to-purple-500">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/')} 
-              className="btn btn-ghost btn-sm"
-            >
-              ← Back
-            </button>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
-              🌐 Cross-Campus Federation
-            </h1>
-            <button 
-              onClick={() => setShowCreateModal(true)} 
-              className="btn btn-primary btn-sm hover:scale-110 transition-transform duration-300 shadow-lg bg-gradient-to-r from-indigo-500 to-purple-500 border-0"
-            >
-              ✨ Create Federation Event
-            </button>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-warning animate-pulse">DEMO MODE</div>
-            <div className="badge badge-info">National Network</div>
-            {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
-            )}
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-5">
+          <div className="flex flex-col gap-3">
+            <div className="flex flex-wrap justify-between items-center gap-2">
+              <div className="flex items-center gap-2 md:gap-4">
+                <button 
+                  onClick={() => navigate('/')} 
+                  className="btn btn-ghost btn-xs sm:btn-sm"
+                >
+                  ← Back
+                </button>
+                <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                  🌐 Federation
+                </h1>
+              </div>
+              <button 
+                onClick={() => setShowCreateModal(true)} 
+                className="btn btn-primary btn-xs sm:btn-sm hover:scale-110 transition-transform duration-300 shadow-lg bg-gradient-to-r from-indigo-500 to-purple-500 border-0"
+              >
+                ✨ Create
+              </button>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="badge badge-warning badge-xs sm:badge-sm animate-pulse">DEMO</div>
+              <div className="badge badge-info badge-xs sm:badge-sm hidden sm:inline-flex">National Network</div>
+              {activeAddress && (
+                <div className="badge badge-success badge-xs sm:badge-sm hidden md:inline-flex">{formatAddress(activeAddress)}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -293,7 +297,7 @@ const FederationPage = () => {
       {/* Create Federation Event Modal */}
       {showCreateModal && (
         <dialog className="modal modal-open">
-          <div className="modal-box max-w-4xl">
+            <div className="modal-box max-w-4xl w-full mx-4">
             <button 
               className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
               onClick={() => setShowCreateModal(false)}
@@ -301,7 +305,7 @@ const FederationPage = () => {
               ✕
             </button>
             
-            <h3 className="font-bold text-2xl mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+            <h3 className="font-bold text-xl md:text-2xl mb-4 bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
               🌐 Create Federation Event
             </h3>
 

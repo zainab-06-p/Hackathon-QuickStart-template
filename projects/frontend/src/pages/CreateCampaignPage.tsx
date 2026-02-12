@@ -147,21 +147,23 @@ const CreateCampaignPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50">
       {/* Header */}
       <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/fundraising')} 
-              className="btn btn-ghost btn-sm"
-            >
-              ← Back to Campaigns
-            </button>
-            <h1 className="text-2xl font-bold text-blue-600">🚀 Create New Campaign</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-info">TestNet</div>
-            {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
-            )}
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-4">
+              <button 
+                onClick={() => navigate('/fundraising')} 
+                className="btn btn-ghost btn-xs sm:btn-sm"
+              >
+                ← Back
+              </button>
+              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">🚀 Create Campaign</h1>
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
+              {activeAddress && (
+                <div className="badge badge-success badge-xs sm:badge-sm hidden sm:inline-flex">{formatAddress(activeAddress)}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -169,11 +171,11 @@ const CreateCampaignPage = () => {
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="card bg-white/95 backdrop-blur shadow-2xl border-2 border-purple-200 hover:border-purple-400 transition-all duration-300">
           <div className="card-body">
-            <h2 className="card-title text-3xl mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h2 className="card-title text-xl md:text-2xl lg:text-3xl mb-4 md:mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               🚀 Campaign Details
             </h2>
-            <div className="alert alert-info bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg mb-6">
-              <span><strong>⛓️ Fully Decentralized:</strong> Each campaign deploys its own smart contract. Funds released only when goal is 100% reached!</span>
+            <div className="alert alert-info bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg mb-4 md:mb-6">
+              <span className="text-xs sm:text-sm"><strong>⛓️ Fully Decentralized:</strong> Each campaign deploys its own smart contract. Funds released only when goal is 100% reached!</span>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

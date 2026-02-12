@@ -211,21 +211,23 @@ const HistoryPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 animate-gradient-shift">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-indigo-500 to-pink-500">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/')} 
-              className="btn btn-ghost btn-sm hover:scale-110 transition-transform"
-            >
-              ← Back
-            </button>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">📋 My Blockchain History</h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-info">TestNet • Decentralized</div>
-            {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
-            )}
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-4">
+              <button 
+                onClick={() => navigate('/')} 
+                className="btn btn-ghost btn-xs sm:btn-sm hover:scale-110 transition-transform"
+              >
+                ← Back
+              </button>
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">📋 History</h1>
+            </div>
+            <div className="flex items-center gap-2 md:gap-3">
+              <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
+              {activeAddress && (
+                <div className="badge badge-success badge-xs sm:badge-sm hidden sm:inline-flex">{formatAddress(activeAddress)}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -234,8 +236,8 @@ const HistoryPage = () => {
         {!activeAddress ? (
           <div className="card bg-white shadow-xl">
             <div className="card-body text-center py-12">
-              <h3 className="text-xl font-bold mb-2">Connect Your Wallet</h3>
-              <p className="text-gray-600">Please connect your wallet to view your blockchain history.</p>
+              <h3 className="text-lg md:text-xl font-bold mb-2">Connect Your Wallet</h3>
+              <p className="text-sm md:text-base text-gray-600">Please connect your wallet to view your blockchain history.</p>
             </div>
           </div>
         ) : loading ? (

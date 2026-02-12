@@ -107,24 +107,26 @@ const NFTEvolutionPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-blue-50 animate-gradient-shift">
       {/* Header */}
       <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-pink-500">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/')} 
-              className="btn btn-ghost btn-sm"
-            >
-              ← Back
-            </button>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
-              ⚡ Dynamic NFT Evolution
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <div className="badge badge-warning animate-pulse">DEMO MODE</div>
-            <div className="badge badge-info">Gamification</div>
-            {activeAddress && (
-              <div className="badge badge-success">{formatAddress(activeAddress)}</div>
-            )}
+        <div className="max-w-7xl mx-auto px-4 py-3 md:py-5">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+            <div className="flex items-center gap-2 md:gap-4">
+              <button 
+                onClick={() => navigate('/')} 
+                className="btn btn-ghost btn-xs sm:btn-sm"
+              >
+                ← Back
+              </button>
+              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 bg-clip-text text-transparent">
+                ⚡ NFT Evolution
+              </h1>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="badge badge-warning badge-xs sm:badge-sm animate-pulse">DEMO</div>
+              <div className="badge badge-info badge-xs sm:badge-sm hidden sm:inline-flex">Gamification</div>
+              {activeAddress && (
+                <div className="badge badge-success badge-xs sm:badge-sm hidden md:inline-flex">{formatAddress(activeAddress)}</div>
+              )}
+            </div>
           </div>
         </div>
       </div>
