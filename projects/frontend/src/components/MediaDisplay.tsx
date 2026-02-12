@@ -24,14 +24,18 @@ export function MediaDisplay({ url, alt, className = '' }: MediaDisplayProps) {
     // Convert IPFS URLs to HTTP gateway URLs
     const httpUrl = convertIpfsToHttp(url, gatewayIndex)
     setCurrentUrl(httpUrl)
-    setMediaType(getMediaType(url))
-    setLoading(false)
+    const detectedType = getMediaType(url)
+    // Default to 'image' if unknown, since most IPFS content is images
+    setMediaType(detectedType === 'unknown' ? 'image' : detectedType)
+    setLoading(true) // Set loading true when URL changes
+    setError(false)
 
     console.log('🖼️ Loading media:', {
       original: url,
       converted: httpUrl,
       gateway: IPFS_GATEWAYS[gatewayIndex],
-      type: mediaType
+      type: detectedType,
+      using: detectedType === 'unknown' ? 'image' : detectedType
     })
   }, [url, gatewayIndex])
 
