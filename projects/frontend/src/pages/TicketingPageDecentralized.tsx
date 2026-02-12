@@ -211,6 +211,12 @@ const TicketingPageDecentralized = () => {
           payment: paymentTxn
         },
         sender: activeAddress,
+        boxReferences: [
+          {
+            appId: BigInt(selectedEvent.appId),
+            name: new Uint8Array(Buffer.from(activeAddress, 'utf8'))
+          }
+        ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,
         validityWindow: 1000,
@@ -237,6 +243,12 @@ const TicketingPageDecentralized = () => {
         },
         sender: activeAddress,
         assetReferences: [ticketAssetId],  // Manually add asset reference
+        boxReferences: [
+          {
+            appId: BigInt(selectedEvent.appId),
+            name: new Uint8Array(Buffer.from(activeAddress, 'utf8'))
+          }
+        ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,  // Cover inner transaction fee
         validityWindow: 1000,
