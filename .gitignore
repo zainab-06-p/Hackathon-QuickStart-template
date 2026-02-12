@@ -170,3 +170,6 @@ node_modules
 
 # Exclude VIT Hack folder
 VIT Hack/
+
+.vercel
+.env*.local

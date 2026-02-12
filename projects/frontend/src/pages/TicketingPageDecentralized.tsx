@@ -10,6 +10,7 @@ import { ContractRegistry } from '../utils/contractRegistry'
 import { getEventState, type EventState } from '../utils/blockchainData'
 import { QRCodeSVG } from 'qrcode.react'
 import TicketScanner from '../components/TicketScanner'
+import algosdk from 'algosdk'
 
 const TicketingPageDecentralized = () => {
   const navigate = useNavigate()
@@ -214,7 +215,7 @@ const TicketingPageDecentralized = () => {
         boxReferences: [
           {
             appId: BigInt(selectedEvent.appId),
-            name: new Uint8Array(Buffer.from(activeAddress, 'utf8'))
+            name: algosdk.decodeAddress(activeAddress).publicKey
           }
         ],
         populateAppCallResources: false,
@@ -246,7 +247,7 @@ const TicketingPageDecentralized = () => {
         boxReferences: [
           {
             appId: BigInt(selectedEvent.appId),
-            name: new Uint8Array(Buffer.from(activeAddress, 'utf8'))
+            name: algosdk.decodeAddress(activeAddress).publicKey
           }
         ],
         populateAppCallResources: false,
