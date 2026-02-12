@@ -4,23 +4,23 @@
 // algopy.arc4.ARC4Contract.approval_program() -> uint64:
 main:
     intcblock 0 1
-    bytecblock 0x151f7c75 "is_sale_active" 0x00 "sold_count" "event_date" "organizer" "unique_buyers" "ticket_price" "max_supply" "sale_end_date"
+    bytecblock 0x151f7c75 "is_sale_active" "sold_count" 0x00 "event_date" "organizer" "unique_buyers" "ticket_price" "max_supply" "sale_end_date"
     // smart_contracts/ticketing/contract.py:5
     // class Ticketing(ARC4Contract):
     txn NumAppArgs
-    bz main_after_if_else@13
-    pushbytess 0xe8dd6bfd 0x71ef5bd3 0x33f8889d 0x88bddb22 0x0a19c048 0xad10bfb2 0xe619d927 // method "create_event(uint64,uint64,uint64,uint64)uint64", method "buy_ticket(pay)uint64", method "verify_entry(account,uint64)bool", method "is_checked_in(uint64)bool", method "toggle_sale()bool", method "get_event_info()(uint64,uint64,uint64,uint64,uint64,uint64,bool)", method "get_organizer()address"
+    bz main_after_if_else@14
+    pushbytess 0xe8dd6bfd 0x71ef5bd3 0xeca5246a 0x33f8889d 0x88bddb22 0x0a19c048 0xad10bfb2 0xe619d927 // method "create_event(uint64,uint64,uint64,uint64)uint64", method "buy_ticket(pay)uint64", method "claim_ticket(uint64)void", method "verify_entry(account,uint64)bool", method "is_checked_in(uint64)bool", method "toggle_sale()bool", method "get_event_info()(uint64,uint64,uint64,uint64,uint64,uint64,bool)", method "get_organizer()address"
     txna ApplicationArgs 0
-    match main_create_event_route@3 main_buy_ticket_route@4 main_verify_entry_route@5 main_is_checked_in_route@6 main_toggle_sale_route@7 main_get_event_info_route@8 main_get_organizer_route@9
+    match main_create_event_route@3 main_buy_ticket_route@4 main_claim_ticket_route@5 main_verify_entry_route@6 main_is_checked_in_route@7 main_toggle_sale_route@8 main_get_event_info_route@9 main_get_organizer_route@10
 
-main_after_if_else@13:
+main_after_if_else@14:
     // smart_contracts/ticketing/contract.py:5
     // class Ticketing(ARC4Contract):
     intc_0 // 0
     return
 
-main_get_organizer_route@9:
-    // smart_contracts/ticketing/contract.py:136
+main_get_organizer_route@10:
+    // smart_contracts/ticketing/contract.py:161
     // @abimethod(readonly=True)
     txn OnCompletion
     !
@@ -35,8 +35,8 @@ main_get_organizer_route@9:
     intc_1 // 1
     return
 
-main_get_event_info_route@8:
-    // smart_contracts/ticketing/contract.py:123
+main_get_event_info_route@9:
+    // smart_contracts/ticketing/contract.py:148
     // @abimethod()
     txn OnCompletion
     !
@@ -56,7 +56,7 @@ main_get_event_info_route@8:
     itob
     uncover 6
     itob
-    bytec_2 // 0x00
+    bytec_3 // 0x00
     intc_0 // 0
     uncover 8
     setbit
@@ -80,8 +80,8 @@ main_get_event_info_route@8:
     intc_1 // 1
     return
 
-main_toggle_sale_route@7:
-    // smart_contracts/ticketing/contract.py:116
+main_toggle_sale_route@8:
+    // smart_contracts/ticketing/contract.py:141
     // @abimethod()
     txn OnCompletion
     !
@@ -89,7 +89,7 @@ main_toggle_sale_route@7:
     txn ApplicationID
     assert // can only call when not creating
     callsub toggle_sale
-    bytec_2 // 0x00
+    bytec_3 // 0x00
     intc_0 // 0
     uncover 2
     setbit
@@ -100,8 +100,8 @@ main_toggle_sale_route@7:
     intc_1 // 1
     return
 
-main_is_checked_in_route@6:
-    // smart_contracts/ticketing/contract.py:105
+main_is_checked_in_route@7:
+    // smart_contracts/ticketing/contract.py:130
     // @abimethod(readonly=True)
     txn OnCompletion
     !
@@ -112,10 +112,10 @@ main_is_checked_in_route@6:
     // class Ticketing(ARC4Contract):
     txna ApplicationArgs 1
     btoi
-    // smart_contracts/ticketing/contract.py:105
+    // smart_contracts/ticketing/contract.py:130
     // @abimethod(readonly=True)
     callsub is_checked_in
-    bytec_2 // 0x00
+    bytec_3 // 0x00
     intc_0 // 0
     uncover 2
     setbit
@@ -126,8 +126,8 @@ main_is_checked_in_route@6:
     intc_1 // 1
     return
 
-main_verify_entry_route@5:
-    // smart_contracts/ticketing/contract.py:81
+main_verify_entry_route@6:
+    // smart_contracts/ticketing/contract.py:104
     // @abimethod()
     txn OnCompletion
     !
@@ -141,10 +141,10 @@ main_verify_entry_route@5:
     txnas Accounts
     txna ApplicationArgs 2
     btoi
-    // smart_contracts/ticketing/contract.py:81
+    // smart_contracts/ticketing/contract.py:104
     // @abimethod()
     callsub verify_entry
-    bytec_2 // 0x00
+    bytec_3 // 0x00
     intc_0 // 0
     uncover 2
     setbit
@@ -152,6 +152,24 @@ main_verify_entry_route@5:
     swap
     concat
     log
+    intc_1 // 1
+    return
+
+main_claim_ticket_route@5:
+    // smart_contracts/ticketing/contract.py:81
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/ticketing/contract.py:5
+    // class Ticketing(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // smart_contracts/ticketing/contract.py:81
+    // @abimethod()
+    callsub claim_ticket
     intc_1 // 1
     return
 
@@ -233,7 +251,7 @@ create_event:
     app_global_put
     // smart_contracts/ticketing/contract.py:30
     // self.sold_count = UInt64(0)
-    bytec_3 // "sold_count"
+    bytec_2 // "sold_count"
     intc_0 // 0
     app_global_put
     // smart_contracts/ticketing/contract.py:31
@@ -273,17 +291,17 @@ buy_ticket:
     // @abimethod()
     // def buy_ticket(self, payment: gtxn.PaymentTransaction) -> UInt64:
     proto 1 1
-    // smart_contracts/ticketing/contract.py:44
+    // smart_contracts/ticketing/contract.py:45
     // assert self.is_sale_active, "Sale not active"
     intc_0 // 0
     bytec_1 // "is_sale_active"
     app_global_get_ex
     assert // check self.is_sale_active exists
     assert // Sale not active
-    // smart_contracts/ticketing/contract.py:45
+    // smart_contracts/ticketing/contract.py:46
     // assert self.sold_count < self.max_supply, "Sold out"
     intc_0 // 0
-    bytec_3 // "sold_count"
+    bytec_2 // "sold_count"
     app_global_get_ex
     assert // check self.sold_count exists
     intc_0 // 0
@@ -292,7 +310,7 @@ buy_ticket:
     assert // check self.max_supply exists
     <
     assert // Sold out
-    // smart_contracts/ticketing/contract.py:46
+    // smart_contracts/ticketing/contract.py:47
     // assert Global.latest_timestamp < self.sale_end_date, "Ticket sales have ended"
     global LatestTimestamp
     intc_0 // 0
@@ -301,7 +319,7 @@ buy_ticket:
     assert // check self.sale_end_date exists
     <
     assert // Ticket sales have ended
-    // smart_contracts/ticketing/contract.py:47
+    // smart_contracts/ticketing/contract.py:48
     // assert Global.latest_timestamp < self.event_date, "Event has passed"
     global LatestTimestamp
     intc_0 // 0
@@ -310,14 +328,14 @@ buy_ticket:
     assert // check self.event_date exists
     <
     assert // Event has passed
-    // smart_contracts/ticketing/contract.py:48
+    // smart_contracts/ticketing/contract.py:49
     // assert payment.receiver == Global.current_application_address
     frame_dig -1
     gtxns Receiver
     global CurrentApplicationAddress
     ==
     assert
-    // smart_contracts/ticketing/contract.py:49
+    // smart_contracts/ticketing/contract.py:50
     // assert payment.amount >= self.ticket_price, "Insufficient payment"
     frame_dig -1
     gtxns Amount
@@ -327,19 +345,41 @@ buy_ticket:
     assert // check self.ticket_price exists
     >=
     assert // Insufficient payment
-    // smart_contracts/ticketing/contract.py:51-52
+    // smart_contracts/ticketing/contract.py:52-53
+    // # Check if buyer already purchased (use box storage with sender address as key)
+    // buyer_box_key = payment.sender.bytes
+    frame_dig -1
+    gtxns Sender
+    // smart_contracts/ticketing/contract.py:54
+    // buyer_ticket_data, already_purchased = op.Box.get(buyer_box_key)
+    dup
+    box_get
+    bury 1
+    // smart_contracts/ticketing/contract.py:55
+    // assert not already_purchased, "You already purchased a ticket for this event"
+    !
+    assert // You already purchased a ticket for this event
+    // smart_contracts/ticketing/contract.py:57-58
+    // # Mark buyer as having purchased (create box with value=1)
+    // op.Box.put(buyer_box_key, op.itob(UInt64(1)))
+    intc_1 // 1
+    itob
+    dig 1
+    swap
+    box_put
+    // smart_contracts/ticketing/contract.py:60-61
     // # Increment ticket counter
     // self.sold_count += UInt64(1)
     intc_0 // 0
-    bytec_3 // "sold_count"
+    bytec_2 // "sold_count"
     app_global_get_ex
     assert // check self.sold_count exists
     intc_1 // 1
     +
-    bytec_3 // "sold_count"
+    bytec_2 // "sold_count"
     swap
     app_global_put
-    // smart_contracts/ticketing/contract.py:53
+    // smart_contracts/ticketing/contract.py:62
     // self.unique_buyers += UInt64(1)
     intc_0 // 0
     bytec 6 // "unique_buyers"
@@ -350,8 +390,8 @@ buy_ticket:
     bytec 6 // "unique_buyers"
     swap
     app_global_put
-    // smart_contracts/ticketing/contract.py:55-66
-    // # Mint NFT ticket to buyer
+    // smart_contracts/ticketing/contract.py:64-75
+    // # Mint NFT ticket - keep in contract until buyer opts in
     // ticket_asset_id = itxn.AssetConfig(
     //     total=1,  # NFT (1 unit only)
     //     decimals=0,
@@ -359,59 +399,51 @@ buy_ticket:
     //     unit_name=b"TIX",
     //     url=b"ipfs://campus-ticket",
     //     manager=Global.current_application_address,
-    //     reserve=payment.sender,
+    //     reserve=payment.sender,  # Mark the buyer in reserve field
     //     freeze=Global.current_application_address,
     //     clawback=Global.current_application_address
     // ).submit().created_asset.id
     itxn_begin
-    // smart_contracts/ticketing/contract.py:62
+    // smart_contracts/ticketing/contract.py:71
     // manager=Global.current_application_address,
     global CurrentApplicationAddress
-    // smart_contracts/ticketing/contract.py:63
-    // reserve=payment.sender,
-    frame_dig -1
-    gtxns Sender
-    // smart_contracts/ticketing/contract.py:64
+    // smart_contracts/ticketing/contract.py:73-74
     // freeze=Global.current_application_address,
-    global CurrentApplicationAddress
-    // smart_contracts/ticketing/contract.py:65
     // clawback=Global.current_application_address
-    dup
+    dupn 2
     itxn_field ConfigAssetClawback
     itxn_field ConfigAssetFreeze
-    dup
-    itxn_field ConfigAssetReserve
-    swap
     itxn_field ConfigAssetManager
-    // smart_contracts/ticketing/contract.py:61
+    itxn_field ConfigAssetReserve
+    // smart_contracts/ticketing/contract.py:70
     // url=b"ipfs://campus-ticket",
     pushbytes 0x697066733a2f2f63616d7075732d7469636b6574
     itxn_field ConfigAssetURL
-    // smart_contracts/ticketing/contract.py:60
+    // smart_contracts/ticketing/contract.py:69
     // unit_name=b"TIX",
     pushbytes 0x544958
     itxn_field ConfigAssetUnitName
-    // smart_contracts/ticketing/contract.py:59
+    // smart_contracts/ticketing/contract.py:68
     // asset_name=b"Event Ticket",
     pushbytes 0x4576656e74205469636b6574
     itxn_field ConfigAssetName
-    // smart_contracts/ticketing/contract.py:58
+    // smart_contracts/ticketing/contract.py:67
     // decimals=0,
     intc_0 // 0
     itxn_field ConfigAssetDecimals
-    // smart_contracts/ticketing/contract.py:57
+    // smart_contracts/ticketing/contract.py:66
     // total=1,  # NFT (1 unit only)
     intc_1 // 1
     itxn_field ConfigAssetTotal
-    // smart_contracts/ticketing/contract.py:55-56
-    // # Mint NFT ticket to buyer
+    // smart_contracts/ticketing/contract.py:64-65
+    // # Mint NFT ticket - keep in contract until buyer opts in
     // ticket_asset_id = itxn.AssetConfig(
     pushint 3 // acfg
     itxn_field TypeEnum
     intc_0 // 0
     itxn_field Fee
-    // smart_contracts/ticketing/contract.py:55-66
-    // # Mint NFT ticket to buyer
+    // smart_contracts/ticketing/contract.py:64-75
+    // # Mint NFT ticket - keep in contract until buyer opts in
     // ticket_asset_id = itxn.AssetConfig(
     //     total=1,  # NFT (1 unit only)
     //     decimals=0,
@@ -419,67 +451,99 @@ buy_ticket:
     //     unit_name=b"TIX",
     //     url=b"ipfs://campus-ticket",
     //     manager=Global.current_application_address,
-    //     reserve=payment.sender,
+    //     reserve=payment.sender,  # Mark the buyer in reserve field
     //     freeze=Global.current_application_address,
     //     clawback=Global.current_application_address
     // ).submit().created_asset.id
     itxn_submit
     itxn CreatedAssetID
-    // smart_contracts/ticketing/contract.py:68-73
-    // # Transfer NFT to buyer
+    // smart_contracts/ticketing/contract.py:77-79
+    // # NFT stays with contract - buyer must opt-in then call claim_ticket
+    // # Check-in box will be created later during verify_entry
+    // return ticket_asset_id
+    retsub
+
+
+// smart_contracts.ticketing.contract.Ticketing.claim_ticket(ticket_asset_id: uint64) -> void:
+claim_ticket:
+    // smart_contracts/ticketing/contract.py:81-82
+    // @abimethod()
+    // def claim_ticket(self, ticket_asset_id: UInt64) -> None:
+    proto 1 0
+    // smart_contracts/ticketing/contract.py:87-88
+    // # Verify this asset was created by this contract and buyer is marked
+    // reserve_addr, reserve_exists = op.AssetParamsGet.asset_reserve(ticket_asset_id)
+    frame_dig -1
+    asset_params_get AssetReserve
+    // smart_contracts/ticketing/contract.py:89
+    // assert reserve_exists, "Asset not found"
+    assert // Asset not found
+    // smart_contracts/ticketing/contract.py:90
+    // assert reserve_addr == Txn.sender, "Not your ticket"
+    txn Sender
+    ==
+    assert // Not your ticket
+    // smart_contracts/ticketing/contract.py:92-93
+    // # Verify buyer has opted into the asset
+    // buyer_balance, buyer_opted_in = op.AssetHoldingGet.asset_balance(Txn.sender, ticket_asset_id)
+    txn Sender
+    frame_dig -1
+    asset_holding_get AssetBalance
+    bury 1
+    // smart_contracts/ticketing/contract.py:94
+    // assert buyer_opted_in, "Must opt-in to asset first"
+    assert // Must opt-in to asset first
+    // smart_contracts/ticketing/contract.py:96-102
+    // # Transfer using clawback
     // itxn.AssetTransfer(
-    //     asset_receiver=payment.sender,
+    //     asset_sender=Global.current_application_address,
+    //     asset_receiver=Txn.sender,
     //     asset_amount=1,
     //     xfer_asset=ticket_asset_id
     // ).submit()
     itxn_begin
-    dup
+    // smart_contracts/ticketing/contract.py:98
+    // asset_sender=Global.current_application_address,
+    global CurrentApplicationAddress
+    // smart_contracts/ticketing/contract.py:99
+    // asset_receiver=Txn.sender,
+    txn Sender
+    frame_dig -1
     itxn_field XferAsset
-    // smart_contracts/ticketing/contract.py:71
+    // smart_contracts/ticketing/contract.py:100
     // asset_amount=1,
     intc_1 // 1
     itxn_field AssetAmount
-    swap
     itxn_field AssetReceiver
-    // smart_contracts/ticketing/contract.py:68-69
-    // # Transfer NFT to buyer
+    itxn_field AssetSender
+    // smart_contracts/ticketing/contract.py:96-97
+    // # Transfer using clawback
     // itxn.AssetTransfer(
     pushint 4 // axfer
     itxn_field TypeEnum
     intc_0 // 0
     itxn_field Fee
-    // smart_contracts/ticketing/contract.py:68-73
-    // # Transfer NFT to buyer
+    // smart_contracts/ticketing/contract.py:96-102
+    // # Transfer using clawback
     // itxn.AssetTransfer(
-    //     asset_receiver=payment.sender,
+    //     asset_sender=Global.current_application_address,
+    //     asset_receiver=Txn.sender,
     //     asset_amount=1,
     //     xfer_asset=ticket_asset_id
     // ).submit()
     itxn_submit
-    // smart_contracts/ticketing/contract.py:75-76
-    // # Initialize check-in status in box storage
-    // box_key = op.itob(ticket_asset_id)
-    dup
-    itob
-    // smart_contracts/ticketing/contract.py:77
-    // Box(Bytes, key=box_key).value = Bytes(b"\x00")  # 0 = not checked in
-    dup
-    box_del
-    pop
-    bytec_2 // 0x00
-    box_put
-    // smart_contracts/ticketing/contract.py:79
-    // return ticket_asset_id
     retsub
 
 
 // smart_contracts.ticketing.contract.Ticketing.verify_entry(ticket_holder: bytes, ticket_asset_id: uint64) -> uint64:
 verify_entry:
-    // smart_contracts/ticketing/contract.py:81-82
+    // smart_contracts/ticketing/contract.py:104-105
     // @abimethod()
     // def verify_entry(self, ticket_holder: Account, ticket_asset_id: UInt64) -> bool:
     proto 2 1
-    // smart_contracts/ticketing/contract.py:87
+    intc_0 // 0
+    dup
+    // smart_contracts/ticketing/contract.py:110
     // assert Txn.sender == self.organizer, "Only organizer can verify"
     txn Sender
     intc_0 // 0
@@ -488,7 +552,7 @@ verify_entry:
     assert // check self.organizer exists
     ==
     assert // Only organizer can verify
-    // smart_contracts/ticketing/contract.py:88
+    // smart_contracts/ticketing/contract.py:111
     // assert Global.latest_timestamp <= self.event_date + UInt64(86400), "Event verification period ended"
     global LatestTimestamp
     intc_0 // 0
@@ -499,53 +563,62 @@ verify_entry:
     +
     <=
     assert // Event verification period ended
-    // smart_contracts/ticketing/contract.py:90-91
+    // smart_contracts/ticketing/contract.py:113-114
     // # Check ticket_holder owns the NFT
     // holder_balance, holder_exists = op.AssetHoldingGet.asset_balance(ticket_holder, ticket_asset_id)
     frame_dig -2
     frame_dig -1
     asset_holding_get AssetBalance
-    // smart_contracts/ticketing/contract.py:92
+    // smart_contracts/ticketing/contract.py:115
     // assert holder_exists and holder_balance == UInt64(1), "Ticket not owned by holder"
     bz verify_entry_bool_false@3
-    frame_dig 0
+    frame_dig 2
     intc_1 // 1
     ==
     bz verify_entry_bool_false@3
     intc_1 // 1
 
 verify_entry_bool_merge@4:
-    // smart_contracts/ticketing/contract.py:92
+    // smart_contracts/ticketing/contract.py:115
     // assert holder_exists and holder_balance == UInt64(1), "Ticket not owned by holder"
     assert // Ticket not owned by holder
-    // smart_contracts/ticketing/contract.py:94-95
-    // # Check ticket hasn't been used
+    // smart_contracts/ticketing/contract.py:117-118
+    // # Check ticket hasn't been used (create box if first time)
     // box_key = op.itob(ticket_asset_id)
     frame_dig -1
     itob
-    // smart_contracts/ticketing/contract.py:96
-    // ticket_status, box_exists = op.Box.get(box_key)
     dup
+    frame_bury 0
+    // smart_contracts/ticketing/contract.py:119
+    // ticket_status, box_exists = op.Box.get(box_key)
     box_get
-    // smart_contracts/ticketing/contract.py:97
-    // assert box_exists, "Invalid ticket"
-    assert // Invalid ticket
-    // smart_contracts/ticketing/contract.py:98
+    swap
+    frame_bury 1
+    // smart_contracts/ticketing/contract.py:121
+    // if box_exists:
+    bz verify_entry_after_if_else@6
+    // smart_contracts/ticketing/contract.py:122-123
+    // # Box exists - check if already used
     // assert op.extract_uint64(ticket_status, 0) == UInt64(0), "Ticket already used"
+    frame_dig 1
     intc_0 // 0
     extract_uint64
     !
     assert // Ticket already used
-    // smart_contracts/ticketing/contract.py:100-101
-    // # Mark as checked-in
+
+verify_entry_after_if_else@6:
+    // smart_contracts/ticketing/contract.py:125-126
+    // # Mark as checked-in (creates box if doesn't exist)
     // op.Box.put(box_key, op.itob(UInt64(1)))
     intc_1 // 1
     itob
+    frame_dig 0
+    swap
     box_put
-    // smart_contracts/ticketing/contract.py:103
+    // smart_contracts/ticketing/contract.py:128
     // return True
     intc_1 // 1
-    swap
+    frame_bury 0
     retsub
 
 verify_entry_bool_false@3:
@@ -555,28 +628,28 @@ verify_entry_bool_false@3:
 
 // smart_contracts.ticketing.contract.Ticketing.is_checked_in(ticket_asset_id: uint64) -> uint64:
 is_checked_in:
-    // smart_contracts/ticketing/contract.py:105-106
+    // smart_contracts/ticketing/contract.py:130-131
     // @abimethod(readonly=True)
     // def is_checked_in(self, ticket_asset_id: UInt64) -> bool:
     proto 1 1
-    // smart_contracts/ticketing/contract.py:108
+    // smart_contracts/ticketing/contract.py:133
     // box_key = op.itob(ticket_asset_id)
     frame_dig -1
     itob
-    // smart_contracts/ticketing/contract.py:109
+    // smart_contracts/ticketing/contract.py:134
     // ticket_status, box_exists = op.Box.get(box_key)
     box_get
-    // smart_contracts/ticketing/contract.py:111
+    // smart_contracts/ticketing/contract.py:136
     // if not box_exists:
     bnz is_checked_in_after_if_else@2
-    // smart_contracts/ticketing/contract.py:112
+    // smart_contracts/ticketing/contract.py:137
     // return False
     intc_0 // 0
     swap
     retsub
 
 is_checked_in_after_if_else@2:
-    // smart_contracts/ticketing/contract.py:114
+    // smart_contracts/ticketing/contract.py:139
     // return op.extract_uint64(ticket_status, 0) == UInt64(1)
     frame_dig 0
     intc_0 // 0
@@ -589,7 +662,7 @@ is_checked_in_after_if_else@2:
 
 // smart_contracts.ticketing.contract.Ticketing.toggle_sale() -> uint64:
 toggle_sale:
-    // smart_contracts/ticketing/contract.py:119
+    // smart_contracts/ticketing/contract.py:144
     // assert Txn.sender == self.organizer, "Only organizer can toggle"
     txn Sender
     intc_0 // 0
@@ -598,7 +671,7 @@ toggle_sale:
     assert // check self.organizer exists
     ==
     assert // Only organizer can toggle
-    // smart_contracts/ticketing/contract.py:120
+    // smart_contracts/ticketing/contract.py:145
     // self.is_sale_active = not self.is_sale_active
     intc_0 // 0
     bytec_1 // "is_sale_active"
@@ -608,7 +681,7 @@ toggle_sale:
     bytec_1 // "is_sale_active"
     swap
     app_global_put
-    // smart_contracts/ticketing/contract.py:121
+    // smart_contracts/ticketing/contract.py:146
     // return self.is_sale_active
     intc_0 // 0
     bytec_1 // "is_sale_active"
@@ -619,49 +692,49 @@ toggle_sale:
 
 // smart_contracts.ticketing.contract.Ticketing.get_event_info() -> uint64, uint64, uint64, uint64, uint64, uint64, uint64:
 get_event_info:
-    // smart_contracts/ticketing/contract.py:127
+    // smart_contracts/ticketing/contract.py:152
     // self.ticket_price,
     intc_0 // 0
     bytec 7 // "ticket_price"
     app_global_get_ex
     assert // check self.ticket_price exists
-    // smart_contracts/ticketing/contract.py:128
+    // smart_contracts/ticketing/contract.py:153
     // self.max_supply,
     intc_0 // 0
     bytec 8 // "max_supply"
     app_global_get_ex
     assert // check self.max_supply exists
-    // smart_contracts/ticketing/contract.py:129
+    // smart_contracts/ticketing/contract.py:154
     // self.sold_count,
     intc_0 // 0
-    bytec_3 // "sold_count"
+    bytec_2 // "sold_count"
     app_global_get_ex
     assert // check self.sold_count exists
-    // smart_contracts/ticketing/contract.py:130
+    // smart_contracts/ticketing/contract.py:155
     // self.event_date,
     intc_0 // 0
     bytec 4 // "event_date"
     app_global_get_ex
     assert // check self.event_date exists
-    // smart_contracts/ticketing/contract.py:131
+    // smart_contracts/ticketing/contract.py:156
     // self.sale_end_date,
     intc_0 // 0
     bytec 9 // "sale_end_date"
     app_global_get_ex
     assert // check self.sale_end_date exists
-    // smart_contracts/ticketing/contract.py:132
+    // smart_contracts/ticketing/contract.py:157
     // self.unique_buyers,
     intc_0 // 0
     bytec 6 // "unique_buyers"
     app_global_get_ex
     assert // check self.unique_buyers exists
-    // smart_contracts/ticketing/contract.py:133
+    // smart_contracts/ticketing/contract.py:158
     // self.is_sale_active
     intc_0 // 0
     bytec_1 // "is_sale_active"
     app_global_get_ex
     assert // check self.is_sale_active exists
-    // smart_contracts/ticketing/contract.py:126-134
+    // smart_contracts/ticketing/contract.py:151-159
     // return (
     //     self.ticket_price,
     //     self.max_supply,
@@ -676,7 +749,7 @@ get_event_info:
 
 // smart_contracts.ticketing.contract.Ticketing.get_organizer() -> bytes:
 get_organizer:
-    // smart_contracts/ticketing/contract.py:139
+    // smart_contracts/ticketing/contract.py:164
     // return self.organizer
     intc_0 // 0
     bytec 5 // "organizer"

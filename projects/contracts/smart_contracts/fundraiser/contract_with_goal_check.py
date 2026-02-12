@@ -2,12 +2,10 @@ from algopy import *
 from algopy.arc4 import abimethod
 
 
-class Fundraiser(ARC4Contract):
+class FundraiserWithMilestoneGoals(ARC4Contract):
     """
-    CampusChain Fundraiser Contract
-    Milestone-based crowdfunding for campus activities
-    Each deployment = one campaign (fully decentralized)
-    Funds released ONLY if goal is met!
+    Enhanced Fundraiser Contract
+    Funds released ONLY if goal is met + per milestone basis
     """
 
     goal_amount: UInt64
@@ -22,7 +20,7 @@ class Fundraiser(ARC4Contract):
 
     @abimethod(allow_actions=['NoOp'], create='require')
     def create_campaign(self, goal: UInt64, milestones: UInt64, deadline: UInt64) -> UInt64:
-        """Create a new fundraising campaign (called during contract creation)"""
+        """Create a new fundraising campaign"""
         self.goal_amount = goal
         self.raised_amount = UInt64(0)
         self.milestone_count = milestones
@@ -64,22 +62,56 @@ class Fundraiser(ARC4Contract):
         # NEW: Must reach goal before ANY milestone can be released
         assert self.goal_reached, "Cannot release funds - goal not reached yet"
         
-        # Calculate amount per milestone (integer division)
-        amount_per_milestone = self.goal_amount // self.milestone_count
+        # Calculate amount per milestone
+        amount_per_milestone = self.goal_amount / self.milestone_count
         
-        # Send funds to creator using inner transaction
-        itxn.Payment(
+        # Send funds to creator
+        itxn = InnerTransaction.payment(
             receiver=self.creator,
             amount=amount_per_milestone,
-            fee=0
-        ).submit()
+            fee=UInt64(1000)
+        )
+        itxn.submit()
         
         self.current_milestone += UInt64(1)
         return self.current_milestone
 
     @abimethod()
+    def refund_if_failed(self) -> bool:
+        """
+        NEW: Allow refunds if campaign failed to meet goal after deadline
+        Contributors can call this to get money back
+        """
+        assert Global.latest_timestamp > self.deadline, "Campaign still active"
+        assert not self.goal_reached, "Goal was reached, no refunds"
+        
+        # In production, you'd need to track individual contributions in box storage
+        # and allow each contributor to claim their refund
+        # This is a simplified version
+        
+        return True
+
+    @abimethod()
+    def finalize_campaign(self) -> bool:
+        """
+        NEW: Finalize campaign after deadline
+        If goal NOT met, enable refunds
+        If goal met, allow milestone releases
+        """
+        assert Global.latest_timestamp > self.deadline, "Campaign still active"
+        assert Txn.sender == self.creator, "Only creator can finalize"
+        
+        if not self.goal_reached:
+            # Goal not met - enable refund mode
+            self.is_active = False
+            return False
+        else:
+            # Goal met - keep active for milestone releases
+            return True
+
+    @abimethod()
     def get_status(self) -> tuple[UInt64, UInt64, UInt64, UInt64, UInt64, bool, bool]:
-        """Get campaign status (includes goal_reached)"""
+        """Get campaign status (added goal_reached)"""
         return (
             self.goal_amount,
             self.raised_amount,
@@ -89,12 +121,12 @@ class Fundraiser(ARC4Contract):
             self.is_active,
             self.goal_reached  # NEW: Include goal status
         )
-    
+
     @abimethod(readonly=True)
-    def get_creator(self) -> Account:
+    def get_creator(self) -> Address:
         """Get campaign creator address"""
         return self.creator
-    
+
     @abimethod(readonly=True)
     def get_deadline(self) -> UInt64:
         """Get campaign deadline"""

@@ -1,0 +1,414 @@
+#pragma version 10
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 0 1
+    bytecblock 0x151f7c75 "raised_amount" "current_milestone" "contributor_count" "goal_amount" "milestone_count" "deadline" "is_active" "creator"
+    // smart_contracts/fundraiser/contract.py:5
+    // class Fundraiser(ARC4Contract):
+    txn NumAppArgs
+    bz main_after_if_else@12
+    pushbytess 0x11362d2d 0xe4c3e010 0xc221c051 0xe5c98f79 0x202a0e19 0x65f78757 // method "create_campaign(uint64,uint64,uint64)uint64", method "donate(pay)uint64", method "release_milestone()uint64", method "get_status()(uint64,uint64,uint64,uint64,uint64,bool)", method "get_creator()address", method "get_deadline()uint64"
+    txna ApplicationArgs 0
+    match main_create_campaign_route@3 main_donate_route@4 main_release_milestone_route@5 main_get_status_route@6 main_get_creator_route@7 main_get_deadline_route@8
+
+main_after_if_else@12:
+    // smart_contracts/fundraiser/contract.py:5
+    // class Fundraiser(ARC4Contract):
+    intc_0 // 0
+    return
+
+main_get_deadline_route@8:
+    // smart_contracts/fundraiser/contract.py:73
+    // @abimethod(readonly=True)
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_deadline
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_creator_route@7:
+    // smart_contracts/fundraiser/contract.py:68
+    // @abimethod(readonly=True)
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_creator
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_status_route@6:
+    // smart_contracts/fundraiser/contract.py:56
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_status
+    uncover 5
+    itob
+    uncover 5
+    itob
+    uncover 5
+    itob
+    uncover 5
+    itob
+    uncover 5
+    itob
+    pushbytes 0x00
+    intc_0 // 0
+    uncover 7
+    setbit
+    uncover 5
+    uncover 5
+    concat
+    uncover 4
+    concat
+    uncover 3
+    concat
+    uncover 2
+    concat
+    swap
+    concat
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_release_milestone_route@5:
+    // smart_contracts/fundraiser/contract.py:47
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub release_milestone
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_donate_route@4:
+    // smart_contracts/fundraiser/contract.py:34
+    // @abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/fundraiser/contract.py:5
+    // class Fundraiser(ARC4Contract):
+    txn GroupIndex
+    intc_1 // 1
+    -
+    dup
+    gtxns TypeEnum
+    intc_1 // pay
+    ==
+    assert // transaction type is pay
+    // smart_contracts/fundraiser/contract.py:34
+    // @abimethod()
+    callsub donate
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_create_campaign_route@3:
+    // smart_contracts/fundraiser/contract.py:21
+    // @abimethod(allow_actions=['NoOp'], create='require')
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    !
+    assert // can only call when creating
+    // smart_contracts/fundraiser/contract.py:5
+    // class Fundraiser(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    txna ApplicationArgs 2
+    btoi
+    txna ApplicationArgs 3
+    btoi
+    // smart_contracts/fundraiser/contract.py:21
+    // @abimethod(allow_actions=['NoOp'], create='require')
+    callsub create_campaign
+    itob
+    bytec_0 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.create_campaign(goal: uint64, milestones: uint64, deadline: uint64) -> uint64:
+create_campaign:
+    // smart_contracts/fundraiser/contract.py:21-22
+    // @abimethod(allow_actions=['NoOp'], create='require')
+    // def create_campaign(self, goal: UInt64, milestones: UInt64, deadline: UInt64) -> UInt64:
+    proto 3 1
+    // smart_contracts/fundraiser/contract.py:24
+    // self.goal_amount = goal
+    bytec 4 // "goal_amount"
+    frame_dig -3
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:25
+    // self.raised_amount = UInt64(0)
+    bytec_1 // "raised_amount"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:26
+    // self.milestone_count = milestones
+    bytec 5 // "milestone_count"
+    frame_dig -2
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:27
+    // self.current_milestone = UInt64(0)
+    bytec_2 // "current_milestone"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:28
+    // self.deadline = deadline
+    bytec 6 // "deadline"
+    frame_dig -1
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:29
+    // self.is_active = True
+    bytec 7 // "is_active"
+    intc_1 // 1
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:30
+    // self.creator = Txn.sender
+    bytec 8 // "creator"
+    txn Sender
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:31
+    // self.contributor_count = UInt64(0)
+    bytec_3 // "contributor_count"
+    intc_0 // 0
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:32
+    // return UInt64(1)
+    intc_1 // 1
+    retsub
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.donate(payment: uint64) -> uint64:
+donate:
+    // smart_contracts/fundraiser/contract.py:34-35
+    // @abimethod()
+    // def donate(self, payment: gtxn.PaymentTransaction) -> UInt64:
+    proto 1 1
+    // smart_contracts/fundraiser/contract.py:37
+    // assert self.is_active, "Campaign not active"
+    intc_0 // 0
+    bytec 7 // "is_active"
+    app_global_get_ex
+    assert // check self.is_active exists
+    assert // Campaign not active
+    // smart_contracts/fundraiser/contract.py:38
+    // assert Global.latest_timestamp <= self.deadline, "Campaign ended"
+    global LatestTimestamp
+    intc_0 // 0
+    bytec 6 // "deadline"
+    app_global_get_ex
+    assert // check self.deadline exists
+    <=
+    assert // Campaign ended
+    // smart_contracts/fundraiser/contract.py:39
+    // assert self.raised_amount < self.goal_amount, "Goal already reached"
+    intc_0 // 0
+    bytec_1 // "raised_amount"
+    app_global_get_ex
+    assert // check self.raised_amount exists
+    intc_0 // 0
+    bytec 4 // "goal_amount"
+    app_global_get_ex
+    assert // check self.goal_amount exists
+    <
+    assert // Goal already reached
+    // smart_contracts/fundraiser/contract.py:40
+    // assert payment.receiver == Global.current_application_address
+    frame_dig -1
+    gtxns Receiver
+    global CurrentApplicationAddress
+    ==
+    assert
+    // smart_contracts/fundraiser/contract.py:41
+    // assert payment.amount >= UInt64(100000), "Minimum 0.1 ALGO donation"
+    frame_dig -1
+    gtxns Amount
+    dup
+    pushint 100000 // 100000
+    >=
+    assert // Minimum 0.1 ALGO donation
+    // smart_contracts/fundraiser/contract.py:43
+    // self.raised_amount += payment.amount
+    intc_0 // 0
+    bytec_1 // "raised_amount"
+    app_global_get_ex
+    assert // check self.raised_amount exists
+    +
+    bytec_1 // "raised_amount"
+    swap
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:44
+    // self.contributor_count += UInt64(1)
+    intc_0 // 0
+    bytec_3 // "contributor_count"
+    app_global_get_ex
+    assert // check self.contributor_count exists
+    intc_1 // 1
+    +
+    bytec_3 // "contributor_count"
+    swap
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:45
+    // return self.raised_amount
+    intc_0 // 0
+    bytec_1 // "raised_amount"
+    app_global_get_ex
+    assert // check self.raised_amount exists
+    retsub
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.release_milestone() -> uint64:
+release_milestone:
+    // smart_contracts/fundraiser/contract.py:50
+    // assert Txn.sender == self.creator, "Only creator can release"
+    txn Sender
+    intc_0 // 0
+    bytec 8 // "creator"
+    app_global_get_ex
+    assert // check self.creator exists
+    ==
+    assert // Only creator can release
+    // smart_contracts/fundraiser/contract.py:51
+    // assert self.current_milestone < self.milestone_count, "All milestones completed"
+    intc_0 // 0
+    bytec_2 // "current_milestone"
+    app_global_get_ex
+    assert // check self.current_milestone exists
+    intc_0 // 0
+    bytec 5 // "milestone_count"
+    app_global_get_ex
+    assert // check self.milestone_count exists
+    <
+    assert // All milestones completed
+    // smart_contracts/fundraiser/contract.py:53
+    // self.current_milestone += UInt64(1)
+    intc_0 // 0
+    bytec_2 // "current_milestone"
+    app_global_get_ex
+    assert // check self.current_milestone exists
+    intc_1 // 1
+    +
+    bytec_2 // "current_milestone"
+    swap
+    app_global_put
+    // smart_contracts/fundraiser/contract.py:54
+    // return self.current_milestone
+    intc_0 // 0
+    bytec_2 // "current_milestone"
+    app_global_get_ex
+    assert // check self.current_milestone exists
+    retsub
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.get_status() -> uint64, uint64, uint64, uint64, uint64, uint64:
+get_status:
+    // smart_contracts/fundraiser/contract.py:60
+    // self.goal_amount,
+    intc_0 // 0
+    bytec 4 // "goal_amount"
+    app_global_get_ex
+    assert // check self.goal_amount exists
+    // smart_contracts/fundraiser/contract.py:61
+    // self.raised_amount,
+    intc_0 // 0
+    bytec_1 // "raised_amount"
+    app_global_get_ex
+    assert // check self.raised_amount exists
+    // smart_contracts/fundraiser/contract.py:62
+    // self.current_milestone,
+    intc_0 // 0
+    bytec_2 // "current_milestone"
+    app_global_get_ex
+    assert // check self.current_milestone exists
+    // smart_contracts/fundraiser/contract.py:63
+    // self.milestone_count,
+    intc_0 // 0
+    bytec 5 // "milestone_count"
+    app_global_get_ex
+    assert // check self.milestone_count exists
+    // smart_contracts/fundraiser/contract.py:64
+    // self.contributor_count,
+    intc_0 // 0
+    bytec_3 // "contributor_count"
+    app_global_get_ex
+    assert // check self.contributor_count exists
+    // smart_contracts/fundraiser/contract.py:65
+    // self.is_active
+    intc_0 // 0
+    bytec 7 // "is_active"
+    app_global_get_ex
+    assert // check self.is_active exists
+    // smart_contracts/fundraiser/contract.py:59-66
+    // return (
+    //     self.goal_amount,
+    //     self.raised_amount,
+    //     self.current_milestone,
+    //     self.milestone_count,
+    //     self.contributor_count,
+    //     self.is_active
+    // )
+    retsub
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.get_creator() -> bytes:
+get_creator:
+    // smart_contracts/fundraiser/contract.py:71
+    // return self.creator
+    intc_0 // 0
+    bytec 8 // "creator"
+    app_global_get_ex
+    assert // check self.creator exists
+    retsub
+
+
+// smart_contracts.fundraiser.contract.Fundraiser.get_deadline() -> uint64:
+get_deadline:
+    // smart_contracts/fundraiser/contract.py:76
+    // return self.deadline
+    intc_0 // 0
+    bytec 6 // "deadline"
+    app_global_get_ex
+    assert // check self.deadline exists
+    retsub
