@@ -67,9 +67,22 @@ const FundraisingPageDecentralized = () => {
 
   useEffect(() => {
     loadCampaigns()
-    // Poll for updates every 10 seconds
-    const interval = setInterval(() => loadCampaigns(), 10000)
-    return () => clearInterval(interval)
+    // Poll for updates every 5 seconds for faster cross-device discovery
+    const interval = setInterval(() => loadCampaigns(), 5000)
+    
+    // Also refresh when page becomes visible (for cross-device sync)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        console.log('Page visible again, refreshing campaigns...')
+        loadCampaigns(true) // Force refresh when returning to page
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    return () => {
+      clearInterval(interval)
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, []) // ⚠️ IMPORTANT: No activeAddress dependency - all users see the same campaigns
 
   const donate = async () => {
@@ -282,6 +295,20 @@ const FundraisingPageDecentralized = () => {
                 <span className="badge badge-sm bg-white/20 border-white/30">NEW</span>
               </h3>
               <p className="text-sm text-white/90">Multi-college mega-events with shared funding pools. VIT + MIT + SRM + SASTRA = one network.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Cross-Device Sync Info Banner */}
+        <div className="alert alert-info shadow-lg mb-6">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 className="font-bold">Cross-Device Discovery Info</h3>
+            <div className="text-sm">
+              New campaigns are visible immediately on the same device. For other devices, the Algorand blockchain indexer needs 30-60 seconds to sync. 
+              Click the <span className="font-bold">🔄 Refresh</span> button or switch back to this tab to force an update.
             </div>
           </div>
         </div>
