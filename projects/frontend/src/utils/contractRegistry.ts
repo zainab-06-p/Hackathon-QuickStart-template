@@ -35,7 +35,8 @@ const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v3'
 const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v3'
 const CACHE_DURATION = 2 * 1000 // 2 seconds for faster cross-device sync
 const MAX_RETRY_ATTEMPTS = 3
-const QUERY_LIMIT = 1000 // Reduced from 5000 to avoid HTTP/2 errors
+const QUERY_LIMIT = 1000
+const RECENT_DAYS = 90 // Only scan apps created in last 90 days
 
 export interface ContractMetadata {
   appId: number
@@ -63,10 +64,22 @@ export class ContractRegistry {
       this.indexerClient = new algosdk.Indexer(
         config.token as any || '',
         config.server,
-        config.port as any || ''
+        config.port as any || ''  
       )
     }
     return this.indexerClient
+  }
+
+  // Get current blockchain round to search recent apps
+  private static async getCurrentRound(): Promise<number> {
+    try {
+      const indexer = this.getIndexer()
+      const health = await indexer.makeHealthCheck().do()
+      return Number(health.round || 0)
+    } catch (error) {
+      console.warn('Failed to get current round:', error)
+      return 0
+    }
   }
 
   // Decode base64 to string
@@ -293,35 +306,63 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 3: Scan recent applications (with detailed debugging on first few)
-      console.log('🔎 Scanning recent applications for ALL fundraisers...')
-      const apps = await this.retryWithBackoff(() => 
-        indexer.searchForApplications().limit(QUERY_LIMIT).do()
+      // Strategy 3: Scan apps created in RECENT BLOCKCHAIN ROUNDS
+      // CRITICAL FIX: Apps at ID 755M, can't scan all TestNet apps
+      // Solution: Get current round, scan larger set, filter by recent creation
+      const currentRound = await this.getCurrentRound()
+      const searchFromRound = Math.max(0, currentRound - 100000) // Last ~100k rounds
+      
+      console.log(`🔎 Current round: ${currentRound}, will filter apps created after round ${searchFromRound}...`)
+      
+      // Scan more apps but filter by creation round
+      const result: any = await this.retryWithBackoff(() => 
+        indexer.searchForApplications()
+          .limit(QUERY_LIMIT * 10) // 10k apps
+          .do()
       )
-      console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
+      const apps = result.applications || []
+      console.log(`🔎 Indexer returned ${apps.length} applications, filtering by recent rounds...`)
       
       let debugCount = 0
-      for (const app of apps.applications) {
+      let scannedCount = 0
+      let recentCount = 0
+      
+      for (const app of apps) {
+        scannedCount++
+        
         if (!app.params || !app.params.globalState) continue
         
         const appId = Number(app.id)
+        const createdAt = Number(app.createdAtRound || 0)
         
         // Skip if already found
         if (indexerContracts.some(c => c.appId === appId)) continue
         
-        // Debug first 5 apps to see what keys they have
+        // CRITICAL: Filter by creation round to only check recent apps
+        if (createdAt < searchFromRound) {
+          continue // Skip old apps
+        }
+        
+        recentCount++
+        
+        // Debug first 5 recent apps
         const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
-        if (shouldDebug) debugCount++
+        if (shouldDebug) {
+          debugCount++
+          console.log(`🔍 Checking app ${appId} (created at round ${createdAt})`)
+        }
         
         if (this.isFundraiserContract(app.params.globalState, appId, shouldDebug)) {
           indexerContracts.push({
             appId,
             creator: String(app.params.creator || ''),
-            createdAt: Number(app.createdAtRound || 0),
+            createdAt,
           })
-          console.log(`✅ Found fundraiser: App ID ${appId} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
+          console.log(`✅ Found fundraiser: App ID ${appId} (created round ${createdAt}, creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
+      
+      console.log(`📊 Scanned ${scannedCount} total apps, ${recentCount} were recent, found ${indexerContracts.length} fundraisers`)
       
       console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique fundraisers`)
       
@@ -404,35 +445,63 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 3: Scan recent applications (with detailed debugging on first few)
-      console.log('🔎 Scanning recent applications for ALL events...')
-      const apps = await this.retryWithBackoff(() => 
-        indexer.searchForApplications().limit(QUERY_LIMIT).do()
+      // Strategy 3: Scan apps created in RECENT BLOCKCHAIN ROUNDS (Ticketing)
+      // CRITICAL FIX: Apps at ID 755M, can't scan all TestNet apps
+      // Solution: Get current round, scan larger set, filter by recent creation
+      const currentRound = await this.getCurrentRound()
+      const searchFromRound = Math.max(0, currentRound - 100000) // Last ~100k rounds
+      
+      console.log(`🔎 Current round: ${currentRound}, will filter apps created after round ${searchFromRound}...`)
+      
+      // Scan more apps but filter by creation round
+      const result: any = await this.retryWithBackoff(() => 
+        indexer.searchForApplications()
+          .limit(QUERY_LIMIT * 10) // 10k apps
+          .do()
       )
-      console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
+      const apps = result.applications || []
+      console.log(`🔎 Indexer returned ${apps.length} applications, filtering by recent rounds...`)
       
       let debugCount = 0
-      for (const app of apps.applications) {
+      let scannedCount = 0
+      let recentCount = 0
+      
+      for (const app of apps) {
+        scannedCount++
+        
         if (!app.params || !app.params.globalState) continue
         
         const appId = Number(app.id)
+        const createdAt = Number(app.createdAtRound || 0)
         
         // Skip if already found
         if (indexerContracts.some(c => c.appId === appId)) continue
         
-        // Debug first 5 apps to see what keys they have
+        // CRITICAL: Filter by creation round to only check recent apps
+        if (createdAt < searchFromRound) {
+          continue // Skip old apps
+        }
+        
+        recentCount++
+        
+        // Debug first 5 recent apps
         const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
-        if (shouldDebug) debugCount++
+        if (shouldDebug) {
+          debugCount++
+          console.log(`🔍 Checking app ${appId} (created at round ${createdAt})`)
+        }
         
         if (this.isTicketingContract(app.params.globalState, appId, shouldDebug)) {
           indexerContracts.push({
             appId,
             creator: String(app.params.creator || ''),
-            createdAt: Number(app.createdAtRound || 0),
+            createdAt,
           })
-          console.log(`✅ Found ticketing: App ID ${appId} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
+          console.log(`✅ Found ticketing: App ID ${appId} (created round ${createdAt}, creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
+      
+      console.log(`📊 Scanned ${scannedCount} total apps, ${recentCount} were recent, found ${indexerContracts.length} events`)
       
       console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique events`)
       
