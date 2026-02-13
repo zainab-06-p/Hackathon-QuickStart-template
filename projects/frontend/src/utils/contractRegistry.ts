@@ -99,35 +99,89 @@ export class ContractRegistry {
   }
 
   // Identify if an app is a fundraiser contract
-  private static isFundraiserContract(globalState: any[]): boolean {
-    const keys = new Set(globalState.map(item => this.decodeBase64(item.key)))
+  private static isFundraiserContract(globalState: any[], appId: number, debug = false): boolean {
+    if (!globalState || globalState.length === 0) return false
+    
+    const keys = new Set<string>()
+    globalState.forEach(item => {
+      const key = this.decodeBase64(item.key)
+      keys.add(key)
+    })
+    
+    if (debug) {
+      console.log(`🔬 App ${appId} has keys:`, Array.from(keys).join(', '))
+    }
     
     // Check for fundraiser-specific keys
-    // Must have at least 2 of these 3 key combinations
-    const fundraiserKeys = [
-      keys.has('goal_amount'),
-      keys.has('raised_amount'),
-      keys.has('is_active') || keys.has('milestone_count')
-    ]
+    const hasGoalAmount = keys.has('goal_amount')
+    const hasRaisedAmount = keys.has('raised_amount')
+    const hasIsActiveOrMilestone = keys.has('is_active') || keys.has('milestone_count')
     
-    const matches = fundraiserKeys.filter(Boolean).length
-    return matches >= 2
+    const isFundraiser = hasGoalAmount && hasRaisedAmount
+    
+    if (debug && isFundraiser) {
+      console.log(`✅ App ${appId} IS a fundraiser (goal_amount: ${hasGoalAmount}, raised_amount: ${hasRaisedAmount})`)  
+    }
+    
+    return isFundraiser
   }
 
   // Identify if an app is a ticketing contract
-  private static isTicketingContract(globalState: any[]): boolean {
-    const keys = new Set(globalState.map(item => this.decodeBase64(item.key)))
+  private static isTicketingContract(globalState: any[], appId: number, debug = false): boolean {
+    if (!globalState || globalState.length === 0) return false
+    
+    const keys = new Set<string>()
+    globalState.forEach(item => {
+      const key = this.decodeBase64(item.key)
+      keys.add(key)
+    })
+    
+    if (debug) {
+      console.log(`🔬 App ${appId} has keys:`, Array.from(keys).join(', '))
+    }
     
     // Check for ticketing-specific keys
-    // Must have at least 2 of these 3 key combinations
-    const ticketingKeys = [
-      keys.has('ticket_price'),
-      keys.has('max_supply'),
-      keys.has('sold_count') || keys.has('is_sale_active')
-    ]
+    const hasTicketPrice = keys.has('ticket_price')
+    const hasMaxSupply = keys.has('max_supply')
+    const hasSoldCount = keys.has('sold_count')
     
-    const matches = ticketingKeys.filter(Boolean).length
-    return matches >= 2
+    const isTicketing = hasTicketPrice && hasMaxSupply
+    
+    if (debug && isTicketing) {
+      console.log(`✅ App ${appId} IS a ticketing contract (ticket_price: ${hasTicketPrice}, max_supply: ${hasMaxSupply})`)
+    }
+    
+    return isTicketing
+  }
+
+  // Query specific app IDs directly (for cross-device discovery)
+  private static async querySpecificApps(appIds: number[], type: 'fundraiser' | 'ticketing'): Promise<ContractMetadata[]> {
+    const indexer = this.getIndexer()
+    const contracts: ContractMetadata[] = []
+    
+    for (const appId of appIds) {
+      try {
+        const app = await indexer.lookupApplications(appId).do()
+        if (!app.application || !app.application.params || !app.application.params.globalState) continue
+        
+        const globalState = app.application.params.globalState
+        const isMatch = type === 'fundraiser' 
+          ? this.isFundraiserContract(globalState, appId, true)
+          : this.isTicketingContract(globalState, appId, true)
+        
+        if (isMatch) {
+          contracts.push({
+            appId,
+            creator: String(app.application.params.creator || ''),
+            createdAt: Number(app.application.createdAtRound || 0)
+          })
+        }
+      } catch (error) {
+        console.warn(`Failed to query app ${appId}:`, error)
+      }
+    }
+    
+    return contracts
   }
 
   // Register a new deployed fundraiser contract (stores locally for immediate visibility)
@@ -199,7 +253,19 @@ export class ContractRegistry {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query by creator address if provided (optional optimization)
+      // Strategy 1: Query local fundraiser app IDs directly from other devices
+      const localAppIds = localContracts.map(c => c.appId)
+      if (localAppIds.length > 0) {
+        console.log(`🎯 Querying ${localAppIds.length} known fundraiser app IDs directly:`, localAppIds)
+        const directContracts = await this.querySpecificApps(localAppIds, 'fundraiser')
+        directContracts.forEach(c => {
+          if (!indexerContracts.some(existing => existing.appId === c.appId)) {
+            indexerContracts.push(c)
+          }
+        })
+      }
+      
+      // Strategy 2: Query by creator address if provided
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
         try {
@@ -211,13 +277,15 @@ export class ContractRegistry {
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            if (this.isFundraiserContract(app.params.globalState)) {
-              indexerContracts.push({
-                appId: Number(app.id),
-                creator: String(app.params.creator || ''),
-                createdAt: Number(app.createdAtRound || 0),
-              })
-              console.log(`✅ Found fundraiser: App ID ${app.id} by ${creatorAddress}`)
+            if (this.isFundraiserContract(app.params.globalState, Number(app.id), false)) {
+              if (!indexerContracts.some(c => c.appId === Number(app.id))) {
+                indexerContracts.push({
+                  appId: Number(app.id),
+                  creator: String(app.params.creator || ''),
+                  createdAt: Number(app.createdAtRound || 0),
+                })
+                console.log(`✅ Found fundraiser: App ID ${app.id} by ${creatorAddress}`)
+              }
             }
           }
         } catch (error) {
@@ -225,26 +293,33 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 2: Scan recent applications with retry logic
+      // Strategy 3: Scan recent applications (with detailed debugging on first few)
       console.log('🔎 Scanning recent applications for ALL fundraisers...')
       const apps = await this.retryWithBackoff(() => 
         indexer.searchForApplications().limit(QUERY_LIMIT).do()
       )
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
+      let debugCount = 0
       for (const app of apps.applications) {
         if (!app.params || !app.params.globalState) continue
         
-        // Skip if already found
-        if (indexerContracts.some(c => c.appId === Number(app.id))) continue
+        const appId = Number(app.id)
         
-        if (this.isFundraiserContract(app.params.globalState)) {
+        // Skip if already found
+        if (indexerContracts.some(c => c.appId === appId)) continue
+        
+        // Debug first 5 apps to see what keys they have
+        const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
+        if (shouldDebug) debugCount++
+        
+        if (this.isFundraiserContract(app.params.globalState, appId, shouldDebug)) {
           indexerContracts.push({
-            appId: Number(app.id),
+            appId,
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
-          console.log(`✅ Found fundraiser: App ID ${app.id} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
+          console.log(`✅ Found fundraiser: App ID ${appId} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
       
@@ -289,7 +364,19 @@ export class ContractRegistry {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query by creator address if provided (optional optimization)
+      // Strategy 1: Query local ticketing app IDs directly from other devices
+      const localAppIds = localContracts.map(c => c.appId)
+      if (localAppIds.length > 0) {
+        console.log(`🎯 Querying ${localAppIds.length} known ticketing app IDs directly:`, localAppIds)
+        const directContracts = await this.querySpecificApps(localAppIds, 'ticketing')
+        directContracts.forEach(c => {
+          if (!indexerContracts.some(existing => existing.appId === c.appId)) {
+            indexerContracts.push(c)
+          }
+        })
+      }
+      
+      // Strategy 2: Query by creator address if provided
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
         try {
@@ -301,13 +388,15 @@ export class ContractRegistry {
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            if (this.isTicketingContract(app.params.globalState)) {
-              indexerContracts.push({
-                appId: Number(app.id),
-                creator: String(app.params.creator || ''),
-                createdAt: Number(app.createdAtRound || 0),
-              })
-              console.log(`✅ Found ticketing: App ID ${app.id} by ${creatorAddress}`)
+            if (this.isTicketingContract(app.params.globalState, Number(app.id), false)) {
+              if (!indexerContracts.some(c => c.appId === Number(app.id))) {
+                indexerContracts.push({
+                  appId: Number(app.id),
+                  creator: String(app.params.creator || ''),
+                  createdAt: Number(app.createdAtRound || 0),
+                })
+                console.log(`✅ Found ticketing: App ID ${app.id} by ${creatorAddress}`)
+              }
             }
           }
         } catch (error) {
@@ -315,26 +404,33 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 2: Scan recent applications with retry logic
+      // Strategy 3: Scan recent applications (with detailed debugging on first few)
       console.log('🔎 Scanning recent applications for ALL events...')
       const apps = await this.retryWithBackoff(() => 
         indexer.searchForApplications().limit(QUERY_LIMIT).do()
       )
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
+      let debugCount = 0
       for (const app of apps.applications) {
         if (!app.params || !app.params.globalState) continue
         
-        // Skip if already found
-        if (indexerContracts.some(c => c.appId === Number(app.id))) continue
+        const appId = Number(app.id)
         
-        if (this.isTicketingContract(app.params.globalState)) {
+        // Skip if already found
+        if (indexerContracts.some(c => c.appId === appId)) continue
+        
+        // Debug first 5 apps to see what keys they have
+        const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
+        if (shouldDebug) debugCount++
+        
+        if (this.isTicketingContract(app.params.globalState, appId, shouldDebug)) {
           indexerContracts.push({
-            appId: Number(app.id),
+            appId,
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
-          console.log(`✅ Found ticketing: App ID ${app.id} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
+          console.log(`✅ Found ticketing: App ID ${appId} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
       
