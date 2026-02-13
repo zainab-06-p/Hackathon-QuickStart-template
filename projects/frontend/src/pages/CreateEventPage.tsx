@@ -6,6 +6,7 @@ import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment 
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import { TicketingFactory } from '../contracts/TicketingClient'
+import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 
 const CreateEventPage = () => {
@@ -96,6 +97,7 @@ const CreateEventPage = () => {
       
       enqueueSnackbar(`✅ Event created! App ID: ${appId}`, { variant: 'success' })
 
+      // Register in localStorage for immediate visibility
       ContractRegistry.registerTicketing({
         appId,
         creator: activeAddress,
@@ -104,6 +106,33 @@ const CreateEventPage = () => {
         description: newEvent.description,
         venue: newEvent.venue
       })
+
+      // 🎯 Register with on-chain registry for cross-device discovery
+      const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID
+      if (registryAppId && Number(registryAppId) > 0) {
+        try {
+          console.log(`📝 Registering event ${appId} with registry contract ${registryAppId}...`)
+          
+          const registryFactory = new CampusChainRegistryFactory({
+            algorand,
+            defaultSender: activeAddress,
+          })
+          
+          const registryClient = registryFactory.getAppClientById({
+            appId: BigInt(registryAppId)
+          })
+          
+          await registryClient.send.registerTicketing({
+            args: { appId: BigInt(appId) }
+          })
+          
+          console.log(`✅ Event ${appId} registered in on-chain registry!`)
+          enqueueSnackbar('📋 Event registered for cross-device discovery!', { variant: 'success' })
+        } catch (error) {
+          console.warn('Registry registration failed (non-critical):', error)
+          // Don't block the user - localStorage registration is enough
+        }
+      }
 
       setTimeout(() => {
         navigate('/ticketing')

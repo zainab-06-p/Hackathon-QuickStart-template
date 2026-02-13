@@ -6,6 +6,7 @@ import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment 
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
+import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 
 const CreateCampaignPage = () => {
@@ -84,6 +85,7 @@ const CreateCampaignPage = () => {
       
       enqueueSnackbar(`✅ Campaign created! App ID: ${appId}`, { variant: 'success' })
 
+      // Register in localStorage for immediate visibility
       ContractRegistry.registerFundraiser({
         appId,
         creator: activeAddress,
@@ -91,6 +93,33 @@ const CreateCampaignPage = () => {
         title: newCampaign.title,
         description: newCampaign.description
       })
+
+      // 🎯 Register with on-chain registry for cross-device discovery
+      const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID
+      if (registryAppId && Number(registryAppId) > 0) {
+        try {
+          console.log(`📝 Registering campaign ${appId} with registry contract ${registryAppId}...`)
+          
+          const registryFactory = new CampusChainRegistryFactory({
+            algorand,
+            defaultSender: activeAddress,
+          })
+          
+          const registryClient = registryFactory.getAppClientById({
+            appId: BigInt(registryAppId)
+          })
+          
+          await registryClient.send.registerFundraiser({
+            args: { appId: BigInt(appId) }
+          })
+          
+          console.log(`✅ Campaign ${appId} registered in on-chain registry!`)
+          enqueueSnackbar('📋 Campaign registered for cross-device discovery!', { variant: 'success' })
+        } catch (error) {
+          console.warn('Registry registration failed (non-critical):', error)
+          // Don't block the user - localStorage registration is enough
+        }
+      }
 
       // Navigate back to campaigns list
       setTimeout(() => {
