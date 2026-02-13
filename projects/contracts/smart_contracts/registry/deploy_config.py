@@ -3,42 +3,40 @@ Deploy configuration for CampusChain Registry Contract
 """
 
 import logging
-from algopy_testing import AlgopyTestContext, algopy_testing_context
+import algokit_utils
 
 logger = logging.getLogger(__name__)
 
 
-# define deployment behaviour based on supplied app spec
-def deploy(
-    algod_client,
-    indexer_client,
-    app_spec,
-    deployer,
-) -> None:
-    from smart_contracts.artifacts.registry.contract import (
-        CampusChainRegistryClient,
+def deploy() -> None:
+    """Deploy the CampusChain Registry contract to TestNet"""
+    from smart_contracts.artifacts.registry.campus_chain_registry_client import CampusChainRegistryFactory
+
+    # Get Algorand client configured for TestNet
+    algorand = algokit_utils.AlgorandClient.from_environment()
+    deployer = algorand.account.from_environment("DEPLOYER")
+
+    logger.info("🚀 Deploying CampusChain Registry Contract to TestNet...")
+
+    factory = algorand.client.get_typed_app_factory(
+        CampusChainRegistryFactory, 
+        default_sender=deployer.address
     )
 
-    app_client = CampusChainRegistryClient(
-        algod_client,
-        creator=deployer,
-        indexer_client=indexer_client,
+    app_client, result = factory.deploy(
+        on_update=algokit_utils.OnUpdate.ReplaceApp,
+        on_schema_break=algokit_utils.OnSchemaBreak.ReplaceApp,
     )
 
-    logger.info("Deploying CampusChain Registry Contract...")
-
-    app_client.deploy(
-        on_schema_break=OnSchemaBreak.ReplaceApp,
-        on_update=OnUpdate.UpdateApp,
-    )
-
-    # Initialize the registry with empty lists
-    logger.info("Initializing registry with empty lists...")
-    response = app_client.create_registry()
-    
-    logger.info(f"✅ Registry deployed successfully!")
-    logger.info(f"📋 Registry App ID: {app_client.app_id}")
-    logger.info(f"⚠️ IMPORTANT: Add this to your .env.production file:")
-    logger.info(f"   VITE_REGISTRY_APP_ID={app_client.app_id}")
-    
-    return app_client.app_id
+    if result.operation_performed in [
+        algokit_utils.OperationPerformed.Create,
+        algokit_utils.OperationPerformed.Replace,
+    ]:
+        logger.info(f"✅ Registry deployed successfully!")
+        logger.info(f"📋 Registry App ID: {app_client.app_id}")
+        logger.info(f"📍 Registry Address: {app_client.app_address}")
+        logger.info(f"")
+        logger.info(f"⚠️  IMPORTANT: Add this to your frontend/.env.production file:")
+        logger.info(f"   VITE_REGISTRY_APP_ID={app_client.app_id}")
+        logger.info(f"")
+        logger.info(f"✅ Registry ready! Boxes will be auto-created on first registration.")

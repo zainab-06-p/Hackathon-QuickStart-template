@@ -1,0 +1,489 @@
+#pragma version 10
+#pragma typetrack false
+
+// algopy.arc4.ARC4Contract.approval_program() -> uint64:
+main:
+    intcblock 0 1 8 8192
+    bytecblock 0x66756e6472616973657273 0x7469636b6574696e67 0x0000 0x151f7c75
+    // smart_contracts/registry/contract.py:17
+    // class CampusChainRegistry(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@10
+    pushbytess 0x12ba033e 0x1ccb6de0 0x6a02d468 0xdad83e42 0xdf246153 // method "register_fundraiser(uint64)void", method "register_ticketing(uint64)void", method "get_fundraisers()uint64[]", method "get_ticketing()uint64[]", method "get_total_counts()(uint64,uint64)"
+    txna ApplicationArgs 0
+    match main_register_fundraiser_route@3 main_register_ticketing_route@4 main_get_fundraisers_route@5 main_get_ticketing_route@6 main_get_total_counts_route@7
+
+main_after_if_else@14:
+    // smart_contracts/registry/contract.py:17
+    // class CampusChainRegistry(ARC4Contract):
+    intc_0 // 0
+    return
+
+main_get_total_counts_route@7:
+    // smart_contracts/registry/contract.py:126
+    // @abimethod(readonly=True)
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_total_counts
+    swap
+    itob
+    swap
+    itob
+    concat
+    bytec_3 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_ticketing_route@6:
+    // smart_contracts/registry/contract.py:112
+    // @abimethod(readonly=True)
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_ticketing
+    bytec_3 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_get_fundraisers_route@5:
+    // smart_contracts/registry/contract.py:98
+    // @abimethod(readonly=True)
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    callsub get_fundraisers
+    bytec_3 // 0x151f7c75
+    swap
+    concat
+    log
+    intc_1 // 1
+    return
+
+main_register_ticketing_route@4:
+    // smart_contracts/registry/contract.py:61
+    // @abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/registry/contract.py:17
+    // class CampusChainRegistry(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // smart_contracts/registry/contract.py:61
+    // @abimethod
+    callsub register_ticketing
+    intc_1 // 1
+    return
+
+main_register_fundraiser_route@3:
+    // smart_contracts/registry/contract.py:24
+    // @abimethod
+    txn OnCompletion
+    !
+    assert // OnCompletion is not NoOp
+    txn ApplicationID
+    assert // can only call when not creating
+    // smart_contracts/registry/contract.py:17
+    // class CampusChainRegistry(ARC4Contract):
+    txna ApplicationArgs 1
+    btoi
+    // smart_contracts/registry/contract.py:24
+    // @abimethod
+    callsub register_fundraiser
+    intc_1 // 1
+    return
+
+main_bare_routing@10:
+    // smart_contracts/registry/contract.py:17
+    // class CampusChainRegistry(ARC4Contract):
+    txn OnCompletion
+    bnz main_after_if_else@14
+    txn ApplicationID
+    !
+    assert // can only call when creating
+    intc_1 // 1
+    return
+
+
+// smart_contracts.registry.contract.CampusChainRegistry.register_fundraiser(app_id: uint64) -> void:
+register_fundraiser:
+    // smart_contracts/registry/contract.py:24-25
+    // @abimethod
+    // def register_fundraiser(self, app_id: UInt64) -> None:
+    proto 1 0
+    intc_0 // 0
+    pushbytes ""
+    dupn 3
+    // smart_contracts/registry/contract.py:30-31
+    // # Load existing fundraiser list from box (create if doesn't exist)
+    // fundraiser_box = BoxRef(key=b"fundraisers")
+    bytec_0 // 0x66756e6472616973657273
+    // smart_contracts/registry/contract.py:33-34
+    // # Check if box exists, if not create it
+    // existing_bytes, box_exists = fundraiser_box.maybe()
+    box_get
+    // smart_contracts/registry/contract.py:35
+    // if not box_exists:
+    bnz register_fundraiser_after_if_else@2
+    // smart_contracts/registry/contract.py:30-31
+    // # Load existing fundraiser list from box (create if doesn't exist)
+    // fundraiser_box = BoxRef(key=b"fundraisers")
+    bytec_0 // 0x66756e6472616973657273
+    // smart_contracts/registry/contract.py:36-37
+    // # Create box with empty array on first registration
+    // fundraiser_box.create(size=8192)  # 8KB box
+    intc_3 // 8192
+    box_create
+    pop
+    // smart_contracts/registry/contract.py:38
+    // empty_array = DynamicArray[ARC4UInt64]()
+    bytec_2 // 0x0000
+    frame_bury 5
+
+register_fundraiser_after_if_else@2:
+    // smart_contracts/registry/contract.py:43-44
+    // # Add new app ID (prevent duplicates)
+    // app_id_arc4 = ARC4UInt64(app_id)
+    frame_dig -1
+    itob
+    frame_bury 0
+    // smart_contracts/registry/contract.py:46-47
+    // # Check if already registered (linear search - acceptable for moderate lists)
+    // already_registered = False
+    intc_0 // 0
+    frame_bury 1
+    // smart_contracts/registry/contract.py:48
+    // for i in urange(fundraiser_list.length):
+    frame_dig 5
+    intc_0 // 0
+    extract_uint16
+    frame_bury 4
+    intc_0 // 0
+    frame_bury 3
+
+register_fundraiser_for_header@3:
+    // smart_contracts/registry/contract.py:48
+    // for i in urange(fundraiser_list.length):
+    frame_dig 3
+    frame_dig 4
+    <
+    frame_dig 1
+    frame_bury 2
+    bz register_fundraiser_after_for@8
+    // smart_contracts/registry/contract.py:49
+    // if fundraiser_list[i] == app_id_arc4:
+    frame_dig 5
+    extract 2 0
+    frame_dig 3
+    intc_2 // 8
+    *
+    intc_2 // 8
+    extract3 // on error: Index access is out of bounds
+    frame_dig 0
+    b==
+    bz register_fundraiser_after_if_else@6
+    // smart_contracts/registry/contract.py:50
+    // already_registered = True
+    intc_1 // 1
+    frame_bury 2
+
+register_fundraiser_after_for@8:
+    frame_dig 2
+    // smart_contracts/registry/contract.py:53
+    // assert not already_registered, "App ID already registered"
+    !
+    assert // App ID already registered
+    // smart_contracts/registry/contract.py:55-56
+    // # Append new app ID
+    // fundraiser_list.append(app_id_arc4)
+    frame_dig 5
+    extract 2 0
+    frame_dig 0
+    concat
+    dup
+    len
+    intc_2 // 8
+    /
+    itob
+    extract 6 2
+    swap
+    concat
+    // smart_contracts/registry/contract.py:30-31
+    // # Load existing fundraiser list from box (create if doesn't exist)
+    // fundraiser_box = BoxRef(key=b"fundraisers")
+    bytec_0 // 0x66756e6472616973657273
+    // smart_contracts/registry/contract.py:58-59
+    // # Save back to box
+    // fundraiser_box.put(fundraiser_list.bytes)
+    swap
+    box_put
+    retsub
+
+register_fundraiser_after_if_else@6:
+    // smart_contracts/registry/contract.py:48
+    // for i in urange(fundraiser_list.length):
+    frame_dig 3
+    intc_1 // 1
+    +
+    frame_bury 3
+    b register_fundraiser_for_header@3
+
+
+// smart_contracts.registry.contract.CampusChainRegistry.register_ticketing(app_id: uint64) -> void:
+register_ticketing:
+    // smart_contracts/registry/contract.py:61-62
+    // @abimethod
+    // def register_ticketing(self, app_id: UInt64) -> None:
+    proto 1 0
+    intc_0 // 0
+    pushbytes ""
+    dupn 3
+    // smart_contracts/registry/contract.py:67-68
+    // # Load existing ticketing list from box (create if doesn't exist)
+    // ticketing_box = BoxRef(key=b"ticketing")
+    bytec_1 // 0x7469636b6574696e67
+    // smart_contracts/registry/contract.py:70-71
+    // # Check if box exists, if not create it
+    // existing_bytes, box_exists = ticketing_box.maybe()
+    box_get
+    // smart_contracts/registry/contract.py:72
+    // if not box_exists:
+    bnz register_ticketing_after_if_else@2
+    // smart_contracts/registry/contract.py:67-68
+    // # Load existing ticketing list from box (create if doesn't exist)
+    // ticketing_box = BoxRef(key=b"ticketing")
+    bytec_1 // 0x7469636b6574696e67
+    // smart_contracts/registry/contract.py:73-74
+    // # Create box with empty array on first registration
+    // ticketing_box.create(size=8192)  # 8KB box
+    intc_3 // 8192
+    box_create
+    pop
+    // smart_contracts/registry/contract.py:75
+    // empty_array = DynamicArray[ARC4UInt64]()
+    bytec_2 // 0x0000
+    frame_bury 5
+
+register_ticketing_after_if_else@2:
+    // smart_contracts/registry/contract.py:80-81
+    // # Add new app ID (prevent duplicates)
+    // app_id_arc4 = ARC4UInt64(app_id)
+    frame_dig -1
+    itob
+    frame_bury 0
+    // smart_contracts/registry/contract.py:83-84
+    // # Check if already registered
+    // already_registered = False
+    intc_0 // 0
+    frame_bury 1
+    // smart_contracts/registry/contract.py:85
+    // for i in urange(ticketing_list.length):
+    frame_dig 5
+    intc_0 // 0
+    extract_uint16
+    frame_bury 4
+    intc_0 // 0
+    frame_bury 3
+
+register_ticketing_for_header@3:
+    // smart_contracts/registry/contract.py:85
+    // for i in urange(ticketing_list.length):
+    frame_dig 3
+    frame_dig 4
+    <
+    frame_dig 1
+    frame_bury 2
+    bz register_ticketing_after_for@8
+    // smart_contracts/registry/contract.py:86
+    // if ticketing_list[i] == app_id_arc4:
+    frame_dig 5
+    extract 2 0
+    frame_dig 3
+    intc_2 // 8
+    *
+    intc_2 // 8
+    extract3 // on error: Index access is out of bounds
+    frame_dig 0
+    b==
+    bz register_ticketing_after_if_else@6
+    // smart_contracts/registry/contract.py:87
+    // already_registered = True
+    intc_1 // 1
+    frame_bury 2
+
+register_ticketing_after_for@8:
+    frame_dig 2
+    // smart_contracts/registry/contract.py:90
+    // assert not already_registered, "App ID already registered"
+    !
+    assert // App ID already registered
+    // smart_contracts/registry/contract.py:92-93
+    // # Append new app ID
+    // ticketing_list.append(app_id_arc4)
+    frame_dig 5
+    extract 2 0
+    frame_dig 0
+    concat
+    dup
+    len
+    intc_2 // 8
+    /
+    itob
+    extract 6 2
+    swap
+    concat
+    // smart_contracts/registry/contract.py:67-68
+    // # Load existing ticketing list from box (create if doesn't exist)
+    // ticketing_box = BoxRef(key=b"ticketing")
+    bytec_1 // 0x7469636b6574696e67
+    // smart_contracts/registry/contract.py:95-96
+    // # Save back to box
+    // ticketing_box.put(ticketing_list.bytes)
+    swap
+    box_put
+    retsub
+
+register_ticketing_after_if_else@6:
+    // smart_contracts/registry/contract.py:85
+    // for i in urange(ticketing_list.length):
+    frame_dig 3
+    intc_1 // 1
+    +
+    frame_bury 3
+    b register_ticketing_for_header@3
+
+
+// smart_contracts.registry.contract.CampusChainRegistry.get_fundraisers() -> bytes:
+get_fundraisers:
+    // smart_contracts/registry/contract.py:98-99
+    // @abimethod(readonly=True)
+    // def get_fundraisers(self) -> DynamicArray[ARC4UInt64]:
+    proto 0 1
+    // smart_contracts/registry/contract.py:104
+    // fundraiser_box = BoxRef(key=b"fundraisers")
+    bytec_0 // 0x66756e6472616973657273
+    // smart_contracts/registry/contract.py:105
+    // existing_bytes, box_exists = fundraiser_box.maybe()
+    box_get
+    // smart_contracts/registry/contract.py:106
+    // if box_exists:
+    bz get_fundraisers_else_body@2
+    // smart_contracts/registry/contract.py:107
+    // return DynamicArray[ARC4UInt64].from_bytes(existing_bytes)
+    frame_dig 0
+    swap
+    retsub
+
+get_fundraisers_else_body@2:
+    // smart_contracts/registry/contract.py:109-110
+    // # Return empty array if box doesn't exist yet
+    // return DynamicArray[ARC4UInt64]()
+    bytec_2 // 0x0000
+    swap
+    retsub
+
+
+// smart_contracts.registry.contract.CampusChainRegistry.get_ticketing() -> bytes:
+get_ticketing:
+    // smart_contracts/registry/contract.py:112-113
+    // @abimethod(readonly=True)
+    // def get_ticketing(self) -> DynamicArray[ARC4UInt64]:
+    proto 0 1
+    // smart_contracts/registry/contract.py:118
+    // ticketing_box = BoxRef(key=b"ticketing")
+    bytec_1 // 0x7469636b6574696e67
+    // smart_contracts/registry/contract.py:119
+    // existing_bytes, box_exists = ticketing_box.maybe()
+    box_get
+    // smart_contracts/registry/contract.py:120
+    // if box_exists:
+    bz get_ticketing_else_body@2
+    // smart_contracts/registry/contract.py:121
+    // return DynamicArray[ARC4UInt64].from_bytes(existing_bytes)
+    frame_dig 0
+    swap
+    retsub
+
+get_ticketing_else_body@2:
+    // smart_contracts/registry/contract.py:123-124
+    // # Return empty array if box doesn't exist yet
+    // return DynamicArray[ARC4UInt64]()
+    bytec_2 // 0x0000
+    swap
+    retsub
+
+
+// smart_contracts.registry.contract.CampusChainRegistry.get_total_counts() -> uint64, uint64:
+get_total_counts:
+    // smart_contracts/registry/contract.py:126-127
+    // @abimethod(readonly=True)
+    // def get_total_counts(self) -> tuple[UInt64, UInt64]:
+    proto 0 2
+    // smart_contracts/registry/contract.py:132
+    // fundraiser_box = BoxRef(key=b"fundraisers")
+    bytec_0 // 0x66756e6472616973657273
+    // smart_contracts/registry/contract.py:135-136
+    // # Handle boxes that don't exist yet
+    // fundraiser_bytes, fundraiser_exists = fundraiser_box.maybe()
+    box_get
+    // smart_contracts/registry/contract.py:133
+    // ticketing_box = BoxRef(key=b"ticketing")
+    bytec_1 // 0x7469636b6574696e67
+    // smart_contracts/registry/contract.py:137
+    // ticketing_bytes, ticketing_exists = ticketing_box.maybe()
+    box_get
+    cover 2
+    swap
+    // smart_contracts/registry/contract.py:139
+    // fundraiser_count = UInt64(0)
+    intc_0 // 0
+    swap
+    // smart_contracts/registry/contract.py:140
+    // ticketing_count = UInt64(0)
+    intc_0 // 0
+    swap
+    // smart_contracts/registry/contract.py:142
+    // if fundraiser_exists:
+    bz get_total_counts_after_if_else@2
+    // smart_contracts/registry/contract.py:144
+    // fundraiser_count = fundraiser_list.length
+    frame_dig 0
+    intc_0 // 0
+    extract_uint16
+    frame_bury 3
+
+get_total_counts_after_if_else@2:
+    // smart_contracts/registry/contract.py:146
+    // if ticketing_exists:
+    frame_dig 1
+    bz get_total_counts_after_if_else@4
+    // smart_contracts/registry/contract.py:148
+    // ticketing_count = ticketing_list.length
+    frame_dig 2
+    intc_0 // 0
+    extract_uint16
+    frame_bury 4
+
+get_total_counts_after_if_else@4:
+    // smart_contracts/registry/contract.py:150
+    // return (fundraiser_count, ticketing_count)
+    frame_dig 3
+    frame_dig 4
+    frame_bury 1
+    frame_bury 0
+    retsub
