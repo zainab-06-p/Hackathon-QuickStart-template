@@ -49,8 +49,8 @@ const REGISTRY_APP_ID = import.meta.env.VITE_REGISTRY_APP_ID
 // This solves the cold-start problem for fresh devices
 // Add your Algorand addresses here to enable cross-device discovery
 const BOOTSTRAP_CREATOR_ADDRESSES: string[] = [
-  // Example: 'ABC123XYZ...', 'DEF456UVW...'
-  // Add creator wallet addresses that should be discoverable by default
+  // TODO: Add your wallet address here (find it in browser console logs)
+  // Example: 'ABC123XYZ4J6K2ABCDEFGHIJKLMNOPQRSTUVWXYZ234567890ABCDEFGH',
 ]
 
 export interface ContractMetadata {
