@@ -36,7 +36,7 @@ const FundraisingPageDecentralized = () => {
   const loadCampaigns = async () => {
     setLoading(true)
     try {
-      const registry = ContractRegistry.getFundraisers()
+      const registry = await ContractRegistry.getFundraisers()
       const campaignStates: CampaignState[] = []
       
       for (const metadata of registry) {

@@ -48,7 +48,7 @@ const TicketingPageDecentralized = () => {
   const loadEvents = async () => {
     setLoading(true)
     try {
-      const registry = ContractRegistry.getTicketing()
+      const registry = await ContractRegistry.getTicketing()
       const eventStates: EventState[] = []
       
       for (const metadata of registry) {

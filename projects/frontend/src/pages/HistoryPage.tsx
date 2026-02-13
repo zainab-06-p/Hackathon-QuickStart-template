@@ -45,7 +45,7 @@ const HistoryPage = () => {
 
     try {
       // Get campaigns created by user
-      const allCampaigns = ContractRegistry.getFundraisers()
+      const allCampaigns = await ContractRegistry.getFundraisers()
       for (const metadata of allCampaigns) {
         if (metadata.creator === activeAddress) {
           const state = await getCampaignState(algorand, metadata)
@@ -62,7 +62,7 @@ const HistoryPage = () => {
       }
 
       // Get events created by user
-      const allEvents = ContractRegistry.getTicketing()
+      const allEvents = await ContractRegistry.getTicketing()
       for (const metadata of allEvents) {
         if (metadata.creator === activeAddress) {
           const state = await getEventState(algorand, metadata)
