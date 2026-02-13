@@ -34,6 +34,8 @@ const TICKETING_LOCAL_KEY = 'campuschain_ticketing_local_v3'
 const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v3'
 const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v3'
 const CACHE_DURATION = 2 * 1000 // 2 seconds for faster cross-device sync
+const MAX_RETRY_ATTEMPTS = 3
+const QUERY_LIMIT = 1000 // Reduced from 5000 to avoid HTTP/2 errors
 
 export interface ContractMetadata {
   appId: number
@@ -78,6 +80,54 @@ export class ContractRegistry {
     } catch {
       return String(data)
     }
+  }
+
+  // Retry helper with exponential backoff
+  private static async retryWithBackoff<T>(
+    fn: () => Promise<T>,
+    attempts = MAX_RETRY_ATTEMPTS,
+    delay = 1000
+  ): Promise<T> {
+    try {
+      return await fn()
+    } catch (error) {
+      if (attempts <= 1) throw error
+      console.log(`⚠️ Request failed, retrying in ${delay}ms... (${attempts - 1} attempts left)`)
+      await new Promise(resolve => setTimeout(resolve, delay))
+      return this.retryWithBackoff(fn, attempts - 1, delay * 2)
+    }
+  }
+
+  // Identify if an app is a fundraiser contract
+  private static isFundraiserContract(globalState: any[]): boolean {
+    const keys = new Set(globalState.map(item => this.decodeBase64(item.key)))
+    
+    // Check for fundraiser-specific keys
+    // Must have at least 2 of these 3 key combinations
+    const fundraiserKeys = [
+      keys.has('goal_amount'),
+      keys.has('raised_amount'),
+      keys.has('is_active') || keys.has('milestone_count')
+    ]
+    
+    const matches = fundraiserKeys.filter(Boolean).length
+    return matches >= 2
+  }
+
+  // Identify if an app is a ticketing contract
+  private static isTicketingContract(globalState: any[]): boolean {
+    const keys = new Set(globalState.map(item => this.decodeBase64(item.key)))
+    
+    // Check for ticketing-specific keys
+    // Must have at least 2 of these 3 key combinations
+    const ticketingKeys = [
+      keys.has('ticket_price'),
+      keys.has('max_supply'),
+      keys.has('sold_count') || keys.has('is_sale_active')
+    ]
+    
+    const matches = ticketingKeys.filter(Boolean).length
+    return matches >= 2
   }
 
   // Register a new deployed fundraiser contract (stores locally for immediate visibility)
@@ -153,24 +203,15 @@ export class ContractRegistry {
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
         try {
-          const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          const accountApps = await this.retryWithBackoff(() => 
+            indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          )
           console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            const globalState = app.params.globalState
-            const stateObj: any = {}
-            for (const item of globalState) {
-              const key = this.decodeBase64(item.key)
-              stateObj[key] = item.value
-            }
-            
-            const isFundraiser = 'goal_amount' in stateObj && 
-                               'raised_amount' in stateObj && 
-                               'milestone_count' in stateObj
-            
-            if (isFundraiser) {
+            if (this.isFundraiserContract(app.params.globalState)) {
               indexerContracts.push({
                 appId: Number(app.id),
                 creator: String(app.params.creator || ''),
@@ -184,9 +225,11 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 2: Scan ALL recent applications - INCREASED LIMIT for better discovery
+      // Strategy 2: Scan recent applications with retry logic
       console.log('🔎 Scanning recent applications for ALL fundraisers...')
-      const apps = await indexer.searchForApplications().limit(5000).do()
+      const apps = await this.retryWithBackoff(() => 
+        indexer.searchForApplications().limit(QUERY_LIMIT).do()
+      )
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
       for (const app of apps.applications) {
@@ -195,18 +238,7 @@ export class ContractRegistry {
         // Skip if already found
         if (indexerContracts.some(c => c.appId === Number(app.id))) continue
         
-        const globalState = app.params.globalState
-        const stateObj: any = {}
-        for (const item of globalState) {
-          const key = this.decodeBase64(item.key)
-          stateObj[key] = item.value
-        }
-        
-        const isFundraiser = 'goal_amount' in stateObj && 
-                           'raised_amount' in stateObj && 
-                           'milestone_count' in stateObj
-        
-        if (isFundraiser) {
+        if (this.isFundraiserContract(app.params.globalState)) {
           indexerContracts.push({
             appId: Number(app.id),
             creator: String(app.params.creator || ''),
@@ -261,24 +293,15 @@ export class ContractRegistry {
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
         try {
-          const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          const accountApps = await this.retryWithBackoff(() => 
+            indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          )
           console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            const globalState = app.params.globalState
-            const stateObj: any = {}
-            for (const item of globalState) {
-              const key = this.decodeBase64(item.key)
-              stateObj[key] = item.value
-            }
-            
-            const isTicketing = 'ticket_price' in stateObj && 
-                              'max_supply' in stateObj && 
-                              'sold_count' in stateObj
-            
-            if (isTicketing) {
+            if (this.isTicketingContract(app.params.globalState)) {
               indexerContracts.push({
                 appId: Number(app.id),
                 creator: String(app.params.creator || ''),
@@ -292,9 +315,11 @@ export class ContractRegistry {
         }
       }
       
-      // Strategy 2: Scan ALL recent applications - INCREASED LIMIT for better discovery
+      // Strategy 2: Scan recent applications with retry logic
       console.log('🔎 Scanning recent applications for ALL events...')
-      const apps = await indexer.searchForApplications().limit(5000).do()
+      const apps = await this.retryWithBackoff(() => 
+        indexer.searchForApplications().limit(QUERY_LIMIT).do()
+      )
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
       for (const app of apps.applications) {
@@ -303,18 +328,7 @@ export class ContractRegistry {
         // Skip if already found
         if (indexerContracts.some(c => c.appId === Number(app.id))) continue
         
-        const globalState = app.params.globalState
-        const stateObj: any = {}
-        for (const item of globalState) {
-          const key = this.decodeBase64(item.key)
-          stateObj[key] = item.value
-        }
-        
-        const isTicketing = 'ticket_price' in stateObj && 
-                          'max_supply' in stateObj && 
-                          'sold_count' in stateObj
-        
-        if (isTicketing) {
+        if (this.isTicketingContract(app.params.globalState)) {
           indexerContracts.push({
             appId: Number(app.id),
             creator: String(app.params.creator || ''),
