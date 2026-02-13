@@ -36,7 +36,8 @@ const FundraisingPageDecentralized = () => {
   const loadCampaigns = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      const registry = await ContractRegistry.getFundraisers(forceRefresh)
+      // Pass activeAddress to query contracts created by this wallet (faster discovery)
+      const registry = await ContractRegistry.getFundraisers(forceRefresh, activeAddress || undefined)
       const campaignStates: CampaignState[] = []
       
       for (const metadata of registry) {
@@ -65,7 +66,7 @@ const FundraisingPageDecentralized = () => {
     // Poll for updates every 10 seconds
     const interval = setInterval(() => loadCampaigns(), 10000)
     return () => clearInterval(interval)
-  }, [])
+  }, [activeAddress]) // Re-run when wallet connects/changes
 
   const donate = async () => {
     if (!selectedCampaign || !activeAddress) {

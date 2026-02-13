@@ -48,7 +48,8 @@ const TicketingPageDecentralized = () => {
   const loadEvents = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      const registry = await ContractRegistry.getTicketing(forceRefresh)
+      // Pass activeAddress to query contracts created by this wallet (faster discovery)
+      const registry = await ContractRegistry.getTicketing(forceRefresh, activeAddress || undefined)
       const eventStates: EventState[] = []
       
       for (const metadata of registry) {
