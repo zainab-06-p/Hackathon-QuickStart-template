@@ -1,19 +1,24 @@
 /**
  * Decentralized Contract Registry
  * 
- * TRUE CROSS-DEVICE APPROACH:
- * 1. Query Algorand Indexer to discover ALL deployed contracts
- * 2. Identify contract types by their global state keys
- * 3. Cache in localStorage for performance (30 second refresh)
+ * HYBRID CROSS-DEVICE APPROACH:
+ * 1. Store newly created contracts in localStorage (immediate visibility)
+ * 2. Query Algorand Indexer to discover contracts from other devices
+ * 3. Merge both sources with 30-second cache
  * 
- * This works across ALL devices - no manual sharing needed!
+ * This provides:
+ * - Instant visibility of locally created contracts
+ * - Cross-device discovery via blockchain indexer
+ * - Efficient caching to reduce API calls
  */
 
 import algosdk from 'algosdk'
 import { getIndexerConfigFromViteEnvironment } from './network/getAlgoClientConfigs'
 
-const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v2'
-const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v2'
+const FUNDRAISER_LOCAL_KEY = 'campuschain_fundraiser_local_v3'
+const TICKETING_LOCAL_KEY = 'campuschain_ticketing_local_v3'
+const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v3'
+const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v3'
 const CACHE_DURATION = 30 * 1000 // 30 seconds
 
 export interface ContractMetadata {
@@ -57,30 +62,62 @@ export class ContractRegistry {
     }
   }
 
-  // Register a new deployed fundraiser contract (stores locally to trigger immediate cache refresh)
+  // Register a new deployed fundraiser contract (stores locally for immediate visibility)
   static registerFundraiser(metadata: ContractMetadata): void {
-    // Clear cache to force refresh
-    localStorage.removeItem(FUNDRAISER_CACHE_KEY)
-    console.log('✅ Fundraiser registered, cache cleared for immediate discovery')
+    try {
+      // Get existing local contracts
+      const stored = localStorage.getItem(FUNDRAISER_LOCAL_KEY)
+      const contracts: ContractMetadata[] = stored ? JSON.parse(stored) : []
+      
+      // Avoid duplicates
+      if (!contracts.some(c => c.appId === metadata.appId)) {
+        contracts.push(metadata)
+        localStorage.setItem(FUNDRAISER_LOCAL_KEY, JSON.stringify(contracts))
+        console.log(`✅ Fundraiser ${metadata.appId} stored locally`)
+      }
+      
+      // Clear cache to trigger refresh with new contract
+      localStorage.removeItem(FUNDRAISER_CACHE_KEY)
+    } catch (error) {
+      console.error('Failed to register fundraiser:', error)
+    }
   }
 
-  // Register a new deployed ticketing contract (stores locally to trigger immediate cache refresh)
+  // Register a new deployed ticketing contract (stores locally for immediate visibility)
   static registerTicketing(metadata: ContractMetadata): void {
-    // Clear cache to force refresh
-    localStorage.removeItem(TICKETING_CACHE_KEY)
-    console.log('✅ Ticketing contract registered, cache cleared for immediate discovery')
+    try {
+      // Get existing local contracts
+      const stored = localStorage.getItem(TICKETING_LOCAL_KEY)
+      const contracts: ContractMetadata[] = stored ? JSON.parse(stored) : []
+      
+      // Avoid duplicates
+      if (!contracts.some(c => c.appId === metadata.appId)) {
+        contracts.push(metadata)
+        localStorage.setItem(TICKETING_LOCAL_KEY, JSON.stringify(contracts))
+        console.log(`✅ Ticketing contract ${metadata.appId} stored locally`)
+      }
+      
+      // Clear cache to trigger refresh with new contract
+      localStorage.removeItem(TICKETING_CACHE_KEY)
+    } catch (error) {
+      console.error('Failed to register ticketing contract:', error)
+    }
   }
 
-  // Get all fundraiser contracts from indexer (with caching)
+  // Get all fundraiser contracts (merges local + indexer results with caching)
   static async getFundraisers(): Promise<ContractMetadata[]> {
-    // Check cache first
+    // Get locally stored contracts (immediate)
+    const localStored = localStorage.getItem(FUNDRAISER_LOCAL_KEY)
+    const localContracts: ContractMetadata[] = localStored ? JSON.parse(localStored) : []
+    
+    // Check cache first for indexer results
     const cached = this.getCache(FUNDRAISER_CACHE_KEY)
     if (cached) {
-      console.log(`📦 Using cached fundraisers (${cached.length} contracts)`)
-      return cached
+      console.log(`📦 Using cached data: ${localContracts.length} local + ${cached.length} indexer = ${this.mergeUnique(localContracts, cached).length} total`)
+      return this.mergeUnique(localContracts, cached)
     }
 
-    console.log('🔍 Discovering fundraiser contracts from blockchain...')
+    console.log('🔍 Discovering fundraiser contracts from blockchain indexer...')
     
     try {
       const indexer = this.getIndexer()
@@ -88,7 +125,7 @@ export class ContractRegistry {
       // Search for all applications (limited to recent ones for performance)
       const apps = await indexer.searchForApplications().limit(1000).do()
       
-      const fundraisers: ContractMetadata[] = []
+      const indexerContracts: ContractMetadata[] = []
       
       for (const app of apps.applications) {
         if (!app.params || !app.params.globalState) continue
@@ -103,7 +140,7 @@ export class ContractRegistry {
                            keys.includes('milestone_count')
         
         if (isFundraiser) {
-          fundraisers.push({
+          indexerContracts.push({
             appId: Number(app.id),
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
@@ -111,28 +148,34 @@ export class ContractRegistry {
         }
       }
       
-      console.log(`✅ Discovered ${fundraisers.length} fundraiser contracts`)
+      console.log(`✅ Discovered: ${localContracts.length} local + ${indexerContracts.length} indexer contracts`)
       
-      // Cache the results
-      this.setCache(FUNDRAISER_CACHE_KEY, fundraisers)
+      // Cache the indexer results
+      this.setCache(FUNDRAISER_CACHE_KEY, indexerContracts)
       
-      return fundraisers
+      // Merge and return unique contracts
+      return this.mergeUnique(localContracts, indexerContracts)
     } catch (error) {
-      console.error('❌ Failed to discover fundraiser contracts:', error)
-      return []
+      console.error('❌ Indexer query failed, using local contracts only:', error)
+      // Fallback to local contracts if indexer fails
+      return localContracts
     }
   }
 
-  // Get all ticketing contracts from indexer (with caching)
+  // Get all ticketing contracts (merges local + indexer results with caching)
   static async getTicketing(): Promise<ContractMetadata[]> {
-    // Check cache first
+    // Get locally stored contracts (immediate)
+    const localStored = localStorage.getItem(TICKETING_LOCAL_KEY)
+    const localContracts: ContractMetadata[] = localStored ? JSON.parse(localStored) : []
+    
+    // Check cache first for indexer results
     const cached = this.getCache(TICKETING_CACHE_KEY)
     if (cached) {
-      console.log(`📦 Using cached ticketing contracts (${cached.length} contracts)`)
-      return cached
+      console.log(`📦 Using cached data: ${localContracts.length} local + ${cached.length} indexer = ${this.mergeUnique(localContracts, cached).length} total`)
+      return this.mergeUnique(localContracts, cached)
     }
 
-    console.log('🔍 Discovering ticketing contracts from blockchain...')
+    console.log('🔍 Discovering ticketing contracts from blockchain indexer...')
     
     try {
       const indexer = this.getIndexer()
@@ -140,7 +183,7 @@ export class ContractRegistry {
       // Search for all applications
       const apps = await indexer.searchForApplications().limit(1000).do()
       
-      const ticketing: ContractMetadata[] = []
+      const indexerContracts: ContractMetadata[] = []
       
       for (const app of apps.applications) {
         if (!app.params || !app.params.globalState) continue
@@ -155,7 +198,7 @@ export class ContractRegistry {
                           keys.includes('sold_count')
         
         if (isTicketing) {
-          ticketing.push({
+          indexerContracts.push({
             appId: Number(app.id),
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
@@ -163,16 +206,29 @@ export class ContractRegistry {
         }
       }
       
-      console.log(`✅ Discovered ${ticketing.length} ticketing contracts`)
+      console.log(`✅ Discovered: ${localContracts.length} local + ${indexerContracts.length} indexer contracts`)
       
-      // Cache the results
-      this.setCache(TICKETING_CACHE_KEY, ticketing)
+      // Cache the indexer results
+      this.setCache(TICKETING_CACHE_KEY, indexerContracts)
       
-      return ticketing
+      // Merge and return unique contracts
+      return this.mergeUnique(localContracts, indexerContracts)
     } catch (error) {
-      console.error('❌ Failed to discover ticketing contracts:', error)
-      return []
+      console.error('❌ Indexer query failed, using local contracts only:', error)
+      // Fallback to local contracts if indexer fails
+      return localContracts
     }
+  }
+
+  // Merge two arrays and remove duplicates by appId
+  private static mergeUnique(arr1: ContractMetadata[], arr2: ContractMetadata[]): ContractMetadata[] {
+    const map = new Map<number, ContractMetadata>()
+    
+    // Add all contracts, later ones overwrite earlier ones with same appId
+    arr1.forEach(item => map.set(item.appId, item))
+    arr2.forEach(item => map.set(item.appId, item))
+    
+    return Array.from(map.values())
   }
 
   // Get from cache if fresh
@@ -208,10 +264,12 @@ export class ContractRegistry {
     }
   }
 
-  // Clear all caches (force refresh on next load)
+  // Clear all local storage and caches (force refresh on next load)
   static clear(): void {
+    localStorage.removeItem(FUNDRAISER_LOCAL_KEY)
+    localStorage.removeItem(TICKETING_LOCAL_KEY)
     localStorage.removeItem(FUNDRAISER_CACHE_KEY)
     localStorage.removeItem(TICKETING_CACHE_KEY)
-    console.log('🗑️ All caches cleared')
+    console.log('🗑️ All local storage and caches cleared')
   }
 }
