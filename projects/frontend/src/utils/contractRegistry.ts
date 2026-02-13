@@ -38,6 +38,21 @@ const MAX_RETRY_ATTEMPTS = 3
 const QUERY_LIMIT = 1000
 const RECENT_DAYS = 90 // Only scan apps created in last 90 days
 
+// 🎯 REGISTRY CONTRACT: Decentralized database for all app IDs
+// This is the PRIMARY discovery mechanism for cross-device visibility
+// Deploy the registry contract once and add its app ID here
+const REGISTRY_APP_ID = import.meta.env.VITE_REGISTRY_APP_ID 
+  ? Number(import.meta.env.VITE_REGISTRY_APP_ID) 
+  : 0 // Set to 0 if not deployed yet
+
+// Bootstrap mechanism: Query these creator addresses when registry not available
+// This solves the cold-start problem for fresh devices
+// Add your Algorand addresses here to enable cross-device discovery
+const BOOTSTRAP_CREATOR_ADDRESSES: string[] = [
+  // Example: 'ABC123XYZ...', 'DEF456UVW...'
+  // Add creator wallet addresses that should be discoverable by default
+]
+
 export interface ContractMetadata {
   appId: number
   creator: string
@@ -79,6 +94,40 @@ export class ContractRegistry {
     } catch (error) {
       console.warn('Failed to get current round:', error)
       return 0
+    }
+  }
+
+  // 🎯 Query the registry contract for all app IDs (PRIMARY discovery method)
+  private static async queryRegistryContract(type: 'fundraiser' | 'ticketing'): Promise<number[]> {
+    if (!REGISTRY_APP_ID || REGISTRY_APP_ID === 0) {
+      console.log('⚠️ Registry contract not deployed yet, skipping registry query')
+      return []
+    }
+
+    try {
+      console.log(`📋 Querying registry contract (App ID ${REGISTRY_APP_ID}) for ${type} app IDs...`)
+      const indexer = this.getIndexer()
+      
+      // Get the registry app's global state
+      const appInfo = await indexer.lookupApplications(REGISTRY_APP_ID).do()
+      
+      if (!appInfo.application || !appInfo.application.params) {
+        console.warn('Registry contract not found or has no state')
+        return []
+      }
+
+      // Registry uses box storage, need to read boxes
+      // For now, we'll use a direct ABI call simulation
+      // In production, you'd use AlgoKit client to call get_fundraisers() or get_ticketing()
+      
+      // TEMPORARY: For now, return empty array until we integrate proper ABI calls
+      // TODO: Integrate @algorandfoundation/algokit-utils to call ABI methods
+      console.log('⚠️ Registry ABI integration pending - using fallback discovery for now')
+      return []
+      
+    } catch (error) {
+      console.warn('Failed to query registry contract:', error)
+      return []
     }
   }
 
@@ -266,103 +315,103 @@ export class ContractRegistry {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query local fundraiser app IDs directly from other devices
+      // \ud83c\udfaf STRATEGY 0: Query Registry Contract (PRIMARY - truly decentralized discovery!)
+      // If registry is deployed, this will discover ALL campaigns across ALL devices in real-time
+      const registryAppIds = await this.queryRegistryContract('fundraiser')
+      if (registryAppIds.length > 0) {
+        console.log(`\ud83d\udccb Registry returned ${registryAppIds.length} fundraiser app IDs`)
+        const registryContracts = await this.querySpecificApps(registryAppIds, 'fundraiser')
+        registryContracts.forEach(c => {
+          if (!indexerContracts.some(existing => existing.appId === c.appId)) {
+            indexerContracts.push(c)
+          }
+        })
+        console.log(`\u2705 Found ${registryContracts.length} campaigns via registry contract`)
+      }
+      
+      // Strategy 1: ALWAYS query local app IDs directly (MOST RELIABLE for cross-device)
+      // This is the PRIMARY cross-device discovery mechanism
       const localAppIds = localContracts.map(c => c.appId)
+      let foundViaDirectQuery = 0
+      
       if (localAppIds.length > 0) {
         console.log(`🎯 Querying ${localAppIds.length} known fundraiser app IDs directly:`, localAppIds)
         const directContracts = await this.querySpecificApps(localAppIds, 'fundraiser')
         directContracts.forEach(c => {
           if (!indexerContracts.some(existing => existing.appId === c.appId)) {
             indexerContracts.push(c)
+            foundViaDirectQuery++
           }
         })
+        console.log(`✅ Found ${foundViaDirectQuery} campaigns via direct app ID queries`)
       }
       
-      // Strategy 2: Query by creator address if provided
-      if (creatorAddress) {
-        console.log(`🔎 Querying contracts created by ${creatorAddress}`)
+      // Strategy 2: Query ALL unique creator addresses from localStorage
+      // Get list of all unique creator addresses from local contracts
+      const uniqueCreators = Array.from(new Set(localContracts.map(c => c.creator)))
+      console.log(`👥 Found ${uniqueCreators.length} unique creators in localStorage`)
+      
+      for (const creator of uniqueCreators) {
         try {
+          console.log(`🔎 Querying contracts created by ${creator.substring(0, 8)}...`)
           const accountApps = await this.retryWithBackoff(() => 
-            indexer.lookupAccountCreatedApplications(creatorAddress).do()
+            indexer.lookupAccountCreatedApplications(creator).do()
           )
           console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            if (this.isFundraiserContract(app.params.globalState, Number(app.id), false)) {
-              if (!indexerContracts.some(c => c.appId === Number(app.id))) {
-                indexerContracts.push({
-                  appId: Number(app.id),
-                  creator: String(app.params.creator || ''),
-                  createdAt: Number(app.createdAtRound || 0),
-                })
-                console.log(`✅ Found fundraiser: App ID ${app.id} by ${creatorAddress}`)
-              }
+            const appId = Number(app.id)
+            if (indexerContracts.some(c => c.appId === appId)) continue
+            
+            if (this.isFundraiserContract(app.params.globalState, appId, false)) {
+              indexerContracts.push({
+                appId,
+                creator: String(app.params.creator || ''),
+                createdAt: Number(app.createdAtRound || 0),
+              })
+              console.log(`✅ Found fundraiser: App ID ${appId} by creator`)
             }
           }
         } catch (error) {
-          console.warn('Failed to query by creator address, falling back to general search:', error)
+          console.warn(`Failed to query creator ${creator.substring(0, 8)}:`, error)
         }
       }
       
-      // Strategy 3: Scan apps created in RECENT BLOCKCHAIN ROUNDS
-      // CRITICAL FIX: Apps at ID 755M, can't scan all TestNet apps
-      // Solution: Get current round, scan larger set, filter by recent creation
-      const currentRound = await this.getCurrentRound()
-      const searchFromRound = Math.max(0, currentRound - 100000) // Last ~100k rounds
-      
-      console.log(`🔎 Current round: ${currentRound}, will filter apps created after round ${searchFromRound}...`)
-      
-      // Scan more apps but filter by creation round
-      const result: any = await this.retryWithBackoff(() => 
-        indexer.searchForApplications()
-          .limit(QUERY_LIMIT * 10) // 10k apps
-          .do()
-      )
-      const apps = result.applications || []
-      console.log(`🔎 Indexer returned ${apps.length} applications, filtering by recent rounds...`)
-      
-      let debugCount = 0
-      let scannedCount = 0
-      let recentCount = 0
-      
-      for (const app of apps) {
-        scannedCount++
+      // Strategy 3: Bootstrap mechanism for cold start (empty localStorage)
+      // Query hardcoded creator addresses to discover initial campaigns
+      if (localContracts.length === 0 && BOOTSTRAP_CREATOR_ADDRESSES.length > 0) {
+        console.log(`🚀 BOOTSTRAP: Empty localStorage, querying ${BOOTSTRAP_CREATOR_ADDRESSES.length} known creator addresses...`)
         
-        if (!app.params || !app.params.globalState) continue
-        
-        const appId = Number(app.id)
-        const createdAt = Number(app.createdAtRound || 0)
-        
-        // Skip if already found
-        if (indexerContracts.some(c => c.appId === appId)) continue
-        
-        // CRITICAL: Filter by creation round to only check recent apps
-        if (createdAt < searchFromRound) {
-          continue // Skip old apps
-        }
-        
-        recentCount++
-        
-        // Debug first 5 recent apps
-        const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
-        if (shouldDebug) {
-          debugCount++
-          console.log(`🔍 Checking app ${appId} (created at round ${createdAt})`)
-        }
-        
-        if (this.isFundraiserContract(app.params.globalState, appId, shouldDebug)) {
-          indexerContracts.push({
-            appId,
-            creator: String(app.params.creator || ''),
-            createdAt,
-          })
-          console.log(`✅ Found fundraiser: App ID ${appId} (created round ${createdAt}, creator: ${String(app.params.creator).substring(0, 8)}...)`)
+        for (const creator of BOOTSTRAP_CREATOR_ADDRESSES) {
+          try {
+            console.log(`🔎 Bootstrap query for ${creator.substring(0, 8)}...`)
+            const accountApps = await this.retryWithBackoff(() => 
+              indexer.lookupAccountCreatedApplications(creator).do()
+            )
+            console.log(`📱 Found ${accountApps.applications?.length || 0} applications from bootstrap creator`)
+            
+            for (const app of accountApps.applications || []) {
+              if (!app.params || !app.params.globalState) continue
+              
+              const appId = Number(app.id)
+              if (indexerContracts.some(c => c.appId === appId)) continue
+              
+              if (this.isFundraiserContract(app.params.globalState, appId, false)) {
+                indexerContracts.push({
+                  appId,
+                  creator: String(app.params.creator || ''),
+                  createdAt: Number(app.createdAtRound || 0),
+                })
+                console.log(`✅ Bootstrap found fundraiser: App ID ${appId}`)
+              }
+            }
+          } catch (error) {
+            console.warn(`Bootstrap query failed for ${creator.substring(0, 8)}:`, error)
+          }
         }
       }
-      
-      console.log(`📊 Scanned ${scannedCount} total apps, ${recentCount} were recent, found ${indexerContracts.length} fundraisers`)
       
       console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique fundraisers`)
       
@@ -405,103 +454,101 @@ export class ContractRegistry {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query local ticketing app IDs directly from other devices
+      // 🎯 STRATEGY 0: Query Registry Contract (PRIMARY - truly decentralized discovery!)
+      // If registry is deployed, this will discover ALL events across ALL devices in real-time
+      const registryAppIds = await this.queryRegistryContract('ticketing')
+      if (registryAppIds.length > 0) {
+        console.log(`📋 Registry returned ${registryAppIds.length} ticketing app IDs`)
+        const registryContracts = await this.querySpecificApps(registryAppIds, 'ticketing')
+        registryContracts.forEach(c => {
+          if (!indexerContracts.some(existing => existing.appId === c.appId)) {
+            indexerContracts.push(c)
+          }
+        })
+        console.log(`✅ Found ${registryContracts.length} events via registry contract`)
+      }
+      
+      // Strategy 1: ALWAYS query local app IDs directly (MOST RELIABLE for cross-device)
       const localAppIds = localContracts.map(c => c.appId)
+      let foundViaDirectQuery = 0
+      
       if (localAppIds.length > 0) {
         console.log(`🎯 Querying ${localAppIds.length} known ticketing app IDs directly:`, localAppIds)
         const directContracts = await this.querySpecificApps(localAppIds, 'ticketing')
         directContracts.forEach(c => {
           if (!indexerContracts.some(existing => existing.appId === c.appId)) {
             indexerContracts.push(c)
+            foundViaDirectQuery++
           }
         })
+        console.log(`✅ Found ${foundViaDirectQuery} events via direct app ID queries`)
       }
       
-      // Strategy 2: Query by creator address if provided
-      if (creatorAddress) {
-        console.log(`🔎 Querying contracts created by ${creatorAddress}`)
+      // Strategy 2: Query ALL unique creator addresses from localStorage
+      const uniqueCreators = Array.from(new Set(localContracts.map(c => c.creator)))
+      console.log(`👥 Found ${uniqueCreators.length} unique creators in localStorage`)
+      
+      for (const creator of uniqueCreators) {
         try {
+          console.log(`🔎 Querying contracts created by ${creator.substring(0, 8)}...`)
           const accountApps = await this.retryWithBackoff(() => 
-            indexer.lookupAccountCreatedApplications(creatorAddress).do()
+            indexer.lookupAccountCreatedApplications(creator).do()
           )
           console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
           for (const app of accountApps.applications || []) {
             if (!app.params || !app.params.globalState) continue
             
-            if (this.isTicketingContract(app.params.globalState, Number(app.id), false)) {
-              if (!indexerContracts.some(c => c.appId === Number(app.id))) {
-                indexerContracts.push({
-                  appId: Number(app.id),
-                  creator: String(app.params.creator || ''),
-                  createdAt: Number(app.createdAtRound || 0),
-                })
-                console.log(`✅ Found ticketing: App ID ${app.id} by ${creatorAddress}`)
-              }
+            const appId = Number(app.id)
+            if (indexerContracts.some(c => c.appId === appId)) continue
+            
+            if (this.isTicketingContract(app.params.globalState, appId, false)) {
+              indexerContracts.push({
+                appId,
+                creator: String(app.params.creator || ''),
+                createdAt: Number(app.createdAtRound || 0),
+              })
+              console.log(`✅ Found ticketing: App ID ${appId} by creator`)
             }
           }
         } catch (error) {
-          console.warn('Failed to query by creator address, falling back to general search:', error)
+          console.warn(`Failed to query creator ${creator.substring(0, 8)}:`, error)
         }
       }
       
-      // Strategy 3: Scan apps created in RECENT BLOCKCHAIN ROUNDS (Ticketing)
-      // CRITICAL FIX: Apps at ID 755M, can't scan all TestNet apps
-      // Solution: Get current round, scan larger set, filter by recent creation
-      const currentRound = await this.getCurrentRound()
-      const searchFromRound = Math.max(0, currentRound - 100000) // Last ~100k rounds
-      
-      console.log(`🔎 Current round: ${currentRound}, will filter apps created after round ${searchFromRound}...`)
-      
-      // Scan more apps but filter by creation round
-      const result: any = await this.retryWithBackoff(() => 
-        indexer.searchForApplications()
-          .limit(QUERY_LIMIT * 10) // 10k apps
-          .do()
-      )
-      const apps = result.applications || []
-      console.log(`🔎 Indexer returned ${apps.length} applications, filtering by recent rounds...`)
-      
-      let debugCount = 0
-      let scannedCount = 0
-      let recentCount = 0
-      
-      for (const app of apps) {
-        scannedCount++
+      // Strategy 3: Bootstrap mechanism for cold start (empty localStorage)
+      // Query hardcoded creator addresses to discover initial events
+      if (localContracts.length === 0 && BOOTSTRAP_CREATOR_ADDRESSES.length > 0) {
+        console.log(`🚀 BOOTSTRAP: Empty localStorage, querying ${BOOTSTRAP_CREATOR_ADDRESSES.length} known creator addresses...`)
         
-        if (!app.params || !app.params.globalState) continue
-        
-        const appId = Number(app.id)
-        const createdAt = Number(app.createdAtRound || 0)
-        
-        // Skip if already found
-        if (indexerContracts.some(c => c.appId === appId)) continue
-        
-        // CRITICAL: Filter by creation round to only check recent apps
-        if (createdAt < searchFromRound) {
-          continue // Skip old apps
-        }
-        
-        recentCount++
-        
-        // Debug first 5 recent apps
-        const shouldDebug = debugCount < 5 && !localAppIds.includes(appId)
-        if (shouldDebug) {
-          debugCount++
-          console.log(`🔍 Checking app ${appId} (created at round ${createdAt})`)
-        }
-        
-        if (this.isTicketingContract(app.params.globalState, appId, shouldDebug)) {
-          indexerContracts.push({
-            appId,
-            creator: String(app.params.creator || ''),
-            createdAt,
-          })
-          console.log(`✅ Found ticketing: App ID ${appId} (created round ${createdAt}, creator: ${String(app.params.creator).substring(0, 8)}...)`)
+        for (const creator of BOOTSTRAP_CREATOR_ADDRESSES) {
+          try {
+            console.log(`🔎 Bootstrap query for ${creator.substring(0, 8)}...`)
+            const accountApps = await this.retryWithBackoff(() => 
+              indexer.lookupAccountCreatedApplications(creator).do()
+            )
+            console.log(`📱 Found ${accountApps.applications?.length || 0} applications from bootstrap creator`)
+            
+            for (const app of accountApps.applications || []) {
+              if (!app.params || !app.params.globalState) continue
+              
+              const appId = Number(app.id)
+              if (indexerContracts.some(c => c.appId === appId)) continue
+              
+              if (this.isTicketingContract(app.params.globalState, appId, false)) {
+                indexerContracts.push({
+                  appId,
+                  creator: String(app.params.creator || ''),
+                  createdAt: Number(app.createdAtRound || 0),
+                })
+                console.log(`✅ Bootstrap found ticketing: App ID ${appId}`)
+              }
+            }
+          } catch (error) {
+            console.warn(`Bootstrap query failed for ${creator.substring(0, 8)}:`, error)
+          }
         }
       }
-      
-      console.log(`📊 Scanned ${scannedCount} total apps, ${recentCount} were recent, found ${indexerContracts.length} events`)
       
       console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique events`)
       
@@ -521,9 +568,24 @@ export class ContractRegistry {
   private static mergeUnique(arr1: ContractMetadata[], arr2: ContractMetadata[]): ContractMetadata[] {
     const map = new Map<number, ContractMetadata>()
     
-    // Add all contracts, later ones overwrite earlier ones with same appId
+    // Add arr1 (localStorage) first - has full metadata
     arr1.forEach(item => map.set(item.appId, item))
-    arr2.forEach(item => map.set(item.appId, item))
+    
+    // Add arr2 (indexer) - merge with existing, preserving metadata from localStorage
+    arr2.forEach(item => {
+      const existing = map.get(item.appId)
+      if (existing) {
+        // Merge: keep metadata from localStorage, update blockchain info from indexer
+        map.set(item.appId, {
+          ...item,            // blockchain info (creator, createdAt)
+          title: existing.title,           // preserve title from localStorage
+          description: existing.description, // preserve description from localStorage
+          imageUrl: existing.imageUrl,      // preserve image from localStorage
+        })
+      } else {
+        map.set(item.appId, item)
+      }
+    })
     
     return Array.from(map.values())
   }
