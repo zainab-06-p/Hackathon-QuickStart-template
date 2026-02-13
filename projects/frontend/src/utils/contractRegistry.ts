@@ -119,7 +119,7 @@ export class ContractRegistry {
       const cached = this.getCache(FUNDRAISER_CACHE_KEY)
       if (cached) {
         const total = this.mergeUnique(localContracts, cached)
-        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total`)
+        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total fundraisers`)
         return total
       }
     } else {
@@ -127,46 +127,50 @@ export class ContractRegistry {
       localStorage.removeItem(FUNDRAISER_CACHE_KEY)
     }
 
-    console.log('🔍 Discovering fundraiser contracts from blockchain indexer...')
+    console.log('🔍 Discovering ALL fundraiser contracts from blockchain indexer...')
     
     try {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query by creator address if provided (more reliable, faster)
+      // Strategy 1: Query by creator address if provided (optional optimization)
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
-        const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
-        console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
-        
-        for (const app of accountApps.applications || []) {
-          if (!app.params || !app.params.globalState) continue
+        try {
+          const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
-          const globalState = app.params.globalState
-          const stateObj: any = {}
-          for (const item of globalState) {
-            const key = this.decodeBase64(item.key)
-            stateObj[key] = item.value
+          for (const app of accountApps.applications || []) {
+            if (!app.params || !app.params.globalState) continue
+            
+            const globalState = app.params.globalState
+            const stateObj: any = {}
+            for (const item of globalState) {
+              const key = this.decodeBase64(item.key)
+              stateObj[key] = item.value
+            }
+            
+            const isFundraiser = 'goal_amount' in stateObj && 
+                               'raised_amount' in stateObj && 
+                               'milestone_count' in stateObj
+            
+            if (isFundraiser) {
+              indexerContracts.push({
+                appId: Number(app.id),
+                creator: String(app.params.creator || ''),
+                createdAt: Number(app.createdAtRound || 0),
+              })
+              console.log(`✅ Found fundraiser: App ID ${app.id} by ${creatorAddress}`)
+            }
           }
-          
-          const isFundraiser = 'goal_amount' in stateObj && 
-                             'raised_amount' in stateObj && 
-                             'milestone_count' in stateObj
-          
-          if (isFundraiser) {
-            indexerContracts.push({
-              appId: Number(app.id),
-              creator: String(app.params.creator || ''),
-              createdAt: Number(app.createdAtRound || 0),
-            })
-            console.log(`✅ Found fundraiser: App ID ${app.id} by ${creatorAddress}`)
-          }
+        } catch (error) {
+          console.warn('Failed to query by creator address, falling back to general search:', error)
         }
       }
       
-      // Strategy 2: Scan recent applications (slower, but finds all public contracts)
-      console.log('🔎 Scanning recent applications...')
-      const apps = await indexer.searchForApplications().limit(1000).do()
+      // Strategy 2: Scan ALL recent applications - INCREASED LIMIT for better discovery
+      console.log('🔎 Scanning recent applications for ALL fundraisers...')
+      const apps = await indexer.searchForApplications().limit(5000).do()
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
       for (const app of apps.applications) {
@@ -192,11 +196,11 @@ export class ContractRegistry {
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
-          console.log(`✅ Found fundraiser: App ID ${app.id}`)
+          console.log(`✅ Found fundraiser: App ID ${app.id} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
       
-      console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer contracts`)
+      console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique fundraisers`)
       
       // Cache the indexer results
       this.setCache(FUNDRAISER_CACHE_KEY, indexerContracts)
@@ -221,7 +225,7 @@ export class ContractRegistry {
       const cached = this.getCache(TICKETING_CACHE_KEY)
       if (cached) {
         const total = this.mergeUnique(localContracts, cached)
-        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total`)
+        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total events`)
         return total
       }
     } else {
@@ -229,46 +233,50 @@ export class ContractRegistry {
       localStorage.removeItem(TICKETING_CACHE_KEY)
     }
 
-    console.log('🔍 Discovering ticketing contracts from blockchain indexer...')
+    console.log('🔍 Discovering ALL ticketing contracts from blockchain indexer...')
     
     try {
       const indexer = this.getIndexer()
       const indexerContracts: ContractMetadata[] = []
       
-      // Strategy 1: Query by creator address if provided (more reliable, faster)
+      // Strategy 1: Query by creator address if provided (optional optimization)
       if (creatorAddress) {
         console.log(`🔎 Querying contracts created by ${creatorAddress}`)
-        const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
-        console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
-        
-        for (const app of accountApps.applications || []) {
-          if (!app.params || !app.params.globalState) continue
+        try {
+          const accountApps = await indexer.lookupAccountCreatedApplications(creatorAddress).do()
+          console.log(`📱 Found ${accountApps.applications?.length || 0} applications created by this address`)
           
-          const globalState = app.params.globalState
-          const stateObj: any = {}
-          for (const item of globalState) {
-            const key = this.decodeBase64(item.key)
-            stateObj[key] = item.value
+          for (const app of accountApps.applications || []) {
+            if (!app.params || !app.params.globalState) continue
+            
+            const globalState = app.params.globalState
+            const stateObj: any = {}
+            for (const item of globalState) {
+              const key = this.decodeBase64(item.key)
+              stateObj[key] = item.value
+            }
+            
+            const isTicketing = 'ticket_price' in stateObj && 
+                              'max_supply' in stateObj && 
+                              'sold_count' in stateObj
+            
+            if (isTicketing) {
+              indexerContracts.push({
+                appId: Number(app.id),
+                creator: String(app.params.creator || ''),
+                createdAt: Number(app.createdAtRound || 0),
+              })
+              console.log(`✅ Found ticketing: App ID ${app.id} by ${creatorAddress}`)
+            }
           }
-          
-          const isTicketing = 'ticket_price' in stateObj && 
-                            'max_supply' in stateObj && 
-                            'sold_count' in stateObj
-          
-          if (isTicketing) {
-            indexerContracts.push({
-              appId: Number(app.id),
-              creator: String(app.params.creator || ''),
-              createdAt: Number(app.createdAtRound || 0),
-            })
-            console.log(`✅ Found ticketing: App ID ${app.id} by ${creatorAddress}`)
-          }
+        } catch (error) {
+          console.warn('Failed to query by creator address, falling back to general search:', error)
         }
       }
       
-      // Strategy 2: Scan recent applications (slower, but finds all public contracts)
-      console.log('🔎 Scanning recent applications...')
-      const apps = await indexer.searchForApplications().limit(1000).do()
+      // Strategy 2: Scan ALL recent applications - INCREASED LIMIT for better discovery
+      console.log('🔎 Scanning recent applications for ALL events...')
+      const apps = await indexer.searchForApplications().limit(5000).do()
       console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
       
       for (const app of apps.applications) {
@@ -294,11 +302,11 @@ export class ContractRegistry {
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
-          console.log(`✅ Found ticketing: App ID ${app.id}`)
+          console.log(`✅ Found ticketing: App ID ${app.id} (creator: ${String(app.params.creator).substring(0, 8)}...)`)
         }
       }
       
-      console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer contracts`)
+      console.log(`✅ Total discovered: ${localContracts.length} local + ${indexerContracts.length} indexer = ${this.mergeUnique(localContracts, indexerContracts).length} unique events`)
       
       // Cache the indexer results
       this.setCache(TICKETING_CACHE_KEY, indexerContracts)

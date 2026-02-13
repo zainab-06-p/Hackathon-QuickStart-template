@@ -44,8 +44,8 @@ const HistoryPage = () => {
     const historyItems: HistoryItem[] = []
 
     try {
-      // Get campaigns created by user - pass activeAddress for faster discovery
-      const allCampaigns = await ContractRegistry.getFundraisers(false, activeAddress)
+      // Get all campaigns, filter by creator in code
+      const allCampaigns = await ContractRegistry.getFundraisers(false)
       for (const metadata of allCampaigns) {
         if (metadata.creator === activeAddress) {
           const state = await getCampaignState(algorand, metadata)
@@ -61,8 +61,8 @@ const HistoryPage = () => {
         }
       }
 
-      // Get events created by user - pass activeAddress for faster discovery
-      const allEvents = await ContractRegistry.getTicketing(false, activeAddress)
+      // Get all events, filter by creator in code
+      const allEvents = await ContractRegistry.getTicketing(false)
       for (const metadata of allEvents) {
         if (metadata.creator === activeAddress) {
           const state = await getEventState(algorand, metadata)
