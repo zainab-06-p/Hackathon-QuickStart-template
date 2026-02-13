@@ -5,6 +5,19 @@
  * - Smart contract global state
  * - Transaction history via indexer
  * - No centralized database
+ * 
+ * ⚠️ IMPORTANT: WALLET ADDRESS & DATA VISIBILITY
+ * ===============================================
+ * This application operates as a PUBLIC MARKETPLACE where:
+ * ✅ ALL users can see ALL events and campaigns
+ * ✅ Events/campaigns created by ANY wallet address are visible to EVERYONE
+ * ✅ Students with different wallet addresses can browse and interact with ALL content
+ * 
+ * The functions in this file NEVER filter by connected wallet address.
+ * They fetch data from ALL smart contracts on the blockchain.
+ * 
+ * For creator-specific views (dashboard), use the optional creatorAddress
+ * parameter, but this is NOT used on public marketplace pages.
  */
 
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'

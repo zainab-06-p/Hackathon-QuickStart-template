@@ -33,10 +33,14 @@ const FundraisingPageDecentralized = () => {
   algorand.setDefaultSigner(transactionSigner)
 
   // Load campaigns from blockchain
+  // ⚠️ IMPORTANT: This fetches ALL campaigns from ALL creators
+  // Students with different wallet addresses will see campaigns from everyone
+  // This is a PUBLIC MARKETPLACE - NOT filtered by connected wallet
   const loadCampaigns = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      // Don't pass activeAddress - we want to discover ALL campaigns from ALL creators
+      // ✅ CORRECT: Don't pass activeAddress - discover ALL campaigns from ALL creators
+      // Using getAllFundraisers() is clearer but getFundraisers() without args works the same
       const registry = await ContractRegistry.getFundraisers(forceRefresh)
       const campaignStates: CampaignState[] = []
       
@@ -66,7 +70,7 @@ const FundraisingPageDecentralized = () => {
     // Poll for updates every 10 seconds
     const interval = setInterval(() => loadCampaigns(), 10000)
     return () => clearInterval(interval)
-  }, []) // Remove activeAddress dependency - discover all campaigns regardless of wallet
+  }, []) // ⚠️ IMPORTANT: No activeAddress dependency - all users see the same campaigns
 
   const donate = async () => {
     if (!selectedCampaign || !activeAddress) {

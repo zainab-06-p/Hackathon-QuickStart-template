@@ -45,10 +45,14 @@ const TicketingPageDecentralized = () => {
   }, [transactionSigner, algodConfig, indexerConfig])
 
   // Load events from blockchain
+  // ⚠️ IMPORTANT: This fetches ALL events from ALL creators
+  // Students with different wallet addresses will see events from everyone
+  // This is a PUBLIC MARKETPLACE - NOT filtered by connected wallet
   const loadEvents = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      // Don't pass activeAddress - we want to discover ALL events from ALL creators
+      // ✅ CORRECT: Don't pass activeAddress - discover ALL events from ALL creators
+      // Using getAllEvents() is clearer but getTicketing() without args works the same
       const registry = await ContractRegistry.getTicketing(forceRefresh)
       const eventStates: EventState[] = []
       

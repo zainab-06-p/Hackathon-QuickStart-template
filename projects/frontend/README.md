@@ -6,6 +6,20 @@ CampusChain revolutionizes how campus communities manage finances, organize even
 
 ---
 
+## ⚠️ Important: Multi-Wallet Visibility
+
+**CampusChain operates as a public marketplace where ALL users can see ALL events and campaigns.**
+
+- ✅ Events/campaigns created by ANY wallet address are visible to ALL users
+- ✅ Students with different wallets can browse and interact with content from any creator
+- ✅ Public pages show everything to everyone (marketplace model)
+- ✅ No wallet-based filtering on public pages
+
+📖 **For developers**: See [WALLET_VISIBILITY_GUIDE.md](./WALLET_VISIBILITY_GUIDE.md) for detailed implementation guide  
+⚡ **Quick reference**: See [QUICK_REFERENCE.md](./QUICK_REFERENCE.md) for code snippets
+
+---
+
 ## 🎯 Key Features
 
 ### 1. **Milestone-Based Fundraising** 

@@ -4,12 +4,26 @@
  * HYBRID CROSS-DEVICE APPROACH:
  * 1. Store newly created contracts in localStorage (immediate visibility)
  * 2. Query Algorand Indexer to discover contracts from other devices
- * 3. Merge both sources with 30-second cache
+ * 3. Merge both sources with 5-second cache
  * 
  * This provides:
  * - Instant visibility of locally created contracts
  * - Cross-device discovery via blockchain indexer
  * - Efficient caching to reduce API calls
+ * 
+ * ⚠️ CRITICAL: WALLET ADDRESS & DATA VISIBILITY
+ * ==============================================
+ * PUBLIC MARKETPLACE MODEL:
+ * - getFundraisers() WITHOUT creatorAddress → Returns ALL campaigns from ALL creators
+ * - getTicketing() WITHOUT creatorAddress → Returns ALL events from ALL creators
+ * - Everyone sees the same content regardless of wallet address
+ * 
+ * CREATOR DASHBOARD MODEL (optional):
+ * - getFundraisers(false, myAddress) → Returns ONLY my campaigns (use on dashboard only)
+ * - getTicketing(false, myAddress) → Returns ONLY my events (use on dashboard only)
+ * 
+ * DEFAULT BEHAVIOR: Show everything to everyone (marketplace)
+ * ONLY filter by creator on explicit creator dashboard pages
  */
 
 import algosdk from 'algosdk'
@@ -109,6 +123,8 @@ export class ContractRegistry {
   }
 
   // Get all fundraiser contracts (merges local + indexer results with caching)
+  // ⚠️ DEFAULT: Shows ALL campaigns from ALL creators (public marketplace)
+  // Pass creatorAddress ONLY for creator dashboard pages
   static async getFundraisers(forceRefresh = false, creatorAddress?: string): Promise<ContractMetadata[]> {
     // Get locally stored contracts (immediate)
     const localStored = localStorage.getItem(FUNDRAISER_LOCAL_KEY)
@@ -215,6 +231,8 @@ export class ContractRegistry {
   }
 
   // Get all ticketing contracts (merges local + indexer results with caching)
+  // ⚠️ DEFAULT: Shows ALL events from ALL creators (public marketplace)
+  // Pass creatorAddress ONLY for creator dashboard pages
   static async getTicketing(forceRefresh = false, creatorAddress?: string): Promise<ContractMetadata[]> {
     // Get locally stored contracts (immediate)
     const localStored = localStorage.getItem(TICKETING_LOCAL_KEY)
@@ -371,5 +389,63 @@ export class ContractRegistry {
     localStorage.removeItem(FUNDRAISER_CACHE_KEY)
     localStorage.removeItem(TICKETING_CACHE_KEY)
     console.log('🗑️ All local storage and caches cleared')
+  }
+
+  // ========================================================================
+  // CONVENIENCE METHODS FOR EXPLICIT USE CASES
+  // ========================================================================
+
+  /**
+   * Get ALL fundraisers from ALL creators (PUBLIC MARKETPLACE)
+   * Use this for public pages where everyone should see everything
+   * 
+   * @param forceRefresh - Skip cache and fetch fresh data
+   * @returns All fundraising campaigns from all wallet addresses
+   */
+  static async getAllFundraisers(forceRefresh = false): Promise<ContractMetadata[]> {
+    // Explicitly pass undefined for creatorAddress to get ALL campaigns
+    return this.getFundraisers(forceRefresh, undefined)
+  }
+
+  /**
+   * Get ONLY fundraisers created by specific wallet (CREATOR DASHBOARD)
+   * Use this ONLY for creator dashboard pages showing "My Campaigns"
+   * 
+   * @param creatorAddress - Wallet address of the creator
+   * @param forceRefresh - Skip cache and fetch fresh data
+   * @returns Only campaigns created by the specified wallet address
+   */
+  static async getMyFundraisers(creatorAddress: string, forceRefresh = false): Promise<ContractMetadata[]> {
+    const allCampaigns = await this.getFundraisers(forceRefresh, creatorAddress)
+    // Note: The method already optimizes by querying this creator first,
+    // but still scans all contracts. We filter here for extra safety.
+    return allCampaigns.filter(c => c.creator === creatorAddress)
+  }
+
+  /**
+   * Get ALL events from ALL creators (PUBLIC MARKETPLACE)
+   * Use this for public pages where everyone should see everything
+   * 
+   * @param forceRefresh - Skip cache and fetch fresh data
+   * @returns All events from all wallet addresses
+   */
+  static async getAllEvents(forceRefresh = false): Promise<ContractMetadata[]> {
+    // Explicitly pass undefined for creatorAddress to get ALL events
+    return this.getTicketing(forceRefresh, undefined)
+  }
+
+  /**
+   * Get ONLY events created by specific wallet (CREATOR DASHBOARD)
+   * Use this ONLY for creator dashboard pages showing "My Events"
+   * 
+   * @param creatorAddress - Wallet address of the creator
+   * @param forceRefresh - Skip cache and fetch fresh data
+   * @returns Only events created by the specified wallet address
+   */
+  static async getMyEvents(creatorAddress: string, forceRefresh = false): Promise<ContractMetadata[]> {
+    const allEvents = await this.getTicketing(forceRefresh, creatorAddress)
+    // Note: The method already optimizes by querying this creator first,
+    // but still scans all contracts. We filter here for extra safety.
+    return allEvents.filter(e => e.creator === creatorAddress)
   }
 }
