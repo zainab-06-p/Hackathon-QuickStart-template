@@ -19,7 +19,7 @@ const FUNDRAISER_LOCAL_KEY = 'campuschain_fundraiser_local_v3'
 const TICKETING_LOCAL_KEY = 'campuschain_ticketing_local_v3'
 const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v3'
 const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v3'
-const CACHE_DURATION = 30 * 1000 // 30 seconds
+const CACHE_DURATION = 5 * 1000 // 5 seconds for faster cross-device sync
 
 export interface ContractMetadata {
   appId: number
@@ -54,11 +54,15 @@ export class ContractRegistry {
   }
 
   // Decode base64 to string
-  private static decodeBase64(data: string): string {
+  private static decodeBase64(data: string | Uint8Array): string {
     try {
-      return atob(data)
+      if (typeof data === 'string') {
+        return atob(data)
+      }
+      // Convert Uint8Array to string
+      return new TextDecoder().decode(data)
     } catch {
-      return data
+      return String(data)
     }
   }
 
@@ -105,16 +109,22 @@ export class ContractRegistry {
   }
 
   // Get all fundraiser contracts (merges local + indexer results with caching)
-  static async getFundraisers(): Promise<ContractMetadata[]> {
+  static async getFundraisers(forceRefresh = false): Promise<ContractMetadata[]> {
     // Get locally stored contracts (immediate)
     const localStored = localStorage.getItem(FUNDRAISER_LOCAL_KEY)
     const localContracts: ContractMetadata[] = localStored ? JSON.parse(localStored) : []
     
-    // Check cache first for indexer results
-    const cached = this.getCache(FUNDRAISER_CACHE_KEY)
-    if (cached) {
-      console.log(`📦 Using cached data: ${localContracts.length} local + ${cached.length} indexer = ${this.mergeUnique(localContracts, cached).length} total`)
-      return this.mergeUnique(localContracts, cached)
+    // Check cache first for indexer results (unless force refresh)
+    if (!forceRefresh) {
+      const cached = this.getCache(FUNDRAISER_CACHE_KEY)
+      if (cached) {
+        const total = this.mergeUnique(localContracts, cached)
+        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total`)
+        return total
+      }
+    } else {
+      console.log('🔄 Force refresh - clearing cache')
+      localStorage.removeItem(FUNDRAISER_CACHE_KEY)
     }
 
     console.log('🔍 Discovering fundraiser contracts from blockchain indexer...')
@@ -125,6 +135,8 @@ export class ContractRegistry {
       // Search for all applications (limited to recent ones for performance)
       const apps = await indexer.searchForApplications().limit(1000).do()
       
+      console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
+      
       const indexerContracts: ContractMetadata[] = []
       
       for (const app of apps.applications) {
@@ -132,12 +144,16 @@ export class ContractRegistry {
         
         // Check if this is a fundraiser contract by looking for specific keys
         const globalState = app.params.globalState
-        const keys = globalState.map((item: any) => this.decodeBase64(item.key))
+        const stateObj: any = {}
+        for (const item of globalState) {
+          const key = this.decodeBase64(item.key)
+          stateObj[key] = item.value
+        }
         
         // Fundraiser contracts have these specific keys
-        const isFundraiser = keys.includes('goal_amount') && 
-                           keys.includes('raised_amount') && 
-                           keys.includes('milestone_count')
+        const isFundraiser = 'goal_amount' in stateObj && 
+                           'raised_amount' in stateObj && 
+                           'milestone_count' in stateObj
         
         if (isFundraiser) {
           indexerContracts.push({
@@ -145,6 +161,7 @@ export class ContractRegistry {
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
+          console.log(`✅ Found fundraiser: App ID ${app.id}`)
         }
       }
       
@@ -163,16 +180,22 @@ export class ContractRegistry {
   }
 
   // Get all ticketing contracts (merges local + indexer results with caching)
-  static async getTicketing(): Promise<ContractMetadata[]> {
+  static async getTicketing(forceRefresh = false): Promise<ContractMetadata[]> {
     // Get locally stored contracts (immediate)
     const localStored = localStorage.getItem(TICKETING_LOCAL_KEY)
     const localContracts: ContractMetadata[] = localStored ? JSON.parse(localStored) : []
     
-    // Check cache first for indexer results
-    const cached = this.getCache(TICKETING_CACHE_KEY)
-    if (cached) {
-      console.log(`📦 Using cached data: ${localContracts.length} local + ${cached.length} indexer = ${this.mergeUnique(localContracts, cached).length} total`)
-      return this.mergeUnique(localContracts, cached)
+    // Check cache first for indexer results (unless force refresh)
+    if (!forceRefresh) {
+      const cached = this.getCache(TICKETING_CACHE_KEY)
+      if (cached) {
+        const total = this.mergeUnique(localContracts, cached)
+        console.log(`📦 Cached: ${localContracts.length} local + ${cached.length} indexer = ${total.length} total`)
+        return total
+      }
+    } else {
+      console.log('🔄 Force refresh - clearing cache')
+      localStorage.removeItem(TICKETING_CACHE_KEY)
     }
 
     console.log('🔍 Discovering ticketing contracts from blockchain indexer...')
@@ -183,6 +206,8 @@ export class ContractRegistry {
       // Search for all applications
       const apps = await indexer.searchForApplications().limit(1000).do()
       
+      console.log(`🔎 Indexer returned ${apps.applications?.length || 0} total applications`)
+      
       const indexerContracts: ContractMetadata[] = []
       
       for (const app of apps.applications) {
@@ -190,12 +215,16 @@ export class ContractRegistry {
         
         // Check if this is a ticketing contract by looking for specific keys
         const globalState = app.params.globalState
-        const keys = globalState.map((item: any) => this.decodeBase64(item.key))
+        const stateObj: any = {}
+        for (const item of globalState) {
+          const key = this.decodeBase64(item.key)
+          stateObj[key] = item.value
+        }
         
         // Ticketing contracts have these specific keys
-        const isTicketing = keys.includes('ticket_price') && 
-                          keys.includes('max_supply') && 
-                          keys.includes('sold_count')
+        const isTicketing = 'ticket_price' in stateObj && 
+                          'max_supply' in stateObj && 
+                          'sold_count' in stateObj
         
         if (isTicketing) {
           indexerContracts.push({
@@ -203,6 +232,7 @@ export class ContractRegistry {
             creator: String(app.params.creator || ''),
             createdAt: Number(app.createdAtRound || 0),
           })
+          console.log(`✅ Found ticketing: App ID ${app.id}`)
         }
       }
       

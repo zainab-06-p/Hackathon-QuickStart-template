@@ -45,10 +45,10 @@ const TicketingPageDecentralized = () => {
   }, [transactionSigner, algodConfig, indexerConfig])
 
   // Load events from blockchain
-  const loadEvents = async () => {
+  const loadEvents = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      const registry = await ContractRegistry.getTicketing()
+      const registry = await ContractRegistry.getTicketing(forceRefresh)
       const eventStates: EventState[] = []
       
       for (const metadata of registry) {
@@ -64,6 +64,10 @@ const TicketingPageDecentralized = () => {
       // Load user's tickets if wallet is connected
       if (activeAddress) {
         loadMyTickets(eventStates)
+      }
+      
+      if (forceRefresh) {
+        enqueueSnackbar(`Refreshed! Found ${eventStates.length} events`, { variant: 'success' })
       }
     } catch (error) {
       console.error('Error loading events:', error)
@@ -365,7 +369,7 @@ const TicketingPageDecentralized = () => {
               <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">🎫 Ticketing</h1>
             </div>
             <button 
-              onClick={loadEvents} 
+              onClick={() => loadEvents(true)} 
               className="btn btn-xs sm:btn-sm btn-ghost hover:btn-primary"
               disabled={loading}
             >

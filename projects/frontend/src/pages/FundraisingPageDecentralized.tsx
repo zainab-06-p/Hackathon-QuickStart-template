@@ -33,10 +33,10 @@ const FundraisingPageDecentralized = () => {
   algorand.setDefaultSigner(transactionSigner)
 
   // Load campaigns from blockchain
-  const loadCampaigns = async () => {
+  const loadCampaigns = async (forceRefresh = false) => {
     setLoading(true)
     try {
-      const registry = await ContractRegistry.getFundraisers()
+      const registry = await ContractRegistry.getFundraisers(forceRefresh)
       const campaignStates: CampaignState[] = []
       
       for (const metadata of registry) {
@@ -48,6 +48,10 @@ const FundraisingPageDecentralized = () => {
       
       setCampaigns(campaignStates)
       setLastUpdated(new Date())
+      
+      if (forceRefresh) {
+        enqueueSnackbar(`Refreshed! Found ${campaignStates.length} campaigns`, { variant: 'success' })
+      }
     } catch (error) {
       console.error('Error loading campaigns:', error)
       enqueueSnackbar(`Error loading campaigns: ${(error as Error).message}`, { variant: 'error' })
@@ -59,7 +63,7 @@ const FundraisingPageDecentralized = () => {
   useEffect(() => {
     loadCampaigns()
     // Poll for updates every 10 seconds
-    const interval = setInterval(loadCampaigns, 10000)
+    const interval = setInterval(() => loadCampaigns(), 10000)
     return () => clearInterval(interval)
   }, [])
 
@@ -188,6 +192,13 @@ const FundraisingPageDecentralized = () => {
               className="btn btn-primary btn-sm hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-500 to-purple-500 border-0"
             >
               ✨ Create Campaign
+            </button>
+            <button 
+              onClick={() => loadCampaigns(true)} 
+              className="btn btn-sm btn-outline btn-info hover:scale-110 transition-transform"
+              disabled={loading}
+            >
+              🔄 Refresh
             </button>
             <button 
               onClick={() => navigate('/fundraising/reputation')} 
