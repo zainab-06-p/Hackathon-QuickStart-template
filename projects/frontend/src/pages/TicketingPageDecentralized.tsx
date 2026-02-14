@@ -132,11 +132,9 @@ const TicketingPageDecentralized = () => {
   }
 
   useEffect(() => {
-    // Load initial events from localStorage/blockchain as fallback
-    loadEvents()
-    
     // 🔥 Real-time Firebase listener for instant cross-device sync
-    // This is the PRIMARY data source - it handles all updates automatically
+    // This is the PRIMARY and ONLY data source - it handles all updates automatically
+    // No manual refresh needed - Firebase keeps everything in sync!
     initializeFirebase()
     const unsubscribeFirebase = listenToEvents(async (firebaseEvents) => {
       console.log(`🔥 Firebase events updated: ${firebaseEvents.length} events`)
@@ -161,18 +159,8 @@ const TicketingPageDecentralized = () => {
       setEvents(eventStates)
     })
     
-    // Refresh when page becomes visible (for cross-device sync)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        console.log('Page visible again, refreshing events...')
-        loadEvents(true) // Force refresh when returning to page
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange)
-    
     return () => {
       unsubscribeFirebase()
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])
 
