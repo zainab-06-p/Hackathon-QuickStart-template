@@ -3,8 +3,8 @@ import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import { ContractRegistry } from '../utils/contractRegistry'
 import { getCampaignState, getEventState, type CampaignState, type EventState } from '../utils/blockchainData'
+import { listenToCampaigns, listenToEvents, initializeFirebase } from '../utils/firebase'
 
 interface HistoryItem {
   type: 'campaign_created' | 'event_created' | 'donation' | 'ticket_purchase'
@@ -41,16 +41,29 @@ const HistoryPage = () => {
     if (!activeAddress) return
     
     setLoading(true)
+    
+    // 🔥 Use Firebase for real-time data instead of blockchain discovery
+    initializeFirebase()
+    
     const historyItems: HistoryItem[] = []
 
-    try {
-      // Get all campaigns, filter by creator in code
-      const allCampaigns = await ContractRegistry.getFundraisers(false)
-      for (const metadata of allCampaigns) {
-        if (metadata.creator === activeAddress) {
+    // Listen to campaigns from Firebase
+    const unsubscribeCampaigns = listenToCampaigns(async (firebaseCampaigns) => {
+      const campaignItems: HistoryItem[] = []
+      
+      for (const fbCampaign of firebaseCampaigns) {
+        // Filter by creator
+        if (fbCampaign.creator === activeAddress) {
+          const metadata = {
+            appId: parseInt(fbCampaign.appId),
+            creator: fbCampaign.creator,
+            createdAt: fbCampaign.createdAt,
+            title: fbCampaign.title,
+            description: fbCampaign.description
+          }
           const state = await getCampaignState(algorand, metadata)
           if (state) {
-            historyItems.push({
+            campaignItems.push({
               type: 'campaign_created',
               timestamp: metadata.createdAt,
               appId: metadata.appId,
@@ -60,14 +73,31 @@ const HistoryPage = () => {
           }
         }
       }
+      
+      // Merge with existing history (keeping events)
+      const existingEvents = history.filter(h => h.type === 'event_created')
+      setHistory([...campaignItems, ...existingEvents].sort((a, b) => b.timestamp - a.timestamp))
+      setLoading(false)
+    })
 
-      // Get all events, filter by creator in code
-      const allEvents = await ContractRegistry.getTicketing(false)
-      for (const metadata of allEvents) {
-        if (metadata.creator === activeAddress) {
+    // Listen to events from Firebase  
+    const unsubscribeEvents = listenToEvents(async (firebaseEvents) => {
+      const eventItems: HistoryItem[] = []
+      
+      for (const fbEvent of firebaseEvents) {
+        // Filter by creator
+        if (fbEvent.creator === activeAddress) {
+          const metadata = {
+            appId: parseInt(fbEvent.appId),
+            creator: fbEvent.creator,
+            createdAt: fbEvent.createdAt,
+            title: fbEvent.title,
+            description: fbEvent.description,
+            venue: fbEvent.venue
+          }
           const state = await getEventState(algorand, metadata)
           if (state) {
-            historyItems.push({
+            eventItems.push({
               type: 'event_created',
               timestamp: metadata.createdAt,
               appId: metadata.appId,
@@ -77,82 +107,16 @@ const HistoryPage = () => {
           }
         }
       }
-
-      // Get donations made by user (check indexer for transactions to campaign contracts)
-      try {
-        const indexer = algorand.client.indexer
-        const txns = await indexer
-          .searchForTransactions()
-          .address(activeAddress)
-          .txType('pay')
-          .limit(100)
-          .do()
-
-        for (const txn of txns.transactions) {
-          // Check if receiver is a known campaign contract
-          const campaign = allCampaigns.find(c => {
-            // Get app address (we'd need to calculate this properly)
-            return false // Simplified for now
-          })
-          
-          // If found, add to history
-          // This is simplified - in production you'd need proper app address lookup
-        }
-      } catch (e) {
-        console.log('Could not load transaction history:', e)
-      }
-
-      // Get tickets purchased by user (check NFT holdings)
-      try {
-        const accountInfo = await algorand.client.algod.accountInformation(activeAddress).do()
-        const assets = accountInfo.assets || []
-
-        for (const asset of assets) {
-          if (asset.amount > 0) {
-            try {
-              const assetInfo = await algorand.client.algod.getAssetByID(asset.assetId).do()
-              // Check if this is an event ticket NFT
-              if (assetInfo.params.name === 'Event Ticket' && assetInfo.params.unitName === 'TIX') {
-                // The reserve field contains the buyer's address from our contract
-                if (assetInfo.params.reserve === activeAddress) {
-                  // Find the event by searching for matching title in registry
-                  let eventTitle = 'Unknown Event'
-                  for (const metadata of allEvents) {
-                    const state = await getEventState(algorand, metadata)
-                    if (state) {
-                      eventTitle = metadata.title || 'Unnamed Event'
-                      break // Use first match for now
-                    }
-                  }
-                  
-                  historyItems.push({
-                    type: 'ticket_purchase',
-                    timestamp: Date.now(), // Would need to get from transaction history
-                    appId: Number(asset.assetId), // Use asset ID as identifier
-                    title: eventTitle,
-                    amount: '0.50', // Would need to get from transaction
-                    details: `NFT Asset ID: ${asset.assetId}`
-                  })
-                }
-              }
-            } catch (e) {
-              // Asset might be inaccessible, skip
-            }
-          }
-        }
-      } catch (e) {
-        console.log('Could not load asset holdings:', e)
-      }
-
-      // Sort by timestamp descending
-      historyItems.sort((a, b) => b.timestamp - a.timestamp)
-      setHistory(historyItems)
       
-    } catch (error) {
-      console.error('Error loading history:', error)
-    } finally {
+      // Merge with existing history (keeping campaigns)
+      const existingCampaigns = history.filter(h => h.type === 'campaign_created')
+      setHistory([...existingCampaigns, ...eventItems].sort((a, b) => b.timestamp - a.timestamp))
       setLoading(false)
-    }
+    })
+
+    // Note: Ticket purchase history could be added by querying user's NFT holdings
+    // and matching them with events from Firebase
+    
   }
 
   const formatAddress = (addr: string) => {
