@@ -228,19 +228,28 @@ const TicketingPageDecentralized = () => {
         ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,
-        validityWindow: 1000,
+        validityWindow: 2000,  // 100+ blocks (~8 minutes) for signing time
         maxFee: algokit.algos(0.003),
         suppressLog: true
       })
 
       const ticketAssetId = buyResult.return as bigint
+      console.log('✅ Ticket created with Asset ID:', ticketAssetId)
       enqueueSnackbar(`✅ Ticket reserved! Asset ID: ${ticketAssetId}`, { variant: 'success' })
+      
+      // Store ticket info immediately in case later steps fail
+      setPurchasedTicket({
+        appId: selectedEvent.appId,
+        assetId: ticketAssetId,
+        holderAddress: activeAddress
+      })
       
       // Step 2: Opt-in to the ticket NFT
       enqueueSnackbar('📝 Please approve opt-in to claim your ticket...', { variant: 'info' })
       await algorand.send.assetOptIn({
         sender: activeAddress,
-        assetId: ticketAssetId
+        assetId: ticketAssetId,
+        validityWindow: 2000  // More time to sign
       })
       
       enqueueSnackbar('✅ Opted in! Claiming ticket...', { variant: 'info' })
@@ -260,25 +269,20 @@ const TicketingPageDecentralized = () => {
         ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,  // Cover inner transaction fee
-        validityWindow: 1000,
+        validityWindow: 2000,  // More time to sign
         maxFee: algokit.algos(0.002),  // Extra fee for inner asset transfer
         suppressLog: true
       })
       
       enqueueSnackbar(`🎫 Ticket claimed successfully!`, { variant: 'success' })
 
-      // Store ticket info to show QR code
-      setPurchasedTicket({
-        appId: selectedEvent.appId,
-        assetId: ticketAssetId,
-        holderAddress: activeAddress
-      })
+      // Ticket info already stored above - QR code should be showing now
       
       // Small delay to ensure blockchain state is updated
       await new Promise(resolve => setTimeout(resolve, 2000))
       
       // Firebase will automatically update the event state
-      enqueueSnackbar('Firebase will sync the updated state automatically', { variant: 'info' })
+      enqueueSnackbar('🔥 Check "My Tickets" section for your QR code!', { variant: 'success' })
       
       // Update selected event
       const updated = await getEventState(algorand, {
@@ -295,9 +299,24 @@ const TicketingPageDecentralized = () => {
       console.error('Purchase error:', e)
       const errorMsg = (e as Error).message
       
-      if (errorMsg.includes('already in ledger')) {
+      if (errorMsg.includes('txn dead') || errorMsg.includes('round') || errorMsg.includes('outside')) {
+        enqueueSnackbar('⏰ Transaction expired (took too long to sign). If ticket was created, check "My Tickets" section.', { variant: 'warning' })
+        // Reload tickets to check if purchase succeeded
+        const updated = await getEventState(algorand, {
+          appId: selectedEvent.appId,
+          creator: selectedEvent.organizer,
+          createdAt: 0,
+          title: selectedEvent.title,
+          description: selectedEvent.description,
+          venue: selectedEvent.venue
+        })
+        if (updated) {
+          setSelectedEvent(updated)
+          loadMyTickets([updated])
+        }
+      } else if (errorMsg.includes('already in ledger')) {
         // Transaction succeeded but we got an error after - Firebase will sync
-        enqueueSnackbar('⚠️ Transaction may have succeeded. Firebase will sync...', { variant: 'warning' })
+        enqueueSnackbar('⚠️ Transaction may have succeeded. Check "My Tickets" section!', { variant: 'warning' })
         if (selectedEvent) {
           const updated = await getEventState(algorand, {
             appId: selectedEvent.appId,
