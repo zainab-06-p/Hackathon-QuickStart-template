@@ -82,7 +82,7 @@ const CreateCampaignPage = () => {
           title: newCampaign.title,
           description: newCampaign.description
         })),
-        validityWindow: 2000,  // ~8 minutes for signing
+        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
         populateAppCallResources: false,
         suppressLog: true
       })
@@ -96,7 +96,7 @@ const CreateCampaignPage = () => {
         sender: activeAddress,
         receiver: appAddress,
         amount: algokit.algos(0.1),
-        validityWindow: 2000,  // ~8 minutes for signing
+        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
         suppressLog: true
       })
       

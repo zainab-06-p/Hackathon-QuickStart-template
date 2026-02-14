@@ -85,7 +85,8 @@ const TicketScanner = ({ appId, onVerified, onClose }: TicketScannerProps) => {
           ticketAssetId: assetId
         },
         sender: activeAddress,
-        extraFee: algokit.algos(0.001) // Extra fee for box operations
+        extraFee: algokit.algos(0.001), // Extra fee for box operations
+        validityWindow: 1000  // ~4 minutes for signing (TestNet max)
       })
 
       if (txResult.return) {

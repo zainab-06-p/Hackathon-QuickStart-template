@@ -90,7 +90,7 @@ const CreateEventPage = () => {
           description: newEvent.description,
           venue: newEvent.venue
         })),
-        validityWindow: 2000,  // ~8 minutes for signing
+        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
         populateAppCallResources: false,
         suppressLog: true
       })

@@ -70,7 +70,11 @@ export const saveCampaignToFirebase = async (campaign: FirebaseCampaign): Promis
 
 export const listenToCampaigns = (callback: (campaigns: FirebaseCampaign[]) => void) => {
   const db = getFirebaseDatabase()
-  if (!db) return () => {}
+  if (!db) {
+    console.warn('⚠️ Firebase not configured - returning empty campaigns')
+    callback([]) // Call callback with empty array so loading state resolves
+    return () => {}
+  }
 
   const campaignsRef = ref(db, 'campaigns')
   
@@ -121,7 +125,11 @@ export const saveEventToFirebase = async (event: FirebaseEvent): Promise<boolean
 
 export const listenToEvents = (callback: (events: FirebaseEvent[]) => void) => {
   const db = getFirebaseDatabase()
-  if (!db) return () => {}
+  if (!db) {
+    console.warn('⚠️ Firebase not configured - returning empty events')
+    callback([]) // Call callback with empty array so loading state resolves
+    return () => {}
+  }
 
   const eventsRef = ref(db, 'events')
   

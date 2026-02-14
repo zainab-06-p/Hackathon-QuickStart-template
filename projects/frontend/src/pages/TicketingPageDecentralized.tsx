@@ -228,7 +228,7 @@ const TicketingPageDecentralized = () => {
         ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,
-        validityWindow: 2000,  // 100+ blocks (~8 minutes) for signing time
+        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
         maxFee: algokit.algos(0.003),
         suppressLog: true
       })
@@ -249,7 +249,7 @@ const TicketingPageDecentralized = () => {
       await algorand.send.assetOptIn({
         sender: activeAddress,
         assetId: ticketAssetId,
-        validityWindow: 2000  // More time to sign
+        validityWindow: 1000  // ~4 minutes for signing (TestNet max)
       })
       
       enqueueSnackbar('✅ Opted in! Claiming ticket...', { variant: 'info' })
@@ -269,7 +269,7 @@ const TicketingPageDecentralized = () => {
         ],
         populateAppCallResources: false,
         coverAppCallInnerTransactionFees: true,  // Cover inner transaction fee
-        validityWindow: 2000,  // More time to sign
+        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
         maxFee: algokit.algos(0.002),  // Extra fee for inner asset transfer
         suppressLog: true
       })
