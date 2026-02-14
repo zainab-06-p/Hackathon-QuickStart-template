@@ -484,7 +484,8 @@ const FundraisingPageDecentralized = () => {
                           // Inner transaction needs fee coverage - add extra fee for the payment transaction
                           await appClient.send.releaseMilestone({ 
                             args: [],
-                            extraFee: algokit.algos(0.001) // Extra fee for inner payment transaction
+                            extraFee: algokit.algos(0.001), // Extra fee for inner payment transaction
+                            validityWindow: 2000  // ~8 minutes for signing
                           })
                           
                           enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })

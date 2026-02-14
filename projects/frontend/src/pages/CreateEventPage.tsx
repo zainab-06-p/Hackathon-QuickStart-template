@@ -90,6 +90,7 @@ const CreateEventPage = () => {
           description: newEvent.description,
           venue: newEvent.venue
         })),
+        validityWindow: 2000,  // ~8 minutes for signing
         populateAppCallResources: false,
         suppressLog: true
       })
