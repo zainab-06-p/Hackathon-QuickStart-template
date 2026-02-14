@@ -2,6 +2,7 @@ import { useWallet } from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import algosdk from 'algosdk'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
@@ -57,9 +58,12 @@ const CreateCampaignPage = () => {
       const balance = Number(accountInfo.amount)
       const minBalance = Number(accountInfo.minBalance)
       
-      if (balance < minBalance + 1000000) { // Need at least 1 ALGO extra for contract creation
+      // Need: contract creation fee (1 ALGO) + contract MBR (0.1 ALGO) + user MBR
+      const requiredBalance = minBalance + 1_100_000 // 1.1 ALGO extra
+      
+      if (balance < requiredBalance) {
         enqueueSnackbar(
-          `Insufficient balance! You have ${(balance / 1_000_000).toFixed(3)} ALGO but need at least ${((minBalance + 1000000) / 1_000_000).toFixed(3)} ALGO. Please add more funds to your wallet.`,
+          `Insufficient balance! You have ${(balance / 1_000_000).toFixed(3)} ALGO but need at least ${(requiredBalance / 1_000_000).toFixed(3)} ALGO. Please add more funds to your wallet.`,
           { variant: 'error' }
         )
         return
@@ -83,6 +87,16 @@ const CreateCampaignPage = () => {
       })
 
       const appId = Number(result.appId)
+      const appAddress = algosdk.getApplicationAddress(appId)
+      
+      // Fund the contract with minimum balance (0.1 ALGO) so it can send payments later
+      enqueueSnackbar('Funding contract with minimum balance...', { variant: 'info' })
+      await algorand.send.payment({
+        sender: activeAddress,
+        receiver: appAddress,
+        amount: algokit.algos(0.1),
+        suppressLog: true
+      })
       
       enqueueSnackbar(`✅ Campaign created! App ID: ${appId}`, { variant: 'success' })
 

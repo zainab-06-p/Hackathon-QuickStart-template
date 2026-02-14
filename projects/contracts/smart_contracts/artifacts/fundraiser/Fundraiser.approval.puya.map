@@ -3,7 +3,7 @@
   "sources": [
     "../../fundraiser/contract.py"
   ],
-  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAIA;;AAAA;;;AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;;;AAAA;;;;;;;;;;;;;;AAAA;;AA6FK;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AALA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;;AAbA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;;AAAA;AAAA;;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;AAAA;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAzBA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAlBA;;AAAA;AAAA;AAAA;;AAAA;AAhCL;;AAAA;AAAA;AAAA;AAAA;;AAAA;AAAA;AAAA;AAgCK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAdA;;AAAA;AAAA;AAAA;;AAAA;AAAA;AAlBL;;;AAAA;AAAA;;;AAAA;AAAA;;;AAAA;AAkBK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAAL;;;AAGQ;AAAA;;AAAA;AACA;AAAqB;AAArB;AACA;;AAAA;;AAAA;AACA;AAAyB;AAAzB;AACA;;AAAA;;AAAA;AACA;;AAAiB;AAAjB;AACA;;AAAe;;AAAf;AACA;;AAAyB;AAAzB;AACA;;AAAoB;AAApB;AACO;AAAP;AAER;;;AAGe;AAAA;;AAAA;AAAA;AAAP;AACO;;AAA2B;AAAA;;AAAA;AAAA;AAA3B;AAAP;AACO;AAAA;AAAA;AAAA;AAAqB;AAAA;AAAA;AAAA;AAArB;AAAP;AACO;;AAAA;;AAAoB;;AAApB;AAAP;AACO;;AAAA;;AAAA;AAAkB;;;;AAAlB;AAAP;AAEA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AAA0B;AAA1B;AAAA;;AAAA;AAAA;AAGG;AAAA;AAAA;AAAA;AAAsB;AAAA;AAAA;AAAA;AAAtB;AAAX;;;AACY;;AAAoB;AAApB;AAEG;AAAA;AAAA;AAAA;AAAP;AAQO;;AAAc;AAAA;;AAAA;AAAA;AAAd;AAAP;AACO;AAAA;AAAA;AAAA;AAAyB;AAAA;;AAAA;AAAA;AAAzB;AAAP;AAGO;AAAA;;AAAA;AAAA;AAAP;AAGuB;AAAA;AAAA;AAAA;AAAoB;AAAA;;AAAA;AAAA;AAApB;AAGvB;AACa;AAAA;;AAAA;AAAA;;;;;AADb;;;AAGQ;;;AAHR;AAMA;AAAA;AAAA;AAAA;AAA0B;AAA1B;AAAA;AAAA;AAAA;AACO;AAAA;AAAA;AAAA;AAAP;AAMI;AAAA;AAAA;AAAA;AACA;AAAA;AAAA;AAAA;AACA;AAAA;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AAPJ;AAaO;AAAA;;AAAA;AAAA;AAAP;AAKO;AAAA;;AAAA;AAAA;AAAP",
+  "mappings": ";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAIA;;AAAA;;;AAAA;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;AAAA;;;AAAA;;;;;;;;;;;;;;AAAA;;AAqGK;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AALA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;;AAbA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;;AAAA;AAAA;;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;;AAAA;AAAA;AAAA;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAjCA;;AAAA;AAAA;AAAA;;AAAA;AAAA;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAlBA;;AAAA;AAAA;AAAA;;AAAA;AAhCL;;AAAA;AAAA;AAAA;AAAA;;AAAA;AAAA;AAAA;AAgCK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAdA;;AAAA;AAAA;AAAA;;AAAA;AAAA;AAlBL;;;AAAA;AAAA;;;AAAA;AAAA;;;AAAA;AAkBK;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;;AAAL;;;AAGQ;AAAA;;AAAA;AACA;AAAqB;AAArB;AACA;;AAAA;;AAAA;AACA;AAAyB;AAAzB;AACA;;AAAA;;AAAA;AACA;;AAAiB;AAAjB;AACA;;AAAe;;AAAf;AACA;;AAAyB;AAAzB;AACA;;AAAoB;AAApB;AACO;AAAP;AAER;;;AAGe;AAAA;;AAAA;AAAA;AAAP;AACO;;AAA2B;AAAA;;AAAA;AAAA;AAA3B;AAAP;AACO;AAAA;AAAA;AAAA;AAAqB;AAAA;AAAA;AAAA;AAArB;AAAP;AACO;;AAAA;;AAAoB;;AAApB;AAAP;AACO;;AAAA;;AAAA;AAAkB;AAAlB;AAAP;AAEA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AAA0B;AAA1B;AAAA;;AAAA;AAAA;AAGG;AAAA;AAAA;AAAA;AAAsB;AAAA;AAAA;AAAA;AAAtB;AAAX;;;AACY;;AAAoB;AAApB;AAEG;AAAA;AAAA;AAAA;AAAP;AASO;;AAAc;AAAA;;AAAA;AAAA;AAAd;AAAP;AACO;AAAA;AAAA;AAAA;AAAyB;AAAA;;AAAA;AAAA;AAAzB;AAAP;AAGO;AAAA;;AAAA;AAAA;AAAP;AAGuB;AAAA;AAAA;AAAA;AAAoB;AAAA;;AAAA;AAAA;AAApB;AAIJ;;AAAA;;AAAA;AAGQ;;AAJb;AAIa;AAApB;AAAP;AAGA;AACa;AAAA;;AAAA;AAAA;;;;;AADb;;;AAGQ;;;AAHR;AAMA;AAAA;AAAA;AAAA;AAA0B;AAA1B;AAAA;AAAA;AAAA;AACO;AAAA;AAAA;AAAA;AAAP;AAMI;AAAA;AAAA;AAAA;AACA;AAAA;AAAA;AAAA;AACA;AAAA;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AACA;AAAA;;AAAA;AAAA;AAPJ;AAaO;AAAA;;AAAA;AAAA;AAAP;AAKO;AAAA;;AAAA;AAAA;AAAP",
   "op_pc_offset": 0,
   "pc_events": {
     "1": {
@@ -11,12 +11,12 @@
       "params": {},
       "block": "main",
       "stack_in": [],
-      "op": "intcblock 0 1"
+      "op": "intcblock 0 1 100000"
     },
-    "5": {
+    "8": {
       "op": "bytecblock \"raised_amount\" 0x151f7c75 \"current_milestone\" \"goal_amount\" \"milestone_count\" \"creator\" \"contributor_count\" \"goal_reached\" \"deadline\" \"is_active\""
     },
-    "130": {
+    "133": {
       "op": "txn NumAppArgs",
       "defined_out": [
         "tmp%0#1"
@@ -25,11 +25,11 @@
         "tmp%0#1"
       ]
     },
-    "132": {
+    "135": {
       "op": "bz main_after_if_else@12",
       "stack_out": []
     },
-    "135": {
+    "138": {
       "op": "pushbytess 0x11362d2d 0xe4c3e010 0xc221c051 0xaf4569dd 0x202a0e19 0x65f78757 // method \"create_campaign(uint64,uint64,uint64)uint64\", method \"donate(pay)uint64\", method \"release_milestone()uint64\", method \"get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)\", method \"get_creator()address\", method \"get_deadline()uint64\"",
       "defined_out": [
         "Method(create_campaign(uint64,uint64,uint64)uint64)",
@@ -48,7 +48,7 @@
         "Method(get_deadline()uint64)"
       ]
     },
-    "167": {
+    "170": {
       "op": "txna ApplicationArgs 0",
       "defined_out": [
         "Method(create_campaign(uint64,uint64,uint64)uint64)",
@@ -69,11 +69,11 @@
         "tmp%2#0"
       ]
     },
-    "170": {
+    "173": {
       "op": "match main_create_campaign_route@3 main_donate_route@4 main_release_milestone_route@5 main_get_status_route@6 main_get_creator_route@7 main_get_deadline_route@8",
       "stack_out": []
     },
-    "184": {
+    "187": {
       "block": "main_after_if_else@12",
       "stack_in": [],
       "op": "intc_0 // 0",
@@ -84,11 +84,11 @@
         "tmp%0#0"
       ]
     },
-    "185": {
+    "188": {
       "op": "return",
       "stack_out": []
     },
-    "186": {
+    "189": {
       "block": "main_get_deadline_route@8",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -99,7 +99,7 @@
         "tmp%33#0"
       ]
     },
-    "188": {
+    "191": {
       "op": "!",
       "defined_out": [
         "tmp%34#0"
@@ -108,12 +108,12 @@
         "tmp%34#0"
       ]
     },
-    "189": {
+    "192": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "190": {
+    "193": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%35#0"
@@ -122,12 +122,12 @@
         "tmp%35#0"
       ]
     },
-    "192": {
+    "195": {
       "error": "can only call when not creating",
       "op": "assert // can only call when not creating",
       "stack_out": []
     },
-    "193": {
+    "196": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.get_deadline",
       "op": "callsub get_deadline",
       "defined_out": [
@@ -137,7 +137,7 @@
         "to_encode%3#0"
       ]
     },
-    "196": {
+    "199": {
       "op": "itob",
       "defined_out": [
         "val_as_bytes%8#0"
@@ -146,7 +146,7 @@
         "val_as_bytes%8#0"
       ]
     },
-    "197": {
+    "200": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -157,14 +157,14 @@
         "0x151f7c75"
       ]
     },
-    "198": {
+    "201": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "val_as_bytes%8#0"
       ]
     },
-    "199": {
+    "202": {
       "op": "concat",
       "defined_out": [
         "tmp%37#0"
@@ -173,11 +173,11 @@
         "tmp%37#0"
       ]
     },
-    "200": {
+    "203": {
       "op": "log",
       "stack_out": []
     },
-    "201": {
+    "204": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -186,11 +186,11 @@
         "tmp%0#0"
       ]
     },
-    "202": {
+    "205": {
       "op": "return",
       "stack_out": []
     },
-    "203": {
+    "206": {
       "block": "main_get_creator_route@7",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -201,7 +201,7 @@
         "tmp%27#0"
       ]
     },
-    "205": {
+    "208": {
       "op": "!",
       "defined_out": [
         "tmp%28#0"
@@ -210,12 +210,12 @@
         "tmp%28#0"
       ]
     },
-    "206": {
+    "209": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "207": {
+    "210": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%29#0"
@@ -224,12 +224,12 @@
         "tmp%29#0"
       ]
     },
-    "209": {
+    "212": {
       "error": "can only call when not creating",
       "op": "assert // can only call when not creating",
       "stack_out": []
     },
-    "210": {
+    "213": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.get_creator",
       "op": "callsub get_creator",
       "defined_out": [
@@ -239,7 +239,7 @@
         "tmp%31#0"
       ]
     },
-    "213": {
+    "216": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -250,14 +250,14 @@
         "0x151f7c75"
       ]
     },
-    "214": {
+    "217": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "tmp%31#0"
       ]
     },
-    "215": {
+    "218": {
       "op": "concat",
       "defined_out": [
         "tmp%32#0"
@@ -266,11 +266,11 @@
         "tmp%32#0"
       ]
     },
-    "216": {
+    "219": {
       "op": "log",
       "stack_out": []
     },
-    "217": {
+    "220": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -279,11 +279,11 @@
         "tmp%0#0"
       ]
     },
-    "218": {
+    "221": {
       "op": "return",
       "stack_out": []
     },
-    "219": {
+    "222": {
       "block": "main_get_status_route@6",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -294,7 +294,7 @@
         "tmp%22#0"
       ]
     },
-    "221": {
+    "224": {
       "op": "!",
       "defined_out": [
         "tmp%23#0"
@@ -303,12 +303,12 @@
         "tmp%23#0"
       ]
     },
-    "222": {
+    "225": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "223": {
+    "226": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%24#0"
@@ -317,12 +317,12 @@
         "tmp%24#0"
       ]
     },
-    "225": {
+    "228": {
       "error": "can only call when not creating",
       "op": "assert // can only call when not creating",
       "stack_out": []
     },
-    "226": {
+    "229": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.get_status",
       "op": "callsub get_status",
       "defined_out": [
@@ -344,7 +344,7 @@
         "elements_to_encode%6#0"
       ]
     },
-    "229": {
+    "232": {
       "op": "uncover 6",
       "stack_out": [
         "elements_to_encode%1#0",
@@ -356,7 +356,7 @@
         "elements_to_encode%0#0"
       ]
     },
-    "231": {
+    "234": {
       "op": "itob",
       "defined_out": [
         "elements_to_encode%1#0",
@@ -377,7 +377,7 @@
         "val_as_bytes%3#0"
       ]
     },
-    "232": {
+    "235": {
       "op": "uncover 6",
       "stack_out": [
         "elements_to_encode%2#0",
@@ -389,7 +389,7 @@
         "elements_to_encode%1#0"
       ]
     },
-    "234": {
+    "237": {
       "op": "itob",
       "defined_out": [
         "elements_to_encode%2#0",
@@ -410,7 +410,7 @@
         "val_as_bytes%4#0"
       ]
     },
-    "235": {
+    "238": {
       "op": "uncover 6",
       "stack_out": [
         "elements_to_encode%3#0",
@@ -422,7 +422,7 @@
         "elements_to_encode%2#0"
       ]
     },
-    "237": {
+    "240": {
       "op": "itob",
       "defined_out": [
         "elements_to_encode%3#0",
@@ -443,7 +443,7 @@
         "val_as_bytes%5#0"
       ]
     },
-    "238": {
+    "241": {
       "op": "uncover 6",
       "stack_out": [
         "elements_to_encode%4#0",
@@ -455,7 +455,7 @@
         "elements_to_encode%3#0"
       ]
     },
-    "240": {
+    "243": {
       "op": "itob",
       "defined_out": [
         "elements_to_encode%4#0",
@@ -476,7 +476,7 @@
         "val_as_bytes%6#0"
       ]
     },
-    "241": {
+    "244": {
       "op": "uncover 6",
       "stack_out": [
         "elements_to_encode%5#0",
@@ -488,7 +488,7 @@
         "elements_to_encode%4#0"
       ]
     },
-    "243": {
+    "246": {
       "op": "itob",
       "defined_out": [
         "elements_to_encode%5#0",
@@ -509,7 +509,7 @@
         "val_as_bytes%7#0"
       ]
     },
-    "244": {
+    "247": {
       "op": "pushbytes 0x00",
       "defined_out": [
         "0x00",
@@ -532,7 +532,7 @@
         "0x00"
       ]
     },
-    "247": {
+    "250": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0",
@@ -557,7 +557,7 @@
         "0"
       ]
     },
-    "248": {
+    "251": {
       "op": "uncover 8",
       "stack_out": [
         "elements_to_encode%6#0",
@@ -571,7 +571,7 @@
         "elements_to_encode%5#0"
       ]
     },
-    "250": {
+    "253": {
       "op": "setbit",
       "defined_out": [
         "elements_to_encode%6#0",
@@ -592,7 +592,7 @@
         "encoded_bool%0#0"
       ]
     },
-    "251": {
+    "254": {
       "op": "pushbytes 0x00",
       "stack_out": [
         "elements_to_encode%6#0",
@@ -605,7 +605,7 @@
         "0x00"
       ]
     },
-    "254": {
+    "257": {
       "op": "intc_0 // 0",
       "stack_out": [
         "elements_to_encode%6#0",
@@ -619,7 +619,7 @@
         "0"
       ]
     },
-    "255": {
+    "258": {
       "op": "uncover 8",
       "stack_out": [
         "val_as_bytes%3#0",
@@ -633,7 +633,7 @@
         "elements_to_encode%6#0"
       ]
     },
-    "257": {
+    "260": {
       "op": "setbit",
       "defined_out": [
         "encoded_bool%0#0",
@@ -654,7 +654,7 @@
         "encoded_bool%1#0"
       ]
     },
-    "258": {
+    "261": {
       "op": "uncover 6",
       "stack_out": [
         "val_as_bytes%4#0",
@@ -666,7 +666,7 @@
         "val_as_bytes%3#0"
       ]
     },
-    "260": {
+    "263": {
       "op": "uncover 6",
       "stack_out": [
         "val_as_bytes%5#0",
@@ -678,7 +678,7 @@
         "val_as_bytes%4#0"
       ]
     },
-    "262": {
+    "265": {
       "op": "concat",
       "defined_out": [
         "encoded_bool%0#0",
@@ -697,7 +697,7 @@
         "encoded_tuple_buffer%2#0"
       ]
     },
-    "263": {
+    "266": {
       "op": "uncover 5",
       "stack_out": [
         "val_as_bytes%6#0",
@@ -708,7 +708,7 @@
         "val_as_bytes%5#0"
       ]
     },
-    "265": {
+    "268": {
       "op": "concat",
       "defined_out": [
         "encoded_bool%0#0",
@@ -725,7 +725,7 @@
         "encoded_tuple_buffer%3#0"
       ]
     },
-    "266": {
+    "269": {
       "op": "uncover 4",
       "stack_out": [
         "val_as_bytes%7#0",
@@ -735,7 +735,7 @@
         "val_as_bytes%6#0"
       ]
     },
-    "268": {
+    "271": {
       "op": "concat",
       "defined_out": [
         "encoded_bool%0#0",
@@ -750,7 +750,7 @@
         "encoded_tuple_buffer%4#0"
       ]
     },
-    "269": {
+    "272": {
       "op": "uncover 3",
       "stack_out": [
         "encoded_bool%0#0",
@@ -759,7 +759,7 @@
         "val_as_bytes%7#0"
       ]
     },
-    "271": {
+    "274": {
       "op": "concat",
       "defined_out": [
         "encoded_bool%0#0",
@@ -772,7 +772,7 @@
         "encoded_tuple_buffer%5#0"
       ]
     },
-    "272": {
+    "275": {
       "op": "uncover 2",
       "stack_out": [
         "encoded_bool%1#0",
@@ -780,7 +780,7 @@
         "encoded_bool%0#0"
       ]
     },
-    "274": {
+    "277": {
       "op": "concat",
       "defined_out": [
         "encoded_bool%1#0",
@@ -791,14 +791,14 @@
         "encoded_tuple_buffer%6#0"
       ]
     },
-    "275": {
+    "278": {
       "op": "swap",
       "stack_out": [
         "encoded_tuple_buffer%6#0",
         "encoded_bool%1#0"
       ]
     },
-    "276": {
+    "279": {
       "op": "intc_0 // 0",
       "stack_out": [
         "encoded_tuple_buffer%6#0",
@@ -806,7 +806,7 @@
         "0"
       ]
     },
-    "277": {
+    "280": {
       "op": "getbit",
       "defined_out": [
         "encoded_tuple_buffer%6#0",
@@ -817,10 +817,10 @@
         "is_true%0#0"
       ]
     },
-    "278": {
+    "281": {
       "op": "pushint 321 // 321"
     },
-    "281": {
+    "284": {
       "op": "swap",
       "defined_out": [
         "321",
@@ -833,7 +833,7 @@
         "is_true%0#0"
       ]
     },
-    "282": {
+    "285": {
       "op": "setbit",
       "defined_out": [
         "encoded_tuple_buffer%7#0"
@@ -842,7 +842,7 @@
         "encoded_tuple_buffer%7#0"
       ]
     },
-    "283": {
+    "286": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -853,14 +853,14 @@
         "0x151f7c75"
       ]
     },
-    "284": {
+    "287": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "encoded_tuple_buffer%7#0"
       ]
     },
-    "285": {
+    "288": {
       "op": "concat",
       "defined_out": [
         "tmp%26#0"
@@ -869,11 +869,11 @@
         "tmp%26#0"
       ]
     },
-    "286": {
+    "289": {
       "op": "log",
       "stack_out": []
     },
-    "287": {
+    "290": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -882,11 +882,11 @@
         "tmp%0#0"
       ]
     },
-    "288": {
+    "291": {
       "op": "return",
       "stack_out": []
     },
-    "289": {
+    "292": {
       "block": "main_release_milestone_route@5",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -897,7 +897,7 @@
         "tmp%17#0"
       ]
     },
-    "291": {
+    "294": {
       "op": "!",
       "defined_out": [
         "tmp%18#0"
@@ -906,12 +906,12 @@
         "tmp%18#0"
       ]
     },
-    "292": {
+    "295": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "293": {
+    "296": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%19#0"
@@ -920,12 +920,12 @@
         "tmp%19#0"
       ]
     },
-    "295": {
+    "298": {
       "error": "can only call when not creating",
       "op": "assert // can only call when not creating",
       "stack_out": []
     },
-    "296": {
+    "299": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.release_milestone",
       "op": "callsub release_milestone",
       "defined_out": [
@@ -935,7 +935,7 @@
         "to_encode%2#0"
       ]
     },
-    "299": {
+    "302": {
       "op": "itob",
       "defined_out": [
         "val_as_bytes%2#0"
@@ -944,7 +944,7 @@
         "val_as_bytes%2#0"
       ]
     },
-    "300": {
+    "303": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -955,14 +955,14 @@
         "0x151f7c75"
       ]
     },
-    "301": {
+    "304": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "val_as_bytes%2#0"
       ]
     },
-    "302": {
+    "305": {
       "op": "concat",
       "defined_out": [
         "tmp%21#0"
@@ -971,11 +971,11 @@
         "tmp%21#0"
       ]
     },
-    "303": {
+    "306": {
       "op": "log",
       "stack_out": []
     },
-    "304": {
+    "307": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -984,11 +984,11 @@
         "tmp%0#0"
       ]
     },
-    "305": {
+    "308": {
       "op": "return",
       "stack_out": []
     },
-    "306": {
+    "309": {
       "block": "main_donate_route@4",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -999,7 +999,7 @@
         "tmp%11#0"
       ]
     },
-    "308": {
+    "311": {
       "op": "!",
       "defined_out": [
         "tmp%12#0"
@@ -1008,12 +1008,12 @@
         "tmp%12#0"
       ]
     },
-    "309": {
+    "312": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "310": {
+    "313": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%13#0"
@@ -1022,12 +1022,12 @@
         "tmp%13#0"
       ]
     },
-    "312": {
+    "315": {
       "error": "can only call when not creating",
       "op": "assert // can only call when not creating",
       "stack_out": []
     },
-    "313": {
+    "316": {
       "op": "txn GroupIndex",
       "defined_out": [
         "tmp%15#0"
@@ -1036,7 +1036,7 @@
         "tmp%15#0"
       ]
     },
-    "315": {
+    "318": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -1047,7 +1047,7 @@
         "1"
       ]
     },
-    "316": {
+    "319": {
       "op": "-",
       "defined_out": [
         "gtxn_idx%0#0"
@@ -1056,7 +1056,7 @@
         "gtxn_idx%0#0"
       ]
     },
-    "317": {
+    "320": {
       "op": "dup",
       "defined_out": [
         "gtxn_idx%0#0",
@@ -1067,7 +1067,7 @@
         "gtxn_idx%0#0 (copy)"
       ]
     },
-    "318": {
+    "321": {
       "op": "gtxns TypeEnum",
       "defined_out": [
         "gtxn_idx%0#0",
@@ -1078,7 +1078,7 @@
         "gtxn_type%0#0"
       ]
     },
-    "320": {
+    "323": {
       "op": "intc_1 // pay",
       "defined_out": [
         "gtxn_idx%0#0",
@@ -1091,7 +1091,7 @@
         "pay"
       ]
     },
-    "321": {
+    "324": {
       "op": "==",
       "defined_out": [
         "gtxn_idx%0#0",
@@ -1102,14 +1102,14 @@
         "gtxn_type_matches%0#0"
       ]
     },
-    "322": {
+    "325": {
       "error": "transaction type is pay",
       "op": "assert // transaction type is pay",
       "stack_out": [
         "gtxn_idx%0#0"
       ]
     },
-    "323": {
+    "326": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.donate",
       "op": "callsub donate",
       "defined_out": [
@@ -1119,7 +1119,7 @@
         "to_encode%1#0"
       ]
     },
-    "326": {
+    "329": {
       "op": "itob",
       "defined_out": [
         "val_as_bytes%1#0"
@@ -1128,7 +1128,7 @@
         "val_as_bytes%1#0"
       ]
     },
-    "327": {
+    "330": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -1139,14 +1139,14 @@
         "0x151f7c75"
       ]
     },
-    "328": {
+    "331": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "val_as_bytes%1#0"
       ]
     },
-    "329": {
+    "332": {
       "op": "concat",
       "defined_out": [
         "tmp%16#0"
@@ -1155,11 +1155,11 @@
         "tmp%16#0"
       ]
     },
-    "330": {
+    "333": {
       "op": "log",
       "stack_out": []
     },
-    "331": {
+    "334": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -1168,11 +1168,11 @@
         "tmp%0#0"
       ]
     },
-    "332": {
+    "335": {
       "op": "return",
       "stack_out": []
     },
-    "333": {
+    "336": {
       "block": "main_create_campaign_route@3",
       "stack_in": [],
       "op": "txn OnCompletion",
@@ -1183,7 +1183,7 @@
         "tmp%3#0"
       ]
     },
-    "335": {
+    "338": {
       "op": "!",
       "defined_out": [
         "tmp%4#0"
@@ -1192,12 +1192,12 @@
         "tmp%4#0"
       ]
     },
-    "336": {
+    "339": {
       "error": "OnCompletion is not NoOp",
       "op": "assert // OnCompletion is not NoOp",
       "stack_out": []
     },
-    "337": {
+    "340": {
       "op": "txn ApplicationID",
       "defined_out": [
         "tmp%5#0"
@@ -1206,7 +1206,7 @@
         "tmp%5#0"
       ]
     },
-    "339": {
+    "342": {
       "op": "!",
       "defined_out": [
         "tmp%6#0"
@@ -1215,12 +1215,12 @@
         "tmp%6#0"
       ]
     },
-    "340": {
+    "343": {
       "error": "can only call when creating",
       "op": "assert // can only call when creating",
       "stack_out": []
     },
-    "341": {
+    "344": {
       "op": "txna ApplicationArgs 1",
       "defined_out": [
         "reinterpret_bytes[8]%0#0"
@@ -1229,7 +1229,7 @@
         "reinterpret_bytes[8]%0#0"
       ]
     },
-    "344": {
+    "347": {
       "op": "btoi",
       "defined_out": [
         "tmp%7#0"
@@ -1238,7 +1238,7 @@
         "tmp%7#0"
       ]
     },
-    "345": {
+    "348": {
       "op": "txna ApplicationArgs 2",
       "defined_out": [
         "reinterpret_bytes[8]%1#0",
@@ -1249,7 +1249,7 @@
         "reinterpret_bytes[8]%1#0"
       ]
     },
-    "348": {
+    "351": {
       "op": "btoi",
       "defined_out": [
         "tmp%7#0",
@@ -1260,7 +1260,7 @@
         "tmp%8#0"
       ]
     },
-    "349": {
+    "352": {
       "op": "txna ApplicationArgs 3",
       "defined_out": [
         "reinterpret_bytes[8]%2#0",
@@ -1273,7 +1273,7 @@
         "reinterpret_bytes[8]%2#0"
       ]
     },
-    "352": {
+    "355": {
       "op": "btoi",
       "defined_out": [
         "tmp%7#0",
@@ -1286,7 +1286,7 @@
         "tmp%9#0"
       ]
     },
-    "353": {
+    "356": {
       "callsub": "smart_contracts.fundraiser.contract.Fundraiser.create_campaign",
       "op": "callsub create_campaign",
       "defined_out": [
@@ -1296,7 +1296,7 @@
         "to_encode%0#0"
       ]
     },
-    "356": {
+    "359": {
       "op": "itob",
       "defined_out": [
         "val_as_bytes%0#0"
@@ -1305,7 +1305,7 @@
         "val_as_bytes%0#0"
       ]
     },
-    "357": {
+    "360": {
       "op": "bytec_1 // 0x151f7c75",
       "defined_out": [
         "0x151f7c75",
@@ -1316,14 +1316,14 @@
         "0x151f7c75"
       ]
     },
-    "358": {
+    "361": {
       "op": "swap",
       "stack_out": [
         "0x151f7c75",
         "val_as_bytes%0#0"
       ]
     },
-    "359": {
+    "362": {
       "op": "concat",
       "defined_out": [
         "tmp%10#0"
@@ -1332,11 +1332,11 @@
         "tmp%10#0"
       ]
     },
-    "360": {
+    "363": {
       "op": "log",
       "stack_out": []
     },
-    "361": {
+    "364": {
       "op": "intc_1 // 1",
       "defined_out": [
         "tmp%0#0"
@@ -1345,11 +1345,11 @@
         "tmp%0#0"
       ]
     },
-    "362": {
+    "365": {
       "op": "return",
       "stack_out": []
     },
-    "363": {
+    "366": {
       "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.create_campaign",
       "params": {
         "goal#0": "uint64",
@@ -1360,7 +1360,7 @@
       "stack_in": [],
       "op": "proto 3 1"
     },
-    "366": {
+    "369": {
       "op": "bytec_3 // \"goal_amount\"",
       "defined_out": [
         "\"goal_amount\""
@@ -1369,7 +1369,7 @@
         "\"goal_amount\""
       ]
     },
-    "367": {
+    "370": {
       "op": "frame_dig -3",
       "defined_out": [
         "\"goal_amount\"",
@@ -1380,11 +1380,11 @@
         "goal#0 (copy)"
       ]
     },
-    "369": {
+    "372": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "370": {
+    "373": {
       "op": "bytec_0 // \"raised_amount\"",
       "defined_out": [
         "\"raised_amount\""
@@ -1393,7 +1393,7 @@
         "\"raised_amount\""
       ]
     },
-    "371": {
+    "374": {
       "op": "intc_0 // 0",
       "defined_out": [
         "\"raised_amount\"",
@@ -1404,11 +1404,11 @@
         "0"
       ]
     },
-    "372": {
+    "375": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "373": {
+    "376": {
       "op": "bytec 4 // \"milestone_count\"",
       "defined_out": [
         "\"milestone_count\""
@@ -1417,7 +1417,7 @@
         "\"milestone_count\""
       ]
     },
-    "375": {
+    "378": {
       "op": "frame_dig -2",
       "defined_out": [
         "\"milestone_count\"",
@@ -1428,11 +1428,11 @@
         "milestones#0 (copy)"
       ]
     },
-    "377": {
+    "380": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "378": {
+    "381": {
       "op": "bytec_2 // \"current_milestone\"",
       "defined_out": [
         "\"current_milestone\""
@@ -1441,18 +1441,18 @@
         "\"current_milestone\""
       ]
     },
-    "379": {
+    "382": {
       "op": "intc_0 // 0",
       "stack_out": [
         "\"current_milestone\"",
         "0"
       ]
     },
-    "380": {
+    "383": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "381": {
+    "384": {
       "op": "bytec 8 // \"deadline\"",
       "defined_out": [
         "\"deadline\""
@@ -1461,7 +1461,7 @@
         "\"deadline\""
       ]
     },
-    "383": {
+    "386": {
       "op": "frame_dig -1",
       "defined_out": [
         "\"deadline\"",
@@ -1472,11 +1472,11 @@
         "deadline#0 (copy)"
       ]
     },
-    "385": {
+    "388": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "386": {
+    "389": {
       "op": "bytec 9 // \"is_active\"",
       "defined_out": [
         "\"is_active\""
@@ -1485,7 +1485,7 @@
         "\"is_active\""
       ]
     },
-    "388": {
+    "391": {
       "op": "intc_1 // 1",
       "defined_out": [
         "\"is_active\"",
@@ -1496,11 +1496,11 @@
         "1"
       ]
     },
-    "389": {
+    "392": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "390": {
+    "393": {
       "op": "bytec 5 // \"creator\"",
       "defined_out": [
         "\"creator\""
@@ -1509,7 +1509,7 @@
         "\"creator\""
       ]
     },
-    "392": {
+    "395": {
       "op": "txn Sender",
       "defined_out": [
         "\"creator\"",
@@ -1520,11 +1520,11 @@
         "new_state_value%0#0"
       ]
     },
-    "394": {
+    "397": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "395": {
+    "398": {
       "op": "bytec 6 // \"contributor_count\"",
       "defined_out": [
         "\"contributor_count\""
@@ -1533,18 +1533,18 @@
         "\"contributor_count\""
       ]
     },
-    "397": {
+    "400": {
       "op": "intc_0 // 0",
       "stack_out": [
         "\"contributor_count\"",
         "0"
       ]
     },
-    "398": {
+    "401": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "399": {
+    "402": {
       "op": "bytec 7 // \"goal_reached\"",
       "defined_out": [
         "\"goal_reached\""
@@ -1553,28 +1553,28 @@
         "\"goal_reached\""
       ]
     },
-    "401": {
+    "404": {
       "op": "intc_0 // 0",
       "stack_out": [
         "\"goal_reached\"",
         "0"
       ]
     },
-    "402": {
+    "405": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "403": {
+    "406": {
       "op": "intc_1 // 1",
       "stack_out": [
         "1"
       ]
     },
-    "404": {
+    "407": {
       "retsub": true,
       "op": "retsub"
     },
-    "405": {
+    "408": {
       "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.donate",
       "params": {
         "payment#0": "uint64"
@@ -1583,7 +1583,7 @@
       "stack_in": [],
       "op": "proto 1 1"
     },
-    "408": {
+    "411": {
       "op": "intc_0 // 0",
       "defined_out": [
         "0"
@@ -1592,7 +1592,7 @@
         "0"
       ]
     },
-    "409": {
+    "412": {
       "op": "bytec 9 // \"is_active\"",
       "defined_out": [
         "\"is_active\"",
@@ -1603,7 +1603,7 @@
         "\"is_active\""
       ]
     },
-    "411": {
+    "414": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%0#0",
@@ -1614,19 +1614,19 @@
         "maybe_exists%0#0"
       ]
     },
-    "412": {
+    "415": {
       "error": "check self.is_active exists",
       "op": "assert // check self.is_active exists",
       "stack_out": [
         "maybe_value%0#0"
       ]
     },
-    "413": {
+    "416": {
       "error": "Campaign not active",
       "op": "assert // Campaign not active",
       "stack_out": []
     },
-    "414": {
+    "417": {
       "op": "global LatestTimestamp",
       "defined_out": [
         "tmp%0#0"
@@ -1635,14 +1635,14 @@
         "tmp%0#0"
       ]
     },
-    "416": {
+    "419": {
       "op": "intc_0 // 0",
       "stack_out": [
         "tmp%0#0",
         "0"
       ]
     },
-    "417": {
+    "420": {
       "op": "bytec 8 // \"deadline\"",
       "defined_out": [
         "\"deadline\"",
@@ -1655,7 +1655,7 @@
         "\"deadline\""
       ]
     },
-    "419": {
+    "422": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%1#0",
@@ -1668,7 +1668,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "420": {
+    "423": {
       "error": "check self.deadline exists",
       "op": "assert // check self.deadline exists",
       "stack_out": [
@@ -1676,7 +1676,7 @@
         "maybe_value%1#0"
       ]
     },
-    "421": {
+    "424": {
       "op": "<=",
       "defined_out": [
         "tmp%1#0"
@@ -1685,18 +1685,18 @@
         "tmp%1#0"
       ]
     },
-    "422": {
+    "425": {
       "error": "Campaign ended",
       "op": "assert // Campaign ended",
       "stack_out": []
     },
-    "423": {
+    "426": {
       "op": "intc_0 // 0",
       "stack_out": [
         "0"
       ]
     },
-    "424": {
+    "427": {
       "op": "bytec_0 // \"raised_amount\"",
       "defined_out": [
         "\"raised_amount\"",
@@ -1707,7 +1707,7 @@
         "\"raised_amount\""
       ]
     },
-    "425": {
+    "428": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%2#0",
@@ -1718,21 +1718,21 @@
         "maybe_exists%2#0"
       ]
     },
-    "426": {
+    "429": {
       "error": "check self.raised_amount exists",
       "op": "assert // check self.raised_amount exists",
       "stack_out": [
         "maybe_value%2#0"
       ]
     },
-    "427": {
+    "430": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%2#0",
         "0"
       ]
     },
-    "428": {
+    "431": {
       "op": "bytec_3 // \"goal_amount\"",
       "defined_out": [
         "\"goal_amount\"",
@@ -1745,7 +1745,7 @@
         "\"goal_amount\""
       ]
     },
-    "429": {
+    "432": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%3#0",
@@ -1758,7 +1758,7 @@
         "maybe_exists%3#0"
       ]
     },
-    "430": {
+    "433": {
       "error": "check self.goal_amount exists",
       "op": "assert // check self.goal_amount exists",
       "stack_out": [
@@ -1766,7 +1766,7 @@
         "maybe_value%3#0"
       ]
     },
-    "431": {
+    "434": {
       "op": "<",
       "defined_out": [
         "tmp%2#0"
@@ -1775,12 +1775,12 @@
         "tmp%2#0"
       ]
     },
-    "432": {
+    "435": {
       "error": "Goal already reached",
       "op": "assert // Goal already reached",
       "stack_out": []
     },
-    "433": {
+    "436": {
       "op": "frame_dig -1",
       "defined_out": [
         "payment#0 (copy)"
@@ -1789,7 +1789,7 @@
         "payment#0 (copy)"
       ]
     },
-    "435": {
+    "438": {
       "op": "gtxns Receiver",
       "defined_out": [
         "tmp%3#0"
@@ -1798,7 +1798,7 @@
         "tmp%3#0"
       ]
     },
-    "437": {
+    "440": {
       "op": "global CurrentApplicationAddress",
       "defined_out": [
         "tmp%3#0",
@@ -1809,7 +1809,7 @@
         "tmp%4#0"
       ]
     },
-    "439": {
+    "442": {
       "op": "==",
       "defined_out": [
         "tmp%5#0"
@@ -1818,17 +1818,17 @@
         "tmp%5#0"
       ]
     },
-    "440": {
+    "443": {
       "op": "assert",
       "stack_out": []
     },
-    "441": {
+    "444": {
       "op": "frame_dig -1",
       "stack_out": [
         "payment#0 (copy)"
       ]
     },
-    "443": {
+    "446": {
       "op": "gtxns Amount",
       "defined_out": [
         "tmp%6#0"
@@ -1837,7 +1837,7 @@
         "tmp%6#0"
       ]
     },
-    "445": {
+    "448": {
       "op": "dup",
       "defined_out": [
         "tmp%6#0",
@@ -1848,8 +1848,8 @@
         "tmp%6#0 (copy)"
       ]
     },
-    "446": {
-      "op": "pushint 100000 // 100000",
+    "449": {
+      "op": "intc_2 // 100000",
       "defined_out": [
         "100000",
         "tmp%6#0",
@@ -2442,16 +2442,107 @@
       ]
     },
     "528": {
+      "op": "global CurrentApplicationAddress",
+      "defined_out": [
+        "amount_per_milestone#0",
+        "tmp%3#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "tmp%3#0"
+      ]
+    },
+    "530": {
+      "op": "acct_params_get AcctBalance",
+      "defined_out": [
+        "amount_per_milestone#0",
+        "check%0#0",
+        "contract_balance#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0",
+        "check%0#0"
+      ]
+    },
+    "532": {
+      "error": "account funded",
+      "op": "assert // account funded",
+      "stack_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0"
+      ]
+    },
+    "533": {
+      "op": "dig 1",
+      "defined_out": [
+        "amount_per_milestone#0",
+        "amount_per_milestone#0 (copy)",
+        "contract_balance#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0",
+        "amount_per_milestone#0 (copy)"
+      ]
+    },
+    "535": {
+      "op": "intc_2 // 100000",
+      "defined_out": [
+        "100000",
+        "amount_per_milestone#0",
+        "amount_per_milestone#0 (copy)",
+        "contract_balance#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0",
+        "amount_per_milestone#0 (copy)",
+        "100000"
+      ]
+    },
+    "536": {
+      "op": "+",
+      "defined_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0",
+        "tmp%4#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "contract_balance#0",
+        "tmp%4#0"
+      ]
+    },
+    "537": {
+      "op": ">=",
+      "defined_out": [
+        "amount_per_milestone#0",
+        "tmp%5#0"
+      ],
+      "stack_out": [
+        "amount_per_milestone#0",
+        "tmp%5#0"
+      ]
+    },
+    "538": {
+      "error": "Insufficient balance after MBR",
+      "op": "assert // Insufficient balance after MBR",
+      "stack_out": [
+        "amount_per_milestone#0"
+      ]
+    },
+    "539": {
       "op": "itxn_begin"
     },
-    "529": {
+    "540": {
       "op": "intc_0 // 0",
       "stack_out": [
         "amount_per_milestone#0",
         "0"
       ]
     },
-    "530": {
+    "541": {
       "op": "bytec 5 // \"creator\"",
       "stack_out": [
         "amount_per_milestone#0",
@@ -2459,7 +2550,7 @@
         "\"creator\""
       ]
     },
-    "532": {
+    "543": {
       "op": "app_global_get_ex",
       "defined_out": [
         "amount_per_milestone#0",
@@ -2472,7 +2563,7 @@
         "maybe_exists%6#0"
       ]
     },
-    "533": {
+    "544": {
       "error": "check self.creator exists",
       "op": "assert // check self.creator exists",
       "stack_out": [
@@ -2480,14 +2571,14 @@
         "maybe_value%6#0"
       ]
     },
-    "534": {
+    "545": {
       "op": "itxn_field Receiver"
     },
-    "536": {
+    "547": {
       "op": "itxn_field Amount",
       "stack_out": []
     },
-    "538": {
+    "549": {
       "op": "intc_1 // pay",
       "defined_out": [
         "pay"
@@ -2496,37 +2587,37 @@
         "pay"
       ]
     },
-    "539": {
+    "550": {
       "op": "itxn_field TypeEnum",
       "stack_out": []
     },
-    "541": {
+    "552": {
       "op": "intc_0 // 0",
       "stack_out": [
         "0"
       ]
     },
-    "542": {
+    "553": {
       "op": "itxn_field Fee",
       "stack_out": []
     },
-    "544": {
+    "555": {
       "op": "itxn_submit"
     },
-    "545": {
+    "556": {
       "op": "intc_0 // 0",
       "stack_out": [
         "0"
       ]
     },
-    "546": {
+    "557": {
       "op": "bytec_2 // \"current_milestone\"",
       "stack_out": [
         "0",
         "\"current_milestone\""
       ]
     },
-    "547": {
+    "558": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%7#0",
@@ -2537,14 +2628,14 @@
         "maybe_exists%7#0"
       ]
     },
-    "548": {
+    "559": {
       "error": "check self.current_milestone exists",
       "op": "assert // check self.current_milestone exists",
       "stack_out": [
         "maybe_value%7#0"
       ]
     },
-    "549": {
+    "560": {
       "op": "intc_1 // 1",
       "defined_out": [
         "1",
@@ -2555,7 +2646,7 @@
         "1"
       ]
     },
-    "550": {
+    "561": {
       "op": "+",
       "defined_out": [
         "new_state_value%0#0"
@@ -2564,38 +2655,38 @@
         "new_state_value%0#0"
       ]
     },
-    "551": {
+    "562": {
       "op": "bytec_2 // \"current_milestone\"",
       "stack_out": [
         "new_state_value%0#0",
         "\"current_milestone\""
       ]
     },
-    "552": {
+    "563": {
       "op": "swap",
       "stack_out": [
         "\"current_milestone\"",
         "new_state_value%0#0"
       ]
     },
-    "553": {
+    "564": {
       "op": "app_global_put",
       "stack_out": []
     },
-    "554": {
+    "565": {
       "op": "intc_0 // 0",
       "stack_out": [
         "0"
       ]
     },
-    "555": {
+    "566": {
       "op": "bytec_2 // \"current_milestone\"",
       "stack_out": [
         "0",
         "\"current_milestone\""
       ]
     },
-    "556": {
+    "567": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%8#0",
@@ -2606,18 +2697,18 @@
         "maybe_exists%8#0"
       ]
     },
-    "557": {
+    "568": {
       "error": "check self.current_milestone exists",
       "op": "assert // check self.current_milestone exists",
       "stack_out": [
         "maybe_value%8#0"
       ]
     },
-    "558": {
+    "569": {
       "retsub": true,
       "op": "retsub"
     },
-    "559": {
+    "570": {
       "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.get_status",
       "params": {},
       "block": "get_status",
@@ -2630,7 +2721,7 @@
         "0"
       ]
     },
-    "560": {
+    "571": {
       "op": "bytec_3 // \"goal_amount\"",
       "defined_out": [
         "\"goal_amount\"",
@@ -2641,7 +2732,7 @@
         "\"goal_amount\""
       ]
     },
-    "561": {
+    "572": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%0#0",
@@ -2652,21 +2743,21 @@
         "maybe_exists%0#0"
       ]
     },
-    "562": {
+    "573": {
       "error": "check self.goal_amount exists",
       "op": "assert // check self.goal_amount exists",
       "stack_out": [
         "maybe_value%0#0"
       ]
     },
-    "563": {
+    "574": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
         "0"
       ]
     },
-    "564": {
+    "575": {
       "op": "bytec_0 // \"raised_amount\"",
       "defined_out": [
         "\"raised_amount\"",
@@ -2679,7 +2770,7 @@
         "\"raised_amount\""
       ]
     },
-    "565": {
+    "576": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%1#0",
@@ -2692,7 +2783,7 @@
         "maybe_exists%1#0"
       ]
     },
-    "566": {
+    "577": {
       "error": "check self.raised_amount exists",
       "op": "assert // check self.raised_amount exists",
       "stack_out": [
@@ -2700,7 +2791,7 @@
         "maybe_value%1#0"
       ]
     },
-    "567": {
+    "578": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
@@ -2708,7 +2799,7 @@
         "0"
       ]
     },
-    "568": {
+    "579": {
       "op": "bytec_2 // \"current_milestone\"",
       "defined_out": [
         "\"current_milestone\"",
@@ -2723,7 +2814,7 @@
         "\"current_milestone\""
       ]
     },
-    "569": {
+    "580": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%2#0",
@@ -2738,7 +2829,7 @@
         "maybe_exists%2#0"
       ]
     },
-    "570": {
+    "581": {
       "error": "check self.current_milestone exists",
       "op": "assert // check self.current_milestone exists",
       "stack_out": [
@@ -2747,7 +2838,7 @@
         "maybe_value%2#0"
       ]
     },
-    "571": {
+    "582": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
@@ -2756,7 +2847,7 @@
         "0"
       ]
     },
-    "572": {
+    "583": {
       "op": "bytec 4 // \"milestone_count\"",
       "defined_out": [
         "\"milestone_count\"",
@@ -2773,7 +2864,7 @@
         "\"milestone_count\""
       ]
     },
-    "574": {
+    "585": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%3#0",
@@ -2790,7 +2881,7 @@
         "maybe_exists%3#0"
       ]
     },
-    "575": {
+    "586": {
       "error": "check self.milestone_count exists",
       "op": "assert // check self.milestone_count exists",
       "stack_out": [
@@ -2800,7 +2891,7 @@
         "maybe_value%3#0"
       ]
     },
-    "576": {
+    "587": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
@@ -2810,7 +2901,7 @@
         "0"
       ]
     },
-    "577": {
+    "588": {
       "op": "bytec 6 // \"contributor_count\"",
       "defined_out": [
         "\"contributor_count\"",
@@ -2829,7 +2920,7 @@
         "\"contributor_count\""
       ]
     },
-    "579": {
+    "590": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%4#0",
@@ -2848,7 +2939,7 @@
         "maybe_exists%4#0"
       ]
     },
-    "580": {
+    "591": {
       "error": "check self.contributor_count exists",
       "op": "assert // check self.contributor_count exists",
       "stack_out": [
@@ -2859,7 +2950,7 @@
         "maybe_value%4#0"
       ]
     },
-    "581": {
+    "592": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
@@ -2870,7 +2961,7 @@
         "0"
       ]
     },
-    "582": {
+    "593": {
       "op": "bytec 9 // \"is_active\"",
       "defined_out": [
         "\"is_active\"",
@@ -2891,7 +2982,7 @@
         "\"is_active\""
       ]
     },
-    "584": {
+    "595": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%5#0",
@@ -2912,7 +3003,7 @@
         "maybe_exists%5#0"
       ]
     },
-    "585": {
+    "596": {
       "error": "check self.is_active exists",
       "op": "assert // check self.is_active exists",
       "stack_out": [
@@ -2924,7 +3015,7 @@
         "maybe_value%5#0"
       ]
     },
-    "586": {
+    "597": {
       "op": "intc_0 // 0",
       "stack_out": [
         "maybe_value%0#0",
@@ -2936,7 +3027,7 @@
         "0"
       ]
     },
-    "587": {
+    "598": {
       "op": "bytec 7 // \"goal_reached\"",
       "defined_out": [
         "\"goal_reached\"",
@@ -2959,7 +3050,7 @@
         "\"goal_reached\""
       ]
     },
-    "589": {
+    "600": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%6#0",
@@ -2982,7 +3073,7 @@
         "maybe_exists%6#0"
       ]
     },
-    "590": {
+    "601": {
       "error": "check self.goal_reached exists",
       "op": "assert // check self.goal_reached exists",
       "stack_out": [
@@ -2995,11 +3086,11 @@
         "maybe_value%6#0"
       ]
     },
-    "591": {
+    "602": {
       "retsub": true,
       "op": "retsub"
     },
-    "592": {
+    "603": {
       "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.get_creator",
       "params": {},
       "block": "get_creator",
@@ -3012,7 +3103,7 @@
         "0"
       ]
     },
-    "593": {
+    "604": {
       "op": "bytec 5 // \"creator\"",
       "defined_out": [
         "\"creator\"",
@@ -3023,7 +3114,7 @@
         "\"creator\""
       ]
     },
-    "595": {
+    "606": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%0#0",
@@ -3034,18 +3125,18 @@
         "maybe_exists%0#0"
       ]
     },
-    "596": {
+    "607": {
       "error": "check self.creator exists",
       "op": "assert // check self.creator exists",
       "stack_out": [
         "maybe_value%0#0"
       ]
     },
-    "597": {
+    "608": {
       "retsub": true,
       "op": "retsub"
     },
-    "598": {
+    "609": {
       "subroutine": "smart_contracts.fundraiser.contract.Fundraiser.get_deadline",
       "params": {},
       "block": "get_deadline",
@@ -3058,7 +3149,7 @@
         "0"
       ]
     },
-    "599": {
+    "610": {
       "op": "bytec 8 // \"deadline\"",
       "defined_out": [
         "\"deadline\"",
@@ -3069,7 +3160,7 @@
         "\"deadline\""
       ]
     },
-    "601": {
+    "612": {
       "op": "app_global_get_ex",
       "defined_out": [
         "maybe_exists%0#0",
@@ -3080,14 +3171,14 @@
         "maybe_exists%0#0"
       ]
     },
-    "602": {
+    "613": {
       "error": "check self.deadline exists",
       "op": "assert // check self.deadline exists",
       "stack_out": [
         "maybe_value%0#0"
       ]
     },
-    "603": {
+    "614": {
       "retsub": true,
       "op": "retsub"
     }

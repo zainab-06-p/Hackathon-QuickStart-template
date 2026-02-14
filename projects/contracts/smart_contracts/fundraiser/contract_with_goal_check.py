@@ -55,6 +55,7 @@ class FundraiserWithMilestoneGoals(ARC4Contract):
         """
         Release funds for completed milestone (creator only)
         NEW: Can ONLY release if goal is met!
+        FIXED: Reserves minimum balance (0.1 ALGO) in contract
         """
         assert Txn.sender == self.creator, "Only creator can release"
         assert self.current_milestone < self.milestone_count, "All milestones completed"
@@ -64,6 +65,13 @@ class FundraiserWithMilestoneGoals(ARC4Contract):
         
         # Calculate amount per milestone
         amount_per_milestone = self.goal_amount / self.milestone_count
+        
+        # Reserve minimum balance requirement (0.1 ALGO = 100,000 microAlgos)
+        min_balance = UInt64(100000)
+        contract_balance = Global.current_application_address.balance
+        
+        # Ensure we keep the MBR in the contract
+        assert contract_balance >= amount_per_milestone + min_balance, "Insufficient balance after MBR"
         
         # Send funds to creator
         itxn = InnerTransaction.payment(
