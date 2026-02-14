@@ -67,9 +67,11 @@ const FundraisingPageDecentralized = () => {
   }
 
   useEffect(() => {
+    // Load initial campaigns from localStorage/blockchain as fallback
     loadCampaigns()
     
     // 🔥 Real-time Firebase listener for instant cross-device sync
+    // This is the PRIMARY data source - it handles all updates automatically
     initializeFirebase()
     const unsubscribeFirebase = listenToCampaigns(async (firebaseCampaigns) => {
       console.log(`🔥 Firebase campaigns updated: ${firebaseCampaigns.length} campaigns`)
@@ -94,10 +96,7 @@ const FundraisingPageDecentralized = () => {
       setLastUpdated(new Date())
     })
     
-    // Fallback: Poll for blockchain updates every 30 seconds (reduced from 5s since Firebase handles real-time)
-    const interval = setInterval(() => loadCampaigns(), 30000)
-    
-    // Also refresh when page becomes visible (for cross-device sync)
+    // Refresh when page becomes visible (for cross-device sync)
     const handleVisibilityChange = () => {
       if (!document.hidden) {
         console.log('Page visible again, refreshing campaigns...')
@@ -107,7 +106,6 @@ const FundraisingPageDecentralized = () => {
     document.addEventListener('visibilitychange', handleVisibilityChange)
     
     return () => {
-      clearInterval(interval)
       unsubscribeFirebase()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
