@@ -120,6 +120,8 @@ const TicketingPageDecentralized = () => {
         }
         const state = await getEventState(algorand, metadata)
         if (state) {
+          // Merge organizers from Firebase into the event state
+          state.organizers = fbEvent.organizers || [fbEvent.creator]
           eventStates.push(state)
         }
       }
@@ -718,7 +720,7 @@ const TicketingPageDecentralized = () => {
               )}
 
               {/* Organizer Controls */}
-              {activeAddress === selectedEvent.organizer && (
+              {activeAddress && selectedEvent.organizers && selectedEvent.organizers.includes(activeAddress) && (
                 <div className="space-y-3 mb-4">
                   <button 
                     className="btn btn-primary btn-lg w-full"

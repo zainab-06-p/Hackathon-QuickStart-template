@@ -8,7 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 import { getCampaignState, getCampaignContributors, type CampaignState } from '../utils/blockchainData'
-import { listenToCampaigns, initializeFirebase } from '../utils/firebase'
+import { listenToCampaigns, initializeFirebase, approveMilestone, listenToMilestoneApprovals } from '../utils/firebase'
 import YieldTracker from '../components/YieldTracker'
 
 const FundraisingPageDecentralized = () => {
@@ -20,6 +20,7 @@ const FundraisingPageDecentralized = () => {
   const [donating, setDonating] = useState(false)
   const [donationAmount, setDonationAmount] = useState('1')
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
+  const [milestoneApprovals, setMilestoneApprovals] = useState<{ [address: string]: { approved: boolean; timestamp: number } }>({})
 
   const { enqueueSnackbar } = useSnackbar()
   const { activeAccount, activeAddress, transactionSigner } = useWallet()
@@ -57,6 +58,8 @@ const FundraisingPageDecentralized = () => {
         }
         const state = await getCampaignState(algorand, metadata)
         if (state) {
+          // Merge approvers from Firebase into the campaign state
+          state.approvers = fbCampaign.approvers || [fbCampaign.creator]
           campaignStates.push(state)
         }
       }
@@ -70,6 +73,25 @@ const FundraisingPageDecentralized = () => {
       unsubscribeFirebase()
     }
   }, []) // ⚠️ IMPORTANT: No activeAddress dependency - all users see the same campaigns
+  
+  // Listen to milestone approvals when a campaign is selected
+  useEffect(() => {
+    if (!selectedCampaign) return
+    
+    const nextMilestone = Number(selectedCampaign.currentMilestone) + 1
+    const unsubscribe = listenToMilestoneApprovals(
+      String(selectedCampaign.appId),
+      nextMilestone,
+      (approvals) => {
+        console.log(`🔥 Milestone ${nextMilestone} approvals:`, approvals)
+        setMilestoneApprovals(approvals)
+      }
+    )
+    
+    return () => {
+      unsubscribe()
+    }
+  }, [selectedCampaign])
 
   const donate = async () => {
     if (!selectedCampaign || !activeAddress) {
@@ -447,11 +469,11 @@ const FundraisingPageDecentralized = () => {
                 </div>
               </div>
 
-              {/* Creator: Milestone Release */}
-              {activeAddress === selectedCampaign.creator && (
+              {/* Multi-Sig Milestone Release */}
+              {activeAddress && selectedCampaign.approvers && selectedCampaign.approvers.includes(activeAddress) && (
                 <div className="card bg-gradient-to-r from-orange-500 to-red-500 text-white mb-4">
                   <div className="card-body">
-                    <h4 className="font-bold mb-2">🚀 Creator Controls</h4>
+                    <h4 className="font-bold mb-2">🔐 Multi-Signature Milestone Release</h4>
                     <div className="alert bg-white/20 border-white/30 text-white mb-3">
                       <div className="text-sm">
                         <p className="font-bold">Milestone Progress</p>
@@ -463,39 +485,127 @@ const FundraisingPageDecentralized = () => {
                         )}
                       </div>
                     </div>
-                    <button 
-                      className="btn btn-lg w-full bg-white text-orange-600 hover:bg-orange-50 border-0"
-                      disabled={
-                        Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) ||
-                        selectedCampaign.raisedAmount < selectedCampaign.goalAmount
-                      }
-                      onClick={async () => {
-                        try {
-                          const factory = new FundraiserFactory({
-                            algorand,
-                            defaultSender: activeAddress,
-                          })
-                          const appClient = factory.getAppClientById({
-                            appId: BigInt(selectedCampaign.appId)
-                          })
-                          
-                          enqueueSnackbar('Releasing milestone...', { variant: 'info' })
-                          
-                          // Inner transaction needs fee coverage - add extra fee for the payment transaction
-                          await appClient.send.releaseMilestone({ 
-                            args: [],
-                            extraFee: algokit.algos(0.001), // Extra fee for inner payment transaction
-validityWindow: 1000  // ~4 minutes for signing (TestNet max)
-                          })
-                          
-                          enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })
-                          
-                          // Firebase handles updates automatically
-                          const updated = await getCampaignState(algorand, {
-                            appId: selectedCampaign.appId,
-                            creator: selectedCampaign.creator,
-                            createdAt: 0,
-                            title: selectedCampaign.title,
+                    
+                    {/* Approval Status */}
+                    {Number(selectedCampaign.currentMilestone) < Number(selectedCampaign.milestoneCount) && 
+                     selectedCampaign.raisedAmount >= selectedCampaign.goalAmount && (
+                      <div className="space-y-3 mb-4">
+                        <p className="text-sm font-bold">Approver Status (Next Milestone #{Number(selectedCampaign.currentMilestone) + 1}):</p>
+                        {selectedCampaign.approvers.map((approver, idx) => {
+                          const hasApproved = milestoneApprovals[approver]?.approved
+                          const isCurrentUser = approver === activeAddress
+                          return (
+                            <div key={approver} className="flex items-center justify-between bg-white/10 p-2 rounded">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-xs">{approver.substring(0, 8)}...{approver.substring(approver.length - 6)}</span>
+                                {isCurrentUser && <span className="badge badge-xs">You</span>}
+                              </div>
+                              <div>
+                                {hasApproved ? (
+                                  <span className="text-green-200">✅ Approved</span>
+                                ) : (
+                                  <span className="text-yellow-200">⏳ Pending</span>
+                                )}
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                    
+                    {/* Approve Button (for approvers who haven't approved yet) */}
+                    {Number(selectedCampaign.currentMilestone) < Number(selectedCampaign.milestoneCount) && 
+                     selectedCampaign.raisedAmount >= selectedCampaign.goalAmount &&
+                     !milestoneApprovals[activeAddress]?.approved && (
+                      <button 
+                        className="btn btn-lg w-full bg-yellow-400 text-yellow-900 hover:bg-yellow-300 border-0 mb-2"
+                        onClick={async () => {
+                          try {
+                            enqueueSnackbar('Approving milestone...', { variant: 'info' })
+                            const success = await approveMilestone(
+                              String(selectedCampaign.appId),
+                              Number(selectedCampaign.currentMilestone) + 1,
+                              activeAddress
+                            )
+                            if (success) {
+                              enqueueSnackbar('✅ Milestone approved!', { variant: 'success' })
+                            } else {
+                              enqueueSnackbar('❌ Approval failed', { variant: 'error' })
+                            }
+                          } catch (e) {
+                            console.error('Approval error:', e)
+                            enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
+                          }
+                        }}
+                      >
+                        ✍️ Approve Next Milestone
+                      </button>
+                    )}
+                    
+                    {/* Release Button (only active when all 3 have approved) */}
+                    {(() => {
+                      const allApproved = selectedCampaign.approvers?.every(addr => milestoneApprovals[addr]?.approved) || false
+                      const canRelease = allApproved && 
+                                       Number(selectedCampaign.currentMilestone) < Number(selectedCampaign.milestoneCount) && 
+                                       selectedCampaign.raisedAmount >= selectedCampaign.goalAmount
+                      
+                      return (
+                        <>
+                          <button 
+                            className="btn btn-lg w-full bg-white text-orange-600 hover:bg-orange-50 border-0"
+                            disabled={!canRelease}
+                            onClick={async () => {
+                              try {
+                                const factory = new FundraiserFactory({
+                                  algorand,
+                                  defaultSender: activeAddress,
+                                })
+                                const appClient = factory.getAppClientById({
+                                  appId: BigInt(selectedCampaign.appId)
+                                })
+                                
+                                enqueueSnackbar('Releasing milestone...', { variant: 'info' })
+                                
+                                // Inner transaction needs fee coverage - add extra fee for the payment transaction
+                                await appClient.send.releaseMilestone({ 
+                                  args: [],
+                                  extraFee: algokit.algos(0.001), // Extra fee for inner payment transaction
+                                  validityWindow: 1000  // ~4 minutes for signing (TestNet max)
+                                })
+                                
+                                enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })
+                                
+                                // Firebase handles updates automatically
+                                const updated = await getCampaignState(algorand, {
+                                  appId: selectedCampaign.appId,
+                                  creator: selectedCampaign.creator,
+                                  createdAt: 0,
+                                  title: selectedCampaign.title,
+                                  description: selectedCampaign.description,
+                                  imageUrl: selectedCampaign.imageUrl
+                                })
+                                if (updated) {
+                                  updated.approvers = selectedCampaign.approvers
+                                  setSelectedCampaign(updated)
+                                }
+                              } catch (e) {
+                                console.error('Release error:', e)
+                                enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
+                              }
+                            }}
+                          >
+                            {allApproved ? '💰 Release Next Milestone' : '🔒 Waiting for All Approvals'}
+                          </button>
+                          {!allApproved && Number(selectedCampaign.currentMilestone) < Number(selectedCampaign.milestoneCount) && (
+                            <p className="text-xs text-center mt-2">Need {selectedCampaign.approvers?.filter(addr => !milestoneApprovals[addr]?.approved).length || 0} more approval(s)</p>
+                          )}
+                        </>
+                      )
+                    })()}
+                    
+                    {Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) && (
+                      <p className="text-sm text-center mt-2">All milestones have been released! 🎉</p>
+                    )}
                             description: selectedCampaign.description,
                             imageUrl: selectedCampaign.imageUrl
                           })

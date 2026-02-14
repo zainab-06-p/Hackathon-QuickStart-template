@@ -21,7 +21,8 @@ const CreateEventPage = () => {
     date: new Date(Date.now() + 604800000).toISOString().substring(0, 16),
     saleEndDate: new Date(Date.now() + 518400000).toISOString().substring(0, 16), // 6 days (1 day before event)
     ticketPrice: '2',
-    maxSupply: '100'
+    maxSupply: '100',
+    organizerAddresses: '' // Comma-separated wallet addresses
   })
 
   const { enqueueSnackbar } = useSnackbar()
@@ -112,6 +113,12 @@ const CreateEventPage = () => {
       // 🔥 Save to Firebase for real-time cross-device sync
       try {
         initializeFirebase()
+        // Parse organizer addresses
+        const organizerAddresses = newEvent.organizerAddresses
+          .split(',')
+          .map(addr => addr.trim())
+          .filter(addr => addr.length > 0)
+        
         await saveEventToFirebase({
           appId: String(appId),
           title: newEvent.title,
@@ -121,6 +128,7 @@ const CreateEventPage = () => {
           totalTickets: newEvent.maxSupply,
           ticketPrice: newEvent.ticketPrice,
           creator: activeAddress,
+          organizers: [activeAddress, ...organizerAddresses], // Creator is always an organizer
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -299,6 +307,21 @@ const CreateEventPage = () => {
                   onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
                   placeholder="Describe your event..."
                 />
+              </div>
+              
+              <div className="form-control md:col-span-2">
+                <label className="label">
+                  <span className="label-text font-semibold">Additional Organizers (Optional)</span>
+                </label>
+                <textarea
+                  className="textarea textarea-bordered h-20"
+                  value={newEvent.organizerAddresses}
+                  onChange={(e) => setNewEvent({...newEvent, organizerAddresses: e.target.value})}
+                  placeholder="Enter wallet addresses separated by commas (e.g., ADDR1..., ADDR2..., ADDR3...)&#10;Organizers can scan tickets at entry. You are automatically an organizer."
+                />
+                <label className="label">
+                  <span className="label-text-alt text-info">👥 Add wallet addresses of co-organizers who can scan tickets at the event entrance</span>
+                </label>
               </div>
             </div>
 

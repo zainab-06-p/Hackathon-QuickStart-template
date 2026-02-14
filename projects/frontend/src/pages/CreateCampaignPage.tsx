@@ -20,7 +20,10 @@ const CreateCampaignPage = () => {
     description: '',
     goal: '100',
     milestones: '3',
-    daysUntilDeadline: '30'
+    daysUntilDeadline: '30',
+    approver1: '',
+    approver2: '',
+    approver3: ''
   })
 
   const { enqueueSnackbar } = useSnackbar()
@@ -114,12 +117,20 @@ const CreateCampaignPage = () => {
       // 🔥 Save to Firebase for real-time cross-device sync
       try {
         initializeFirebase()
+        
+        // Validate approver addresses
+        const approvers = [newCampaign.approver1, newCampaign.approver2, newCampaign.approver3]
+        if (!approvers.every(addr => addr.trim().length > 0)) {
+          enqueueSnackbar('⚠️ All 3 approver addresses are required!', { variant: 'warning' })
+        }
+        
         await saveCampaignToFirebase({
           appId: String(appId),
           title: newCampaign.title,
           description: newCampaign.description,
           goal: newCampaign.goal,
           creator: activeAddress,
+          approvers: approvers.map(a => a.trim()),
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -274,6 +285,59 @@ const CreateCampaignPage = () => {
                   placeholder="Describe your campaign..."
                 />
               </div>
+              
+              <div className="divider md:col-span-2">🔒 Multi-Signature Approvers (All 3 Required)</div>
+              
+              <div className="form-control md:col-span-2">
+                <div className="alert alert-warning mb-3">
+                  <div className="text-sm">
+                    <p className="font-bold">🔑 Multi-Sig Protection</p>
+                    <p>All 3 approvers must sign to release each milestone. This prevents unauthorized fund access.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 1 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-xs"
+                  value={newCampaign.approver1}
+                  onChange={(e) => setNewCampaign({...newCampaign, approver1: e.target.value})}
+                  placeholder="ALGORAND_ADDRESS_1..."
+                />
+              </div>
+              
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 2 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-xs"
+                  value={newCampaign.approver2}
+                  onChange={(e) => setNewCampaign({...newCampaign, approver2: e.target.value})}
+                  placeholder="ALGORAND_ADDRESS_2..."
+                />
+              </div>
+              
+              <div className="form-control md:col-span-2">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 3 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-xs"
+                  value={newCampaign.approver3}
+                  onChange={(e) => setNewCampaign({...newCampaign, approver3: e.target.value})}
+                  placeholder="ALGORAND_ADDRESS_3..."
+                />
+                <label className="label">
+                  <span className="label-text-alt text-info">ℹ️ These 3 addresses must all approve before any milestone can be released</span>
+                </label>
+              </div>
             </div>
 
             <div className="divider"></div>
@@ -281,7 +345,7 @@ const CreateCampaignPage = () => {
             <button 
               className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 border-0 text-white'}`}
               onClick={createCampaign}
-              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description}
+              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description || !newCampaign.approver1 || !newCampaign.approver2 || !newCampaign.approver3}
             >
               {creating ? 'Deploying Contract...' : '⛓️ Deploy Campaign Contract'}
             </button>
