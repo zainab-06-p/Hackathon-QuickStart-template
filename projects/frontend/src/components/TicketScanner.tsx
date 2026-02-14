@@ -3,6 +3,7 @@ import { QrReader } from 'react-qr-reader'
 import { useWallet} from '@txnlab/use-wallet-react'
 import { useSnackbar } from 'notistack'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
+import * as algokit from '@algorandfoundation/algokit-utils'
 import { TicketingFactory } from '../contracts/TicketingClient'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 
@@ -77,13 +78,14 @@ const TicketScanner = ({ appId, onVerified, onClose }: TicketScannerProps) => {
       const appClient = factory.getAppClientById({
         appId: BigInt(appId)
       })
-
+      
       const txResult = await appClient.send.verifyEntry({
         args: {
           ticketHolder: holderAddress,
           ticketAssetId: assetId
         },
-        sender: activeAddress
+        sender: activeAddress,
+        extraFee: algokit.algos(0.001) // Extra fee for box operations
       })
 
       if (txResult.return) {
