@@ -116,12 +116,12 @@ const CreateEventPage = () => {
           title: newEvent.title,
           description: newEvent.description,
           venue: newEvent.venue,
-          eventDate: newEvent.dateTime,
-          totalTickets: newEvent.totalTickets,
+          eventDate: newEvent.date,
+          totalTickets: newEvent.maxSupply,
           ticketPrice: newEvent.ticketPrice,
           creator: activeAddress,
           createdAt: Date.now(),
-          blockchainTxId: result.confirmations?.[0]?.txId
+          blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
         console.log('🔥 Event saved to Firebase for real-time sync')
         enqueueSnackbar('🔥 Event synced across all devices!', { variant: 'info' })

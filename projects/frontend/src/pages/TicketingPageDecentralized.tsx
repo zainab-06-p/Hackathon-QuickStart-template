@@ -143,7 +143,7 @@ const TicketingPageDecentralized = () => {
       const eventStates: EventState[] = []
       for (const fbEvent of firebaseEvents) {
         const metadata = {
-          appId: fbEvent.appId,
+          appId: parseInt(fbEvent.appId),
           creator: fbEvent.creator,
           createdAt: fbEvent.createdAt,
           title: fbEvent.title,

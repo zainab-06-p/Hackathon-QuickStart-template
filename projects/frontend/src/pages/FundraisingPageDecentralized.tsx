@@ -78,7 +78,7 @@ const FundraisingPageDecentralized = () => {
       const campaignStates: CampaignState[] = []
       for (const fbCampaign of firebaseCampaigns) {
         const metadata = {
-          appId: fbCampaign.appId,
+          appId: parseInt(fbCampaign.appId),
           creator: fbCampaign.creator,
           createdAt: fbCampaign.createdAt,
           title: fbCampaign.title,

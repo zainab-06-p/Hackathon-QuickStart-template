@@ -1,4 +1,6 @@
+// @ts-ignore - Firebase types are available at runtime
 import { initializeApp } from 'firebase/app'
+// @ts-ignore - Firebase types are available at runtime
 import { getDatabase, ref, push, set, onValue, off, remove } from 'firebase/database'
 
 // Firebase configuration

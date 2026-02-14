@@ -105,7 +105,7 @@ const CreateCampaignPage = () => {
           goal: newCampaign.goal,
           creator: activeAddress,
           createdAt: Date.now(),
-          blockchainTxId: result.confirmations?.[0]?.txId
+          blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
         console.log('🔥 Campaign saved to Firebase for real-time sync')
         enqueueSnackbar('🔥 Campaign synced across all devices!', { variant: 'info' })
