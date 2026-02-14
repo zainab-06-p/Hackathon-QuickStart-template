@@ -63,6 +63,7 @@ const FundraisingPageDecentralized = () => {
       
       setCampaigns(campaignStates)
       setLastUpdated(new Date())
+      setLoading(false) // Mark loading complete after Firebase data loads
     })
     
     return () => {

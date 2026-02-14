@@ -123,6 +123,7 @@ const TicketingPageDecentralized = () => {
       }
       
       setEvents(eventStates)
+      setLoading(false) // Mark loading complete after Firebase data loads
       
       // Load user's tickets if wallet is connected
       if (activeAddress) {
