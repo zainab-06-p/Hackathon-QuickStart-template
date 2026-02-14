@@ -1,0 +1,18 @@
+{
+  "rules": {
+    "campaigns": {
+      ".read": true,
+      ".write": true,
+      "$campaignId": {
+        ".validate": "newData.hasChildren(['appId', 'title', 'description', 'goal', 'creator', 'createdAt'])"
+      }
+    },
+    "events": {
+      ".read": true,
+      ".write": true,
+      "$eventId": {
+        ".validate": "newData.hasChildren(['appId', 'title', 'description', 'venue', 'eventDate', 'creator', 'createdAt'])"
+      }
+    }
+  }
+}
