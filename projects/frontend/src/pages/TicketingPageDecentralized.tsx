@@ -65,11 +65,14 @@ const TicketingPageDecentralized = () => {
             const assetInfo = await algorand.client.algod.getAssetByID(asset.assetId).do()
             // Check if this is an event ticket NFT
             if (assetInfo.params.name === 'Event Ticket' && assetInfo.params.unitName === 'TIX') {
-              // Find the corresponding event by checking if reserve matches activeAddress
-              // The reserve field is set to the buyer's address in our contract
-              let matchedEvent = eventStates.find(e => assetInfo.params.reserve === activeAddress)
+              // Find the corresponding event by matching the asset creator (app address) with event app addresses
+              const assetCreator = assetInfo.params.creator
+              let matchedEvent = eventStates.find(e => {
+                const factory = new TicketingFactory({ algorand, defaultSender: activeAddress })
+                const appClient = factory.getAppClientById({ appId: BigInt(e.appId) })
+                return String(appClient.appAddress) === assetCreator
+              })
               
-              // If no exact match, still show the ticket with generic info
               tickets.push({
                 assetId: Number(asset.assetId),
                 eventTitle: matchedEvent?.title || 'Event Ticket',
@@ -78,8 +81,7 @@ const TicketingPageDecentralized = () => {
               
               console.log('Found ticket:', {
                 assetId: asset.assetId,
-                reserve: assetInfo.params.reserve,
-                activeAddress,
+                creator: assetCreator,
                 matchedEvent: matchedEvent?.title
               })
             }
