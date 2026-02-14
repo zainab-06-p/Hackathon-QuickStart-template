@@ -45,44 +45,10 @@ const TicketingPageDecentralized = () => {
     return client
   }, [transactionSigner, algodConfig, indexerConfig])
 
-  // Load events from blockchain
-  // ⚠️ IMPORTANT: This fetches ALL events from ALL creators
-  // Students with different wallet addresses will see events from everyone
-  // This is a PUBLIC MARKETPLACE - NOT filtered by connected wallet
-  const loadEvents = async (forceRefresh = false) => {
-    setLoading(true)
-    try {
-      // ✅ CORRECT: Don't pass activeAddress - discover ALL events from ALL creators
-      // Using getAllEvents() is clearer but getTicketing() without args works the same
-      const registry = await ContractRegistry.getTicketing(forceRefresh)
-      const eventStates: EventState[] = []
-      
-      for (const metadata of registry) {
-        const state = await getEventState(algorand, metadata)
-        if (state) {
-          eventStates.push(state)
-        }
-      }
-      
-      setEvents(eventStates)
-      setLastUpdated(new Date())
-      
-      // Load user's tickets if wallet is connected
-      if (activeAddress) {
-        loadMyTickets(eventStates)
-      }
-      
-      if (forceRefresh) {
-        enqueueSnackbar(`Refreshed! Found ${eventStates.length} events`, { variant: 'success' })
-      }
-    } catch (error) {
-      console.error('Error loading events:', error)
-      enqueueSnackbar(`Error loading events: ${(error as Error).message}`, { variant: 'error' })
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  // 🔥 FIREBASE ONLY - No blockchain discovery on page load
+  // Firebase real-time listener handles ALL data synchronization
+  // No manual refresh or blockchain discovery needed!
+  
   // Load user's purchased tickets
   const loadMyTickets = async (eventStates: EventState[]) => {
     if (!activeAddress) return
@@ -157,6 +123,11 @@ const TicketingPageDecentralized = () => {
       }
       
       setEvents(eventStates)
+      
+      // Load user's tickets if wallet is connected
+      if (activeAddress) {
+        loadMyTickets(eventStates)
+      }
     })
     
     return () => {

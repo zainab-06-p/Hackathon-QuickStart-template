@@ -33,39 +33,10 @@ const FundraisingPageDecentralized = () => {
   
   algorand.setDefaultSigner(transactionSigner)
 
-  // Load campaigns from blockchain
-  // ⚠️ IMPORTANT: This fetches ALL campaigns from ALL creators
-  // Students with different wallet addresses will see campaigns from everyone
-  // This is a PUBLIC MARKETPLACE - NOT filtered by connected wallet
-  const loadCampaigns = async (forceRefresh = false) => {
-    setLoading(true)
-    try {
-      // ✅ CORRECT: Don't pass activeAddress - discover ALL campaigns from ALL creators
-      // Using getAllFundraisers() is clearer but getFundraisers() without args works the same
-      const registry = await ContractRegistry.getFundraisers(forceRefresh)
-      const campaignStates: CampaignState[] = []
-      
-      for (const metadata of registry) {
-        const state = await getCampaignState(algorand, metadata)
-        if (state) {
-          campaignStates.push(state)
-        }
-      }
-      
-      setCampaigns(campaignStates)
-      setLastUpdated(new Date())
-      
-      if (forceRefresh) {
-        enqueueSnackbar(`Refreshed! Found ${campaignStates.length} campaigns`, { variant: 'success' })
-      }
-    } catch (error) {
-      console.error('Error loading campaigns:', error)
-      enqueueSnackbar(`Error loading campaigns: ${(error as Error).message}`, { variant: 'error' })
-    } finally {
-      setLoading(false)
-    }
-  }
-
+  // 🔥 FIREBASE ONLY - No blockchain discovery on page load
+  // Firebase real-time listener handles ALL data synchronization
+  // No manual refresh or blockchain discovery needed!
+  
   useEffect(() => {
     // 🔥 Real-time Firebase listener for instant cross-device sync
     // This is the PRIMARY and ONLY data source - it handles all updates automatically
