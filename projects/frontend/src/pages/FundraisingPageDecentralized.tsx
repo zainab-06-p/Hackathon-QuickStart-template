@@ -160,10 +160,10 @@ const FundraisingPageDecentralized = () => {
       
       setDonationAmount('1')
       
-      // Reload campaigns to show updated state
-      await loadCampaigns()
+      // Firebase will automatically update the campaign state
+      enqueueSnackbar('Firebase will update the state automatically', { variant: 'info' })
       
-      // Update selected campaign
+      // Update selected campaign from blockchain
       const updated = await getCampaignState(algorand, {
         appId: selectedCampaign.appId,
         creator: selectedCampaign.creator,
@@ -226,11 +226,10 @@ const FundraisingPageDecentralized = () => {
               ✨ Create Campaign
             </button>
             <button 
-              onClick={() => loadCampaigns(true)} 
+              onClick={() => enqueueSnackbar('🔥 Firebase keeps everything synced automatically!', { variant: 'info' })} 
               className="btn btn-sm btn-outline btn-info hover:scale-110 transition-transform"
-              disabled={loading}
             >
-              🔄 Refresh
+              ⚡ Auto-Synced
             </button>
             <button 
               onClick={() => navigate('/fundraising/reputation')} 
@@ -512,9 +511,9 @@ const FundraisingPageDecentralized = () => {
                           
                           await appClient.send.releaseMilestone({ args: [] })
                           
-                          enqueueSnackbar('✅ Milestone funds released!', { variant: 'success' })
+                          enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })
                           
-                          await loadCampaigns()
+                          // Firebase handles updates automatically
                           const updated = await getCampaignState(algorand, {
                             appId: selectedCampaign.appId,
                             creator: selectedCampaign.creator,

@@ -305,8 +305,8 @@ const TicketingPageDecentralized = () => {
       // Small delay to ensure blockchain state is updated
       await new Promise(resolve => setTimeout(resolve, 2000))
       
-      // Reload events to show updated state
-      await loadEvents()
+      // Firebase will automatically update the event state
+      enqueueSnackbar('Firebase will sync the updated state automatically', { variant: 'info' })
       
       // Update selected event
       const updated = await getEventState(algorand, {
@@ -324,9 +324,8 @@ const TicketingPageDecentralized = () => {
       const errorMsg = (e as Error).message
       
       if (errorMsg.includes('already in ledger')) {
-        // Transaction succeeded but we got an error after - refresh to see the result
-        enqueueSnackbar('⚠️ Transaction may have succeeded. Refreshing...', { variant: 'warning' })
-        await loadEvents()
+        // Transaction succeeded but we got an error after - Firebase will sync
+        enqueueSnackbar('⚠️ Transaction may have succeeded. Firebase will sync...', { variant: 'warning' })
         if (selectedEvent) {
           const updated = await getEventState(algorand, {
             appId: selectedEvent.appId,
@@ -401,11 +400,10 @@ const TicketingPageDecentralized = () => {
               <h1 className="text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">🎫 Ticketing</h1>
             </div>
             <button 
-              onClick={() => loadEvents(true)} 
+              onClick={() => enqueueSnackbar('🔥 Firebase keeps everything synced automatically!', { variant: 'info' })} 
               className="btn btn-xs sm:btn-sm btn-ghost hover:btn-primary"
-              disabled={loading}
             >
-              {loading ? <span className="loading loading-spinner loading-sm"></span> : '🔄'} <span className="hidden sm:inline">Refresh</span>
+              ⚡ <span className="hidden sm:inline">Auto-Synced</span>
             </button>
           </div>
           
@@ -754,11 +752,11 @@ const TicketingPageDecentralized = () => {
                         await appClient.send.toggleSale({ args: [] })
                         
                         enqueueSnackbar(
-                          `Ticket sales ${selectedEvent.isSaleActive ? 'closed' : 'reopened'}!`,
+                          `Ticket sales ${selectedEvent.isSaleActive ? 'closed' : 'reopened'}! Firebase will sync automatically.`,
                           { variant: 'success' }
                         )
                         
-                        await loadEvents()
+                        // Firebase handles updates automatically
                         const updated = await getEventState(algorand, {
                           appId: selectedEvent.appId,
                           creator: selectedEvent.organizer,
