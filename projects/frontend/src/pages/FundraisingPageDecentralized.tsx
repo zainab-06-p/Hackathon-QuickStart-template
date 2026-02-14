@@ -480,7 +480,13 @@ const FundraisingPageDecentralized = () => {
                           
                           enqueueSnackbar('Releasing milestone...', { variant: 'info' })
                           
-                          await appClient.send.releaseMilestone({ args: [] })
+                          // Inner transaction needs fee coverage - add extra fee for the payment transaction
+                          await appClient.send.releaseMilestone({ 
+                            args: [],
+                            sendParams: {
+                              fee: algokit.algos(0.002) // Cover both app call (0.001) + inner payment (0.001)
+                            }
+                          })
                           
                           enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })
                           
