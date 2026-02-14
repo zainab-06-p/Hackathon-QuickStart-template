@@ -1,14 +1,16 @@
 from algopy import *
-from algopy.arc4 import abimethod
+from algopy.arc4 import abimethod, Address
 
 
 class Ticketing(ARC4Contract):
     """
-    CampusChain Ticketing Contract
+    CampusChain Multi-Organizer Ticketing Contract
     NFT-based event tickets with anti-scalping and entry verification
     Each deployment = one event (fully decentralized)
     Features:
     - Mints NFT ticket on purchase
+    - Multi-organizer support (creator can add up to 10 organizers)
+    - All organizers can scan tickets and verify entry
     - QR code verification at entry
     - Prevents double entry
     """
@@ -17,23 +19,57 @@ class Ticketing(ARC4Contract):
     max_supply: UInt64
     sold_count: UInt64
     event_date: UInt64
-    sale_end_date: UInt64  # NEW: Separate date when ticket sales stop
+    sale_end_date: UInt64
     is_sale_active: bool
-    organizer: Account
+    creator: Account
     unique_buyers: UInt64
+    organizer_count: UInt64
 
     @abimethod(allow_actions=['NoOp'], create='require')
-    def create_event(self, price: UInt64, supply: UInt64, event_date: UInt64, sale_end_date: UInt64) -> UInt64:
-        """Create a new ticketed event (called during contract creation)"""
+    def create_event(
+        self, 
+        price: UInt64, 
+        supply: UInt64, 
+        event_date: UInt64, 
+        sale_end_date: UInt64
+    ) -> UInt64:
+        """
+        Create a new ticketed event
+        Additional organizers can be added after creation using add_organizer()
+        """
         self.ticket_price = price
         self.max_supply = supply
         self.sold_count = UInt64(0)
         self.event_date = event_date
-        self.sale_end_date = sale_end_date  # Store sale end date
-        self.organizer = Txn.sender
+        self.sale_end_date = sale_end_date
+        self.creator = Txn.sender
         self.is_sale_active = True
         self.unique_buyers = UInt64(0)
+        self.organizer_count = UInt64(0)
         return UInt64(1)
+    
+    @abimethod()
+    def add_organizer(self, organizer_address: Address) -> UInt64:
+        """
+        Add an organizer who can scan tickets (creator only)
+        Stores organizer in box with key "org_{index}"
+        Requires box MBR funding before calling (20,100 microAlgos per organizer)
+        Returns the organizer index
+        """
+        assert Txn.sender == self.creator, "Only creator can add organizers"
+        assert self.organizer_count < UInt64(10), "Maximum 10 organizers allowed"
+        
+        # Create box key from current count
+        current_index = self.organizer_count
+        box_key = b"org_" + op.itob(current_index)
+        
+        # Create box (32 bytes for address) and store organizer
+        # Box MBR: 2500 + 400 * (12 + 32) = 20,100 microAlgos
+        assert op.Box.create(box_key, 32), "Failed to create organizer box"
+        op.Box.put(box_key, organizer_address.bytes)
+        
+        self.organizer_count += UInt64(1)
+        return current_index
 
     @abimethod()
     def buy_ticket(self, payment: gtxn.PaymentTransaction) -> UInt64:
@@ -95,10 +131,26 @@ class Ticketing(ARC4Contract):
     @abimethod()
     def verify_entry(self, ticket_holder: Account, ticket_asset_id: UInt64) -> bool:
         """
-        Verify ticket at event entry (called by organizer/staff)
+        Verify ticket at event entry (called by creator or any organizer)
         Checks NFT ownership and check-in status
+        All organizers have permission to scan and verify tickets
         """
-        assert Txn.sender == self.organizer, "Only organizer can verify"
+        # Check if sender is creator or one of the organizers
+        sender = Txn.sender
+        is_authorized = sender == self.creator
+        
+        # Check organizers from box storage
+        if not is_authorized:
+            for i in urange(self.organizer_count):
+                box_key = b"org_" + op.itob(i)
+                organizer_bytes, exists = op.Box.get(box_key)
+                if exists:
+                    organizer = Account(organizer_bytes)
+                    if sender == organizer:
+                        is_authorized = True
+                        break
+        
+        assert is_authorized, "Only creator or organizers can verify"
         assert Global.latest_timestamp <= self.event_date + UInt64(86400), "Event verification period ended"
         
         # Check ticket_holder owns the NFT
@@ -131,10 +183,26 @@ class Ticketing(ARC4Contract):
 
     @abimethod()
     def toggle_sale(self) -> bool:
-        """Toggle ticket sales on/off (organizer only)"""
-        assert Txn.sender == self.organizer, "Only organizer can toggle"
+        """Toggle ticket sales on/off (creator or organizers only)"""
+        # Check if sender is creator or one of the organizers
+        sender = Txn.sender
+        is_authorized = sender == self.creator
+        
+        # Check organizers from box storage
+        if not is_authorized:
+            for i in urange(self.organizer_count):
+                box_key = b"org_" + op.itob(i)
+                organizer_bytes, exists = op.Box.get(box_key)
+                if exists:
+                    organizer = Account(organizer_bytes)
+                    if sender == organizer:
+                        is_authorized = True
+                        break
+        
+        assert is_authorized, "Only creator or organizers can toggle"
         self.is_sale_active = not self.is_sale_active
         return self.is_sale_active
+
 
     @abimethod()
     def get_event_info(self) -> tuple[UInt64, UInt64, UInt64, UInt64, UInt64, UInt64, bool]:
@@ -151,5 +219,45 @@ class Ticketing(ARC4Contract):
     
     @abimethod(readonly=True)
     def get_organizer(self) -> Account:
-        """Get event organizer address"""
-        return self.organizer
+        """Get event creator address (main organizer)"""
+        return self.creator
+    
+    @abimethod(readonly=True)
+    def get_organizer_by_index(self, index: UInt64) -> Address:
+        """
+        Get organizer address by index
+        Returns zero address if index is out of bounds
+        """
+        if index >= self.organizer_count:
+            return Address()  # Return zero address
+        
+        box_key = b"org_" + op.itob(index)
+        organizer_bytes, exists = op.Box.get(box_key)
+        
+        if exists:
+            return Address(organizer_bytes)
+        return Address()  # Return zero address if not found
+    
+    @abimethod(readonly=True)
+    def get_organizer_count(self) -> UInt64:
+        """Get the number of additional organizers"""
+        return self.organizer_count
+    
+    @abimethod(readonly=True)
+    def is_organizer(self, address: Address) -> bool:
+        """Check if an address is an organizer"""
+        account = address.native
+        
+        if account == self.creator:
+            return True
+        
+        # Check organizers from box storage
+        for i in urange(self.organizer_count):
+            box_key = b"org_" + op.itob(i)
+            organizer_bytes, exists = op.Box.get(box_key)
+            if exists:
+                organizer = Account(organizer_bytes)
+                if account == organizer:
+                    return True
+        
+        return False

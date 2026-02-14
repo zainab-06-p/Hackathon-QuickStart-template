@@ -23,7 +23,12 @@ const CreateCampaignPage = () => {
     daysUntilDeadline: '30'
   })
   
-  const [approverAddresses, setApproverAddresses] = useState<string[]>(['', '', ''])
+  // Multi-signature approvers (3 required for milestone releases)
+  const [approvers, setApprovers] = useState({
+    approver1: '',
+    approver2: '',
+    approver3: ''
+  })
 
   const { enqueueSnackbar } = useSnackbar()
   const { activeAddress, transactionSigner } = useWallet()
@@ -36,11 +41,21 @@ const CreateCampaignPage = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
-  algorand.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
 
   const createCampaign = async () => {
     if (!activeAddress) {
       enqueueSnackbar('Please connect your wallet', { variant: 'error' })
+      return
+    }
+    
+    // Validate approvers
+    if (!approvers.approver1 || !approvers.approver2 || !approvers.approver3) {
+      enqueueSnackbar('Please provide all 3 milestone approvers', { variant: 'error' })
+      return
+    }
+    
+    if (approvers.approver1.length !== 58 || approvers.approver2.length !== 58 || approvers.approver3.length !== 58) {
+      enqueueSnackbar('Invalid approver address(es). Algorand addresses must be 58 characters.', { variant: 'error' })
       return
     }
 
@@ -72,13 +87,16 @@ const CreateCampaignPage = () => {
         return
       }
 
-      enqueueSnackbar('Deploying smart contract...', { variant: 'info' })
+      enqueueSnackbar('Deploying smart contract with multi-sig approvals...', { variant: 'info' })
 
       const { result } = await factory.send.create.createCampaign({
         args: {
           goal: BigInt(goalInMicroAlgos),
           milestones: BigInt(milestonesCount),
-          deadline: BigInt(deadlineTimestamp)
+          deadline: BigInt(deadlineTimestamp),
+          approver1: approvers.approver1,
+          approver2: approvers.approver2,
+          approver3: approvers.approver3
         },
         note: new TextEncoder().encode(JSON.stringify({
           type: 'campaign',
@@ -117,20 +135,12 @@ const CreateCampaignPage = () => {
       // 🔥 Save to Firebase for real-time cross-device sync
       try {
         initializeFirebase()
-        
-        // Validate approver addresses
-        const approvers = approverAddresses.map(a => a.trim()).filter(a => a.length > 0)
-        if (approvers.length < 3) {
-          enqueueSnackbar('⚠️ All 3 approver addresses are required!', { variant: 'warning' })
-        }
-        
         await saveCampaignToFirebase({
           appId: String(appId),
           title: newCampaign.title,
           description: newCampaign.description,
           goal: newCampaign.goal,
           creator: activeAddress,
-          approvers: approvers,
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -285,60 +295,62 @@ const CreateCampaignPage = () => {
                   placeholder="Describe your campaign..."
                 />
               </div>
-              
-              <div className="divider md:col-span-2">🔒 Multi-Signature Approvers (All 3 Required)</div>
-              
-              <div className="form-control md:col-span-2">
-                <div className="alert alert-warning mb-3">
-                  <div className="text-sm">
-                    <p className="font-bold">🔑 Multi-Sig Protection</p>
-                    <p>All 3 approvers must sign to release each milestone. This prevents unauthorized fund access.</p>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  {approverAddresses.map((addr, idx) => (
-                    <div key={idx}>
-                      <label className="label">
-                        <span className="label-text font-semibold">Approver {idx + 1} Address *</span>
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="text"
-                          className="input input-bordered flex-1 font-mono text-xs"
-                          value={addr}
-                          onChange={(e) => {
-                            const newAddresses = [...approverAddresses]
-                            newAddresses[idx] = e.target.value
-                            setApproverAddresses(newAddresses)
-                          }}
-                          placeholder="ALGORAND_WALLET_ADDRESS..."
-                        />
-                        {approverAddresses.length > 3 && (
-                          <button
-                            type="button"
-                            className="btn btn-error btn-sm"
-                            onClick={() => setApproverAddresses(approverAddresses.filter((_, i) => i !== idx))}
-                          >
-                            −
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {approverAddresses.length < 5 && (
-                    <button
-                      type="button"
-                      className="btn btn-success btn-sm w-full mt-2"
-                      onClick={() => setApproverAddresses([...approverAddresses, ''])}
-                    >
-                      + Add Another Approver
-                    </button>
-                  )}
-                </div>
-                <label className="label">
-                  <span className="label-text-alt text-info">ℹ️ All approver addresses must approve before any milestone can be released (minimum 3 required)</span>
-                </label>
+            </div>
+
+            <div className="divider"></div>
+            
+            {/* Multi-Signature Approvers Section */}
+            <div className="alert alert-warning mb-4">
+              <div>
+                <h3 className="font-bold text-lg">🔐 Multi-Signature Milestone Approvals</h3>
+                <p className="text-sm mt-1">Add 3 trusted wallet addresses who must ALL approve before each milestone release</p>
+                <p className="text-xs mt-1 opacity-75">This ensures decentralized governance and prevents misuse of funds</p>
               </div>
+            </div>
+            
+            <div className="grid grid-cols-1 gap-3">
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 1 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-sm"
+                  value={approvers.approver1}
+                  onChange={(e) => setApprovers({...approvers, approver1: e.target.value})}
+                  placeholder="Algorand wallet address (58 characters)"
+                />
+              </div>
+              
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 2 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-sm"
+                  value={approvers.approver2}
+                  onChange={(e) => setApprovers({...approvers, approver2: e.target.value})}
+                  placeholder="Algorand wallet address (58 characters)"
+                />
+              </div>
+              
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text font-semibold">Approver 3 Address *</span>
+                </label>
+                <input
+                  type="text"
+                  className="input input-bordered font-mono text-sm"
+                  value={approvers.approver3}
+                  onChange={(e) => setApprovers({...approvers, approver3: e.target.value})}
+                  placeholder="Algorand wallet address (58 characters)"
+                />
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Tip: Choose trusted individuals (advisors, team members, college officials) who will verify milestones
+              </p>
             </div>
 
             <div className="divider"></div>
@@ -346,7 +358,7 @@ const CreateCampaignPage = () => {
             <button 
               className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 border-0 text-white'}`}
               onClick={createCampaign}
-              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description || approverAddresses.filter(a => a.trim().length > 0).length < 3}
+              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description}
             >
               {creating ? 'Deploying Contract...' : '⛓️ Deploy Campaign Contract'}
             </button>

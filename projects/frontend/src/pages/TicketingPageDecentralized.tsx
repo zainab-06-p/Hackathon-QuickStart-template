@@ -25,6 +25,7 @@ const TicketingPageDecentralized = () => {
   const [scannerEventId, setScannerEventId] = useState<number | null>(null)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [myTickets, setMyTickets] = useState<Array<{ assetId: number; eventTitle: string; eventDate: bigint }>>([])
+  const [isCurrentUserOrganizer, setIsCurrentUserOrganizer] = useState(false)
   
   // Ref-based lock to prevent double-execution (synchronous check)
   const buyingRef = useRef(false)
@@ -105,6 +106,13 @@ const TicketingPageDecentralized = () => {
     // This is the PRIMARY and ONLY data source - it handles all updates automatically
     // No manual refresh needed - Firebase keeps everything in sync!
     initializeFirebase()
+    
+    // Set loading to false after 2 seconds as fallback
+    const loadingTimeout = setTimeout(() => {
+      console.log('⏰ Loading timeout - setting loading to false')
+      setLoading(false)
+    }, 2000)
+    
     const unsubscribeFirebase = listenToEvents(async (firebaseEvents) => {
       console.log(`🔥 Firebase events updated: ${firebaseEvents.length} events`)
       
@@ -121,8 +129,6 @@ const TicketingPageDecentralized = () => {
         }
         const state = await getEventState(algorand, metadata)
         if (state) {
-          // Merge organizers from Firebase into the event state
-          state.organizers = fbEvent.organizers || [fbEvent.creator]
           eventStates.push(state)
         }
       }
@@ -140,6 +146,44 @@ const TicketingPageDecentralized = () => {
       unsubscribeFirebase()
     }
   }, [])
+
+  // Check if current user is an organizer for the selected event
+  useEffect(() => {
+    const checkOrganizerStatus = async () => {
+      if (!selectedEvent || !activeAddress) {
+        setIsCurrentUserOrganizer(false)
+        return
+      }
+
+      // If user is the creator, they're automatically an organizer
+      if (activeAddress === selectedEvent.organizer) {
+        setIsCurrentUserOrganizer(true)
+        return
+      }
+
+      // Check if user is a co-organizer by calling the contract
+      try {
+        const factory = new TicketingFactory({
+          algorand,
+          defaultSender: activeAddress,
+        })
+        const appClient = factory.getAppClientById({
+          appId: BigInt(selectedEvent.appId)
+        })
+
+        const result = await appClient.send.isOrganizer({
+          args: { address: activeAddress }
+        })
+
+        setIsCurrentUserOrganizer(result.return || false)
+      } catch (error) {
+        console.warn('Error checking organizer status:', error)
+        setIsCurrentUserOrganizer(false)
+      }
+    }
+
+    checkOrganizerStatus()
+  }, [selectedEvent, activeAddress, algorand])
 
   const buyTicket = async () => {
     if (!selectedEvent || !activeAddress) {
@@ -721,7 +765,7 @@ const TicketingPageDecentralized = () => {
               )}
 
               {/* Organizer Controls */}
-              {activeAddress && selectedEvent.organizers && selectedEvent.organizers.includes(activeAddress) && (
+              {isCurrentUserOrganizer && (
                 <div className="space-y-3 mb-4">
                   <button 
                     className="btn btn-primary btn-lg w-full"
@@ -736,6 +780,8 @@ const TicketingPageDecentralized = () => {
                   <button 
                     className={`btn btn-lg w-full ${selectedEvent.isSaleActive ? 'btn-warning' : 'btn-success'}`}
                     onClick={async () => {
+                      if (!activeAddress) return
+                      
                       try {
                         const factory = new TicketingFactory({
                           algorand,

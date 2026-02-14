@@ -26,7 +26,6 @@ import { ContractMetadata } from './contractRegistry'
 export interface CampaignState {
   appId: number
   creator: string
-  approvers?: string[] // 3 wallet addresses that must all approve milestone releases
   title: string
   description: string
   goalAmount: bigint
@@ -42,7 +41,6 @@ export interface CampaignState {
 export interface EventState {
   appId: number
   organizer: string
-  organizers?: string[] // Array of wallet addresses who can scan tickets
   title: string
   description: string
   venue: string

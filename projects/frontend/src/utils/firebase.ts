@@ -47,20 +47,8 @@ export interface FirebaseCampaign {
   description: string
   goal: string
   creator: string
-  approvers: string[] // 3 wallet addresses that must all approve milestone releases
   createdAt: number
   blockchainTxId?: string
-}
-
-export interface MilestoneApproval {
-  campaignAppId: string
-  milestoneNumber: number
-  approvals: {
-    [address: string]: {
-      approved: boolean
-      timestamp: number
-    }
-  }
 }
 
 export const saveCampaignToFirebase = async (campaign: FirebaseCampaign): Promise<boolean> => {
@@ -104,57 +92,6 @@ export const listenToCampaigns = (callback: (campaigns: FirebaseCampaign[]) => v
   return () => off(campaignsRef, 'value', unsubscribe)
 }
 
-// Milestone approval operations
-export const approveMilestone = async (
-  campaignAppId: string,
-  milestoneNumber: number,
-  approverAddress: string
-): Promise<boolean> => {
-  try {
-    const db = getFirebaseDatabase()
-    if (!db) return false
-
-    const approvalRef = ref(db, `milestoneApprovals/${campaignAppId}_milestone${milestoneNumber}/approvals/${approverAddress}`)
-    await set(approvalRef, {
-      approved: true,
-      timestamp: Date.now()
-    })
-    
-    console.log(`✅ Milestone ${milestoneNumber} approved by ${approverAddress}`)
-    return true
-  } catch (error) {
-    console.error('❌ Failed to approve milestone:', error)
-    return false
-  }
-}
-
-export const listenToMilestoneApprovals = (
-  campaignAppId: string,
-  milestoneNumber: number,
-  callback: (approvals: { [address: string]: { approved: boolean; timestamp: number } }) => void
-) => {
-  const db = getFirebaseDatabase()
-  if (!db) {
-    console.warn('⚠️ Firebase not configured - returning empty approvals')
-    callback({})
-    return () => {}
-  }
-
-  const approvalRef = ref(db, `milestoneApprovals/${campaignAppId}_milestone${milestoneNumber}/approvals`)
-  
-  const unsubscribe = onValue(approvalRef, (snapshot: any) => {
-    const data = snapshot.val()
-    if (data) {
-      console.log(`🔥 Milestone ${milestoneNumber} approvals updated:`, Object.keys(data).length)
-      callback(data)
-    } else {
-      callback({})
-    }
-  })
-
-  return () => off(approvalRef, 'value', unsubscribe)
-}
-
 // Event operations
 export interface FirebaseEvent {
   appId: string
@@ -165,7 +102,6 @@ export interface FirebaseEvent {
   totalTickets: string
   ticketPrice: string
   creator: string
-  organizers: string[] // Array of wallet addresses who can scan tickets
   createdAt: number
   blockchainTxId?: string
 }

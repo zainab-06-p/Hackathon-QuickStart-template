@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
+import algosdk from 'algosdk'
 import { TicketingFactory } from '../contracts/TicketingClient'
 import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
@@ -24,7 +25,7 @@ const CreateEventPage = () => {
     maxSupply: '100'
   })
   
-  const [organizerAddresses, setOrganizerAddresses] = useState<string[]>([''])
+  const [organizers, setOrganizers] = useState<string[]>([''])  // Array of organizer addresses
 
   const { enqueueSnackbar } = useSnackbar()
   const { activeAddress, transactionSigner } = useWallet()
@@ -115,11 +116,6 @@ const CreateEventPage = () => {
       // 🔥 Save to Firebase for real-time cross-device sync
       try {
         initializeFirebase()
-        // Filter out empty organizer addresses
-        const validOrganizerAddresses = organizerAddresses
-          .map(addr => addr.trim())
-          .filter(addr => addr.length > 0)
-        
         await saveEventToFirebase({
           appId: String(appId),
           title: newEvent.title,
@@ -129,7 +125,6 @@ const CreateEventPage = () => {
           totalTickets: newEvent.maxSupply,
           ticketPrice: newEvent.ticketPrice,
           creator: activeAddress,
-          organizers: [activeAddress, ...validOrganizerAddresses], // Creator is always an organizer
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -140,7 +135,90 @@ const CreateEventPage = () => {
         // Non-blocking: blockchain + localStorage still work
       }
 
-      // 🎯 Register with on-chain registry for cross-device discovery
+      // 👥 Add organizers if any are specified
+      let validOrganizers = organizers.filter(addr => 
+        addr.trim() !== '' && addr.length === 58
+      )
+      
+      if (validOrganizers.length > 0) {
+        if (validOrganizers.length > 10) {
+          enqueueSnackbar(`⚠️ Only first 10 organizers will be added (max limit)`, { variant: 'warning' })
+          validOrganizers = validOrganizers.slice(0, 10)
+        }
+        
+        enqueueSnackbar(`Adding ${validOrganizers.length} organizer(s)...`, { variant: 'info' })
+        
+        let successCount = 0
+        let failCount = 0
+        
+        try {
+          const appClient = factory.getAppClientById({ appId: BigInt(appId) })
+          const appAddress = algosdk.getApplicationAddress(appId)
+          
+          // Helper function to create box key matching contract format
+          const createBoxKey = (index: number): Uint8Array => {
+            const prefix = new TextEncoder().encode('org_')
+            const indexBytes = new Uint8Array(8)
+            const view = new DataView(indexBytes.buffer)
+            view.setBigUint64(0, BigInt(index), false) // big-endian
+            
+            const boxKey = new Uint8Array(prefix.length + indexBytes.length)
+            boxKey.set(prefix, 0)
+            boxKey.set(indexBytes, prefix.length)
+            return boxKey
+          }
+          
+          // Box MBR: 2500 + 400 * (key_size + value_size)
+          // key = "org_" (4 bytes) + index (8 bytes) = 12 bytes
+          // value = Address (32 bytes)
+          // MBR = 2500 + 400 * (12 + 32) = 20,100 microAlgos
+          const boxMBR = 20100
+          const contractBaseMBR = 100000 // Contract needs 100,000 microAlgos base MBR
+          
+          for (let i = 0; i < validOrganizers.length; i++) {
+            try {
+              const organizerAddr = validOrganizers[i]
+              const boxKey = createBoxKey(i)
+              
+              // For first organizer, ensure contract has base MBR + box storage
+              // For subsequent organizers, just add box storage MBR
+              const fundingAmount = i === 0 ? contractBaseMBR + boxMBR : boxMBR
+              
+              // Fund contract for box storage (contract will create the box)
+              await algorand.send.payment({
+                sender: activeAddress,
+                receiver: appAddress,
+                amount: algokit.microAlgos(fundingAmount),
+              })
+              
+              // Add organizer with box reference
+              await appClient.send.addOrganizer({
+                args: { organizerAddress: organizerAddr },
+                boxReferences: [{ appId: BigInt(appId), name: boxKey }],
+              })
+              
+              console.log(`✅ Added organizer ${i + 1}: ${organizerAddr}`)
+              successCount++
+            } catch (orgError) {
+              console.warn(`Failed to add organizer ${i + 1}:`, orgError)
+              failCount++
+            }
+          }
+          
+          if (successCount > 0) {
+            enqueueSnackbar(`✅ Added ${successCount} organizer(s)!`, { variant: 'success' })
+          }
+          if (failCount > 0) {
+            enqueueSnackbar(`⚠️ ${failCount} organizer(s) could not be added. They can be added later.`, { variant: 'warning' })
+          }
+        } catch (error) {
+          console.warn('Organizer addition failed:', error)
+          enqueueSnackbar('⚠️ Organizers could not be added. Event created successfully - you can add organizers later.', { variant: 'warning' })
+        }
+      }
+      
+      // 🎯 Register with on-chain registry for cross-device discovery (DISABLED - has box issues)
+      /* 
       const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID
       if (registryAppId && Number(registryAppId) > 0) {
         try {
@@ -166,6 +244,7 @@ const CreateEventPage = () => {
           // Don't block the user - localStorage registration is enough
         }
       }
+      */
 
       setTimeout(() => {
         navigate('/ticketing')
@@ -309,48 +388,58 @@ const CreateEventPage = () => {
                   placeholder="Describe your event..."
                 />
               </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Additional Organizers (Optional)</span>
-                </label>
-                <label className="label">
-                  <span className="label-text-alt text-info">👥 Add wallet addresses of co-organizers who can scan tickets at the event entrance. You are automatically an organizer.</span>
-                </label>
-                <div className="space-y-2">
-                  {organizerAddresses.map((addr, idx) => (
-                    <div key={idx} className="flex gap-2">
-                      <input
-                        type="text"
-                        className="input input-bordered flex-1 font-mono text-xs"
-                        value={addr}
-                        onChange={(e) => {
-                          const newAddresses = [...organizerAddresses]
-                          newAddresses[idx] = e.target.value
-                          setOrganizerAddresses(newAddresses)
-                        }}
-                        placeholder="ALGORAND_WALLET_ADDRESS..."
-                      />
-                      {organizerAddresses.length > 1 && (
-                        <button
-                          type="button"
-                          className="btn btn-error btn-sm"
-                          onClick={() => setOrganizerAddresses(organizerAddresses.filter((_, i) => i !== idx))}
-                        >
-                          −
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    className="btn btn-success btn-sm w-full"
-                    onClick={() => setOrganizerAddresses([...organizerAddresses, ''])}
-                  >
-                    + Add Another Organizer
-                  </button>
-                </div>
+            </div>
+
+            <div className="divider"></div>
+            
+            {/* Multi-Organizer Section */}
+            <div className="alert alert-success mb-4">
+              <div>
+                <h3 className="font-bold text-lg">👥 Add Co-Organizers (Optional)</h3>
+                <p className="text-sm mt-1">Add wallet addresses of people who can also scan tickets and manage the event (max 10)</p>
+                <p className="text-xs mt-1 opacity-75">⚠️ Leave blank to skip. Each organizer costs ~0.02 ALGO for box storage.</p>
               </div>
+            </div>
+            
+            <div className="space-y-3">
+              {organizers.map((addr, index) => (
+                <div key={index} className="flex gap-2">
+                  <input
+                    type="text"
+                    className="input input-bordered flex-1 font-mono text-sm"
+                    value={addr}
+                    onChange={(e) => {
+                      const newOrganizers = [...organizers]
+                      newOrganizers[index] = e.target.value
+                      setOrganizers(newOrganizers)
+                    }}
+                    placeholder="Algorand wallet address (58 characters) - leave blank to skip"
+                  />
+                  {organizers.length > 1 && (
+                    <button
+                      type="button"
+                      className="btn btn-error btn-outline"
+                      onClick={() => setOrganizers(organizers.filter((_, i) => i !== index))}
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              
+              {organizers.length < 10 && (
+                <button
+                  type="button"
+                  className="btn btn-outline btn-success btn-sm"
+                  onClick={() => setOrganizers([...organizers, ''])}
+                >
+                  + Add Another Organizer
+                </button>
+              )}
+              
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Tip: All organizers will have permission to scan tickets and verify entry at your event. Leave all fields empty if you don't need co-organizers right now.
+              </p>
             </div>
 
             <div className="divider"></div>

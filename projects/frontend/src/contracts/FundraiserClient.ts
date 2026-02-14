@@ -23,7 +23,7 @@ import { TransactionComposer, AppCallMethodCall, AppMethodCallTransactionArgumen
 import { SendParams, SendSingleTransactionResult, SendAtomicTransactionComposerResults } from '@algorandfoundation/algokit-utils/types/transaction'
 import { Address, encodeAddress, modelsv2, OnApplicationComplete, Transaction, TransactionSigner } from 'algosdk'
 
-export const APP_SPEC: Arc56Contract = {"name":"Fundraiser","structs":{},"methods":[{"name":"create_campaign","args":[{"type":"uint64","name":"goal"},{"type":"uint64","name":"milestones"},{"type":"uint64","name":"deadline"}],"returns":{"type":"uint64"},"actions":{"create":["NoOp"],"call":[]},"readonly":false,"desc":"Create a new fundraising campaign (called during contract creation)","events":[],"recommendations":{}},{"name":"donate","args":[{"type":"pay","name":"payment"}],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Donate to the campaign","events":[],"recommendations":{}},{"name":"release_milestone","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Release funds for completed milestone (creator only)\nNEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract","events":[],"recommendations":{}},{"name":"get_status","args":[],"returns":{"type":"(uint64,uint64,uint64,uint64,uint64,bool,bool)"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Get campaign status (includes goal_reached)","events":[],"recommendations":{}},{"name":"get_creator","args":[],"returns":{"type":"address"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get campaign creator address","events":[],"recommendations":{}},{"name":"get_deadline","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get campaign deadline","events":[],"recommendations":{}}],"arcs":[22,28],"desc":"\n    CampusChain Fundraiser Contract\n    Milestone-based crowdfunding for campus activities\n    Each deployment = one campaign (fully decentralized)\n    Funds released ONLY if goal is met!\n    ","networks":{},"state":{"schema":{"global":{"ints":8,"bytes":1},"local":{"ints":0,"bytes":0}},"keys":{"global":{"goal_amount":{"keyType":"AVMString","valueType":"AVMUint64","key":"Z29hbF9hbW91bnQ="},"raised_amount":{"keyType":"AVMString","valueType":"AVMUint64","key":"cmFpc2VkX2Ftb3VudA=="},"milestone_count":{"keyType":"AVMString","valueType":"AVMUint64","key":"bWlsZXN0b25lX2NvdW50"},"current_milestone":{"keyType":"AVMString","valueType":"AVMUint64","key":"Y3VycmVudF9taWxlc3RvbmU="},"deadline":{"keyType":"AVMString","valueType":"AVMUint64","key":"ZGVhZGxpbmU="},"is_active":{"keyType":"AVMString","valueType":"AVMUint64","key":"aXNfYWN0aXZl"},"creator":{"keyType":"AVMString","valueType":"address","key":"Y3JlYXRvcg=="},"contributor_count":{"keyType":"AVMString","valueType":"AVMUint64","key":"Y29udHJpYnV0b3JfY291bnQ="},"goal_reached":{"keyType":"AVMString","valueType":"AVMUint64","key":"Z29hbF9yZWFjaGVk"}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{}}},"bareActions":{"create":[],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[511],"errorMessage":"All milestones completed"},{"pc":[425],"errorMessage":"Campaign ended"},{"pc":[416],"errorMessage":"Campaign not active"},{"pc":[517],"errorMessage":"Cannot release funds - goal not reached yet"},{"pc":[435],"errorMessage":"Goal already reached"},{"pc":[538],"errorMessage":"Insufficient balance after MBR"},{"pc":[451],"errorMessage":"Minimum 0.1 ALGO donation"},{"pc":[192,209,225,295,312,339],"errorMessage":"OnCompletion is not NoOp"},{"pc":[500],"errorMessage":"Only creator can release"},{"pc":[532],"errorMessage":"account funded"},{"pc":[343],"errorMessage":"can only call when creating"},{"pc":[195,212,228,298,315],"errorMessage":"can only call when not creating"},{"pc":[464,591],"errorMessage":"check self.contributor_count exists"},{"pc":[498,544,607],"errorMessage":"check self.creator exists"},{"pc":[504,559,568,581],"errorMessage":"check self.current_milestone exists"},{"pc":[423,613],"errorMessage":"check self.deadline exists"},{"pc":[433,478,521,573],"errorMessage":"check self.goal_amount exists"},{"pc":[516,601],"errorMessage":"check self.goal_reached exists"},{"pc":[415,596],"errorMessage":"check self.is_active exists"},{"pc":[509,526,586],"errorMessage":"check self.milestone_count exists"},{"pc":[429,455,474,490,577],"errorMessage":"check self.raised_amount exists"},{"pc":[325],"errorMessage":"transaction type is pay"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuYXBwcm92YWxfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIGludGNibG9jayAwIDEgMTAwMDAwCiAgICBieXRlY2Jsb2NrICJyYWlzZWRfYW1vdW50IiAweDE1MWY3Yzc1ICJjdXJyZW50X21pbGVzdG9uZSIgImdvYWxfYW1vdW50IiAibWlsZXN0b25lX2NvdW50IiAiY3JlYXRvciIgImNvbnRyaWJ1dG9yX2NvdW50IiAiZ29hbF9yZWFjaGVkIiAiZGVhZGxpbmUiICJpc19hY3RpdmUiCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICB0eG4gTnVtQXBwQXJncwogICAgYnogbWFpbl9hZnRlcl9pZl9lbHNlQDEyCiAgICBwdXNoYnl0ZXNzIDB4MTEzNjJkMmQgMHhlNGMzZTAxMCAweGMyMjFjMDUxIDB4YWY0NTY5ZGQgMHgyMDJhMGUxOSAweDY1Zjc4NzU3IC8vIG1ldGhvZCAiY3JlYXRlX2NhbXBhaWduKHVpbnQ2NCx1aW50NjQsdWludDY0KXVpbnQ2NCIsIG1ldGhvZCAiZG9uYXRlKHBheSl1aW50NjQiLCBtZXRob2QgInJlbGVhc2VfbWlsZXN0b25lKCl1aW50NjQiLCBtZXRob2QgImdldF9zdGF0dXMoKSh1aW50NjQsdWludDY0LHVpbnQ2NCx1aW50NjQsdWludDY0LGJvb2wsYm9vbCkiLCBtZXRob2QgImdldF9jcmVhdG9yKClhZGRyZXNzIiwgbWV0aG9kICJnZXRfZGVhZGxpbmUoKXVpbnQ2NCIKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDAKICAgIG1hdGNoIG1haW5fY3JlYXRlX2NhbXBhaWduX3JvdXRlQDMgbWFpbl9kb25hdGVfcm91dGVANCBtYWluX3JlbGVhc2VfbWlsZXN0b25lX3JvdXRlQDUgbWFpbl9nZXRfc3RhdHVzX3JvdXRlQDYgbWFpbl9nZXRfY3JlYXRvcl9yb3V0ZUA3IG1haW5fZ2V0X2RlYWRsaW5lX3JvdXRlQDgKCm1haW5fYWZ0ZXJfaWZfZWxzZUAxMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIEZ1bmRyYWlzZXIoQVJDNENvbnRyYWN0KToKICAgIGludGNfMCAvLyAwCiAgICByZXR1cm4KCm1haW5fZ2V0X2RlYWRsaW5lX3JvdXRlQDg6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMDYKICAgIC8vIEBhYmltZXRob2QocmVhZG9ubHk9VHJ1ZSkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgY2FsbHN1YiBnZXRfZGVhZGxpbmUKICAgIGl0b2IKICAgIGJ5dGVjXzEgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fZ2V0X2NyZWF0b3Jfcm91dGVANzoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEwMQogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGdldF9jcmVhdG9yCiAgICBieXRlY18xIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2dldF9zdGF0dXNfcm91dGVANjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojg4CiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIG5vdCBjcmVhdGluZwogICAgY2FsbHN1YiBnZXRfc3RhdHVzCiAgICB1bmNvdmVyIDYKICAgIGl0b2IKICAgIHVuY292ZXIgNgogICAgaXRvYgogICAgdW5jb3ZlciA2CiAgICBpdG9iCiAgICB1bmNvdmVyIDYKICAgIGl0b2IKICAgIHVuY292ZXIgNgogICAgaXRvYgogICAgcHVzaGJ5dGVzIDB4MDAKICAgIGludGNfMCAvLyAwCiAgICB1bmNvdmVyIDgKICAgIHNldGJpdAogICAgcHVzaGJ5dGVzIDB4MDAKICAgIGludGNfMCAvLyAwCiAgICB1bmNvdmVyIDgKICAgIHNldGJpdAogICAgdW5jb3ZlciA2CiAgICB1bmNvdmVyIDYKICAgIGNvbmNhdAogICAgdW5jb3ZlciA1CiAgICBjb25jYXQKICAgIHVuY292ZXIgNAogICAgY29uY2F0CiAgICB1bmNvdmVyIDMKICAgIGNvbmNhdAogICAgdW5jb3ZlciAyCiAgICBjb25jYXQKICAgIHN3YXAKICAgIGludGNfMCAvLyAwCiAgICBnZXRiaXQKICAgIHB1c2hpbnQgMzIxIC8vIDMyMQogICAgc3dhcAogICAgc2V0Yml0CiAgICBieXRlY18xIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX3JlbGVhc2VfbWlsZXN0b25lX3JvdXRlQDU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1NQogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgcmVsZWFzZV9taWxlc3RvbmUKICAgIGl0b2IKICAgIGJ5dGVjXzEgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fZG9uYXRlX3JvdXRlQDQ6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTozNwogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIEZ1bmRyYWlzZXIoQVJDNENvbnRyYWN0KToKICAgIHR4biBHcm91cEluZGV4CiAgICBpbnRjXzEgLy8gMQogICAgLQogICAgZHVwCiAgICBndHhucyBUeXBlRW51bQogICAgaW50Y18xIC8vIHBheQogICAgPT0KICAgIGFzc2VydCAvLyB0cmFuc2FjdGlvbiB0eXBlIGlzIHBheQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MzcKICAgIC8vIEBhYmltZXRob2QoKQogICAgY2FsbHN1YiBkb25hdGUKICAgIGl0b2IKICAgIGJ5dGVjXzEgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fY3JlYXRlX2NhbXBhaWduX3JvdXRlQDM6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMwogICAgLy8gQGFiaW1ldGhvZChhbGxvd19hY3Rpb25zPVsnTm9PcCddLCBjcmVhdGU9J3JlcXVpcmUnKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgICEKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gY3JlYXRpbmcKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIEZ1bmRyYWlzZXIoQVJDNENvbnRyYWN0KToKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIGJ0b2kKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDIKICAgIGJ0b2kKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDMKICAgIGJ0b2kKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIzCiAgICAvLyBAYWJpbWV0aG9kKGFsbG93X2FjdGlvbnM9WydOb09wJ10sIGNyZWF0ZT0ncmVxdWlyZScpCiAgICBjYWxsc3ViIGNyZWF0ZV9jYW1wYWlnbgogICAgaXRvYgogICAgYnl0ZWNfMSAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5mdW5kcmFpc2VyLmNvbnRyYWN0LkZ1bmRyYWlzZXIuY3JlYXRlX2NhbXBhaWduKGdvYWw6IHVpbnQ2NCwgbWlsZXN0b25lczogdWludDY0LCBkZWFkbGluZTogdWludDY0KSAtPiB1aW50NjQ6CmNyZWF0ZV9jYW1wYWlnbjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIzLTI0CiAgICAvLyBAYWJpbWV0aG9kKGFsbG93X2FjdGlvbnM9WydOb09wJ10sIGNyZWF0ZT0ncmVxdWlyZScpCiAgICAvLyBkZWYgY3JlYXRlX2NhbXBhaWduKHNlbGYsIGdvYWw6IFVJbnQ2NCwgbWlsZXN0b25lczogVUludDY0LCBkZWFkbGluZTogVUludDY0KSAtPiBVSW50NjQ6CiAgICBwcm90byAzIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI2CiAgICAvLyBzZWxmLmdvYWxfYW1vdW50ID0gZ29hbAogICAgYnl0ZWNfMyAvLyAiZ29hbF9hbW91bnQiCiAgICBmcmFtZV9kaWcgLTMKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNwogICAgLy8gc2VsZi5yYWlzZWRfYW1vdW50ID0gVUludDY0KDApCiAgICBieXRlY18wIC8vICJyYWlzZWRfYW1vdW50IgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyOAogICAgLy8gc2VsZi5taWxlc3RvbmVfY291bnQgPSBtaWxlc3RvbmVzCiAgICBieXRlYyA0IC8vICJtaWxlc3RvbmVfY291bnQiCiAgICBmcmFtZV9kaWcgLTIKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyOQogICAgLy8gc2VsZi5jdXJyZW50X21pbGVzdG9uZSA9IFVJbnQ2NCgwKQogICAgYnl0ZWNfMiAvLyAiY3VycmVudF9taWxlc3RvbmUiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjMwCiAgICAvLyBzZWxmLmRlYWRsaW5lID0gZGVhZGxpbmUKICAgIGJ5dGVjIDggLy8gImRlYWRsaW5lIgogICAgZnJhbWVfZGlnIC0xCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MzEKICAgIC8vIHNlbGYuaXNfYWN0aXZlID0gVHJ1ZQogICAgYnl0ZWMgOSAvLyAiaXNfYWN0aXZlIgogICAgaW50Y18xIC8vIDEKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTozMgogICAgLy8gc2VsZi5jcmVhdG9yID0gVHhuLnNlbmRlcgogICAgYnl0ZWMgNSAvLyAiY3JlYXRvciIKICAgIHR4biBTZW5kZXIKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTozMwogICAgLy8gc2VsZi5jb250cmlidXRvcl9jb3VudCA9IFVJbnQ2NCgwKQogICAgYnl0ZWMgNiAvLyAiY29udHJpYnV0b3JfY291bnQiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjM0CiAgICAvLyBzZWxmLmdvYWxfcmVhY2hlZCA9IEZhbHNlICAjIEluaXRpYWxpemUgYXMgbm90IHJlYWNoZWQKICAgIGJ5dGVjIDcgLy8gImdvYWxfcmVhY2hlZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MzUKICAgIC8vIHJldHVybiBVSW50NjQoMSkKICAgIGludGNfMSAvLyAxCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLmRvbmF0ZShwYXltZW50OiB1aW50NjQpIC0+IHVpbnQ2NDoKZG9uYXRlOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MzctMzgKICAgIC8vIEBhYmltZXRob2QoKQogICAgLy8gZGVmIGRvbmF0ZShzZWxmLCBwYXltZW50OiBndHhuLlBheW1lbnRUcmFuc2FjdGlvbikgLT4gVUludDY0OgogICAgcHJvdG8gMSAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo0MAogICAgLy8gYXNzZXJ0IHNlbGYuaXNfYWN0aXZlLCAiQ2FtcGFpZ24gbm90IGFjdGl2ZSIKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA5IC8vICJpc19hY3RpdmUiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuaXNfYWN0aXZlIGV4aXN0cwogICAgYXNzZXJ0IC8vIENhbXBhaWduIG5vdCBhY3RpdmUKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjQxCiAgICAvLyBhc3NlcnQgR2xvYmFsLmxhdGVzdF90aW1lc3RhbXAgPD0gc2VsZi5kZWFkbGluZSwgIkNhbXBhaWduIGVuZGVkIgogICAgZ2xvYmFsIExhdGVzdFRpbWVzdGFtcAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDggLy8gImRlYWRsaW5lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmRlYWRsaW5lIGV4aXN0cwogICAgPD0KICAgIGFzc2VydCAvLyBDYW1wYWlnbiBlbmRlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NDIKICAgIC8vIGFzc2VydCBzZWxmLnJhaXNlZF9hbW91bnQgPCBzZWxmLmdvYWxfYW1vdW50LCAiR29hbCBhbHJlYWR5IHJlYWNoZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMCAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzMgLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgPAogICAgYXNzZXJ0IC8vIEdvYWwgYWxyZWFkeSByZWFjaGVkCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo0MwogICAgLy8gYXNzZXJ0IHBheW1lbnQucmVjZWl2ZXIgPT0gR2xvYmFsLmN1cnJlbnRfYXBwbGljYXRpb25fYWRkcmVzcwogICAgZnJhbWVfZGlnIC0xCiAgICBndHhucyBSZWNlaXZlcgogICAgZ2xvYmFsIEN1cnJlbnRBcHBsaWNhdGlvbkFkZHJlc3MKICAgID09CiAgICBhc3NlcnQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjQ0CiAgICAvLyBhc3NlcnQgcGF5bWVudC5hbW91bnQgPj0gVUludDY0KDEwMDAwMCksICJNaW5pbXVtIDAuMSBBTEdPIGRvbmF0aW9uIgogICAgZnJhbWVfZGlnIC0xCiAgICBndHhucyBBbW91bnQKICAgIGR1cAogICAgaW50Y18yIC8vIDEwMDAwMAogICAgPj0KICAgIGFzc2VydCAvLyBNaW5pbXVtIDAuMSBBTEdPIGRvbmF0aW9uCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo0NgogICAgLy8gc2VsZi5yYWlzZWRfYW1vdW50ICs9IHBheW1lbnQuYW1vdW50CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMCAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgKwogICAgYnl0ZWNfMCAvLyAicmFpc2VkX2Ftb3VudCIKICAgIHN3YXAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo0NwogICAgLy8gc2VsZi5jb250cmlidXRvcl9jb3VudCArPSBVSW50NjQoMSkKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA2IC8vICJjb250cmlidXRvcl9jb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jb250cmlidXRvcl9jb3VudCBleGlzdHMKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBieXRlYyA2IC8vICJjb250cmlidXRvcl9jb3VudCIKICAgIHN3YXAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo0OS01MAogICAgLy8gIyBORVc6IENoZWNrIGlmIGdvYWwgaXMgcmVhY2hlZAogICAgLy8gaWYgc2VsZi5yYWlzZWRfYW1vdW50ID49IHNlbGYuZ29hbF9hbW91bnQ6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMCAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzMgLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgPj0KICAgIGJ6IGRvbmF0ZV9hZnRlcl9pZl9lbHNlQDIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUxCiAgICAvLyBzZWxmLmdvYWxfcmVhY2hlZCA9IFRydWUKICAgIGJ5dGVjIDcgLy8gImdvYWxfcmVhY2hlZCIKICAgIGludGNfMSAvLyAxCiAgICBhcHBfZ2xvYmFsX3B1dAoKZG9uYXRlX2FmdGVyX2lmX2Vsc2VAMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUzCiAgICAvLyByZXR1cm4gc2VsZi5yYWlzZWRfYW1vdW50CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMCAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5yZWxlYXNlX21pbGVzdG9uZSgpIC0+IHVpbnQ2NDoKcmVsZWFzZV9taWxlc3RvbmU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo2MgogICAgLy8gYXNzZXJ0IFR4bi5zZW5kZXIgPT0gc2VsZi5jcmVhdG9yLCAiT25seSBjcmVhdG9yIGNhbiByZWxlYXNlIgogICAgdHhuIFNlbmRlcgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDUgLy8gImNyZWF0b3IiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3JlYXRvciBleGlzdHMKICAgID09CiAgICBhc3NlcnQgLy8gT25seSBjcmVhdG9yIGNhbiByZWxlYXNlCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo2MwogICAgLy8gYXNzZXJ0IHNlbGYuY3VycmVudF9taWxlc3RvbmUgPCBzZWxmLm1pbGVzdG9uZV9jb3VudCwgIkFsbCBtaWxlc3RvbmVzIGNvbXBsZXRlZCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJjdXJyZW50X21pbGVzdG9uZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jdXJyZW50X21pbGVzdG9uZSBleGlzdHMKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA0IC8vICJtaWxlc3RvbmVfY291bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYubWlsZXN0b25lX2NvdW50IGV4aXN0cwogICAgPAogICAgYXNzZXJ0IC8vIEFsbCBtaWxlc3RvbmVzIGNvbXBsZXRlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjUtNjYKICAgIC8vICMgTkVXOiBNdXN0IHJlYWNoIGdvYWwgYmVmb3JlIEFOWSBtaWxlc3RvbmUgY2FuIGJlIHJlbGVhc2VkCiAgICAvLyBhc3NlcnQgc2VsZi5nb2FsX3JlYWNoZWQsICJDYW5ub3QgcmVsZWFzZSBmdW5kcyAtIGdvYWwgbm90IHJlYWNoZWQgeWV0IgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDcgLy8gImdvYWxfcmVhY2hlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5nb2FsX3JlYWNoZWQgZXhpc3RzCiAgICBhc3NlcnQgLy8gQ2Fubm90IHJlbGVhc2UgZnVuZHMgLSBnb2FsIG5vdCByZWFjaGVkIHlldAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjgtNjkKICAgIC8vICMgQ2FsY3VsYXRlIGFtb3VudCBwZXIgbWlsZXN0b25lIChpbnRlZ2VyIGRpdmlzaW9uKQogICAgLy8gYW1vdW50X3Blcl9taWxlc3RvbmUgPSBzZWxmLmdvYWxfYW1vdW50IC8vIHNlbGYubWlsZXN0b25lX2NvdW50CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMyAvLyAiZ29hbF9hbW91bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuZ29hbF9hbW91bnQgZXhpc3RzCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNCAvLyAibWlsZXN0b25lX2NvdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLm1pbGVzdG9uZV9jb3VudCBleGlzdHMKICAgIC8KICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjczCiAgICAvLyBjb250cmFjdF9iYWxhbmNlID0gR2xvYmFsLmN1cnJlbnRfYXBwbGljYXRpb25fYWRkcmVzcy5iYWxhbmNlCiAgICBnbG9iYWwgQ3VycmVudEFwcGxpY2F0aW9uQWRkcmVzcwogICAgYWNjdF9wYXJhbXNfZ2V0IEFjY3RCYWxhbmNlCiAgICBhc3NlcnQgLy8gYWNjb3VudCBmdW5kZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc1LTc2CiAgICAvLyAjIEVuc3VyZSB3ZSBrZWVwIHRoZSBNQlIgaW4gdGhlIGNvbnRyYWN0CiAgICAvLyBhc3NlcnQgY29udHJhY3RfYmFsYW5jZSA+PSBhbW91bnRfcGVyX21pbGVzdG9uZSArIG1pbl9iYWxhbmNlLCAiSW5zdWZmaWNpZW50IGJhbGFuY2UgYWZ0ZXIgTUJSIgogICAgZGlnIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjcxLTcyCiAgICAvLyAjIFJlc2VydmUgbWluaW11bSBiYWxhbmNlIHJlcXVpcmVtZW50ICgwLjEgQUxHTyA9IDEwMCwwMDAgbWljcm9BbGdvcykKICAgIC8vIG1pbl9iYWxhbmNlID0gVUludDY0KDEwMDAwMCkKICAgIGludGNfMiAvLyAxMDAwMDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc1LTc2CiAgICAvLyAjIEVuc3VyZSB3ZSBrZWVwIHRoZSBNQlIgaW4gdGhlIGNvbnRyYWN0CiAgICAvLyBhc3NlcnQgY29udHJhY3RfYmFsYW5jZSA+PSBhbW91bnRfcGVyX21pbGVzdG9uZSArIG1pbl9iYWxhbmNlLCAiSW5zdWZmaWNpZW50IGJhbGFuY2UgYWZ0ZXIgTUJSIgogICAgKwogICAgPj0KICAgIGFzc2VydCAvLyBJbnN1ZmZpY2llbnQgYmFsYW5jZSBhZnRlciBNQlIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc4LTgzCiAgICAvLyAjIFNlbmQgZnVuZHMgdG8gY3JlYXRvciB1c2luZyBpbm5lciB0cmFuc2FjdGlvbgogICAgLy8gaXR4bi5QYXltZW50KAogICAgLy8gICAgIHJlY2VpdmVyPXNlbGYuY3JlYXRvciwKICAgIC8vICAgICBhbW91bnQ9YW1vdW50X3Blcl9taWxlc3RvbmUsCiAgICAvLyAgICAgZmVlPTAKICAgIC8vICkuc3VibWl0KCkKICAgIGl0eG5fYmVnaW4KICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjgwCiAgICAvLyByZWNlaXZlcj1zZWxmLmNyZWF0b3IsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNSAvLyAiY3JlYXRvciIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jcmVhdG9yIGV4aXN0cwogICAgaXR4bl9maWVsZCBSZWNlaXZlcgogICAgaXR4bl9maWVsZCBBbW91bnQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc4LTc5CiAgICAvLyAjIFNlbmQgZnVuZHMgdG8gY3JlYXRvciB1c2luZyBpbm5lciB0cmFuc2FjdGlvbgogICAgLy8gaXR4bi5QYXltZW50KAogICAgaW50Y18xIC8vIHBheQogICAgaXR4bl9maWVsZCBUeXBlRW51bQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6ODIKICAgIC8vIGZlZT0wCiAgICBpbnRjXzAgLy8gMAogICAgaXR4bl9maWVsZCBGZWUKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc4LTgzCiAgICAvLyAjIFNlbmQgZnVuZHMgdG8gY3JlYXRvciB1c2luZyBpbm5lciB0cmFuc2FjdGlvbgogICAgLy8gaXR4bi5QYXltZW50KAogICAgLy8gICAgIHJlY2VpdmVyPXNlbGYuY3JlYXRvciwKICAgIC8vICAgICBhbW91bnQ9YW1vdW50X3Blcl9taWxlc3RvbmUsCiAgICAvLyAgICAgZmVlPTAKICAgIC8vICkuc3VibWl0KCkKICAgIGl0eG5fc3VibWl0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo4NQogICAgLy8gc2VsZi5jdXJyZW50X21pbGVzdG9uZSArPSBVSW50NjQoMSkKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJjdXJyZW50X21pbGVzdG9uZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jdXJyZW50X21pbGVzdG9uZSBleGlzdHMKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBieXRlY18yIC8vICJjdXJyZW50X21pbGVzdG9uZSIKICAgIHN3YXAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo4NgogICAgLy8gcmV0dXJuIHNlbGYuY3VycmVudF9taWxlc3RvbmUKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJjdXJyZW50X21pbGVzdG9uZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jdXJyZW50X21pbGVzdG9uZSBleGlzdHMKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5mdW5kcmFpc2VyLmNvbnRyYWN0LkZ1bmRyYWlzZXIuZ2V0X3N0YXR1cygpIC0+IHVpbnQ2NCwgdWludDY0LCB1aW50NjQsIHVpbnQ2NCwgdWludDY0LCB1aW50NjQsIHVpbnQ2NDoKZ2V0X3N0YXR1czoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjkyCiAgICAvLyBzZWxmLmdvYWxfYW1vdW50LAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzMgLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6OTMKICAgIC8vIHNlbGYucmFpc2VkX2Ftb3VudCwKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18wIC8vICJyYWlzZWRfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLnJhaXNlZF9hbW91bnQgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo5NAogICAgLy8gc2VsZi5jdXJyZW50X21pbGVzdG9uZSwKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJjdXJyZW50X21pbGVzdG9uZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jdXJyZW50X21pbGVzdG9uZSBleGlzdHMKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojk1CiAgICAvLyBzZWxmLm1pbGVzdG9uZV9jb3VudCwKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA0IC8vICJtaWxlc3RvbmVfY291bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYubWlsZXN0b25lX2NvdW50IGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6OTYKICAgIC8vIHNlbGYuY29udHJpYnV0b3JfY291bnQsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNiAvLyAiY29udHJpYnV0b3JfY291bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY29udHJpYnV0b3JfY291bnQgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo5NwogICAgLy8gc2VsZi5pc19hY3RpdmUsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgOSAvLyAiaXNfYWN0aXZlIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmlzX2FjdGl2ZSBleGlzdHMKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojk4CiAgICAvLyBzZWxmLmdvYWxfcmVhY2hlZCAgIyBORVc6IEluY2x1ZGUgZ29hbCBzdGF0dXMKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA3IC8vICJnb2FsX3JlYWNoZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuZ29hbF9yZWFjaGVkIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6OTEtOTkKICAgIC8vIHJldHVybiAoCiAgICAvLyAgICAgc2VsZi5nb2FsX2Ftb3VudCwKICAgIC8vICAgICBzZWxmLnJhaXNlZF9hbW91bnQsCiAgICAvLyAgICAgc2VsZi5jdXJyZW50X21pbGVzdG9uZSwKICAgIC8vICAgICBzZWxmLm1pbGVzdG9uZV9jb3VudCwKICAgIC8vICAgICBzZWxmLmNvbnRyaWJ1dG9yX2NvdW50LAogICAgLy8gICAgIHNlbGYuaXNfYWN0aXZlLAogICAgLy8gICAgIHNlbGYuZ29hbF9yZWFjaGVkICAjIE5FVzogSW5jbHVkZSBnb2FsIHN0YXR1cwogICAgLy8gKQogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5nZXRfY3JlYXRvcigpIC0+IGJ5dGVzOgpnZXRfY3JlYXRvcjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEwNAogICAgLy8gcmV0dXJuIHNlbGYuY3JlYXRvcgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDUgLy8gImNyZWF0b3IiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3JlYXRvciBleGlzdHMKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5mdW5kcmFpc2VyLmNvbnRyYWN0LkZ1bmRyYWlzZXIuZ2V0X2RlYWRsaW5lKCkgLT4gdWludDY0OgpnZXRfZGVhZGxpbmU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMDkKICAgIC8vIHJldHVybiBzZWxmLmRlYWRsaW5lCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgOCAvLyAiZGVhZGxpbmUiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuZGVhZGxpbmUgZXhpc3RzCiAgICByZXRzdWIK","clear":"I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"},"byteCode":{"approval":"CiADAAGgjQYmCg1yYWlzZWRfYW1vdW50BBUffHURY3VycmVudF9taWxlc3RvbmULZ29hbF9hbW91bnQPbWlsZXN0b25lX2NvdW50B2NyZWF0b3IRY29udHJpYnV0b3JfY291bnQMZ29hbF9yZWFjaGVkCGRlYWRsaW5lCWlzX2FjdGl2ZTEbQQAxggYEETYtLQTkw+AQBMIhwFEEr0Vp3QQgKg4ZBGX3h1c2GgCOBgCVAHoAaQAjABMAAiJDMRkURDEYRIgBmhYpTFCwI0MxGRREMRhEiAGDKUxQsCNDMRkURDEYRIgBUk8GFk8GFk8GFk8GFk8GFoABACJPCFSAAQAiTwhUTwZPBlBPBVBPBFBPA1BPAlBMIlOBwQJMVClMULAjQzEZFEQxGESIAL4WKUxQsCNDMRkURDEYRDEWIwlJOBAjEkSIAE8WKUxQsCNDMRkURDEYFEQ2GgEXNhoCFzYaAxeIAAcWKUxQsCNDigMBK4v9ZygiZycEi/5nKiJnJwiL/2cnCSNnJwUxAGcnBiJnJwciZyOJigEBIicJZUREMgciJwhlRA5EIihlRCIrZUQMRIv/OAcyChJEi/84CEkkD0QiKGVECChMZyInBmVEIwgnBkxnIihlRCIrZUQPQQAEJwcjZyIoZUSJMQAiJwVlRBJEIiplRCInBGVEDEQiJwdlREQiK2VEIicEZUQKMgpzAERLASQID0SxIicFZUSyB7III7IQIrIBsyIqZUQjCCpMZyIqZUSJIitlRCIoZUQiKmVEIicEZUQiJwZlRCInCWVEIicHZUSJIicFZUSJIicIZUSJ","clear":"CoEBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
+export const APP_SPEC: Arc56Contract = {"name":"Fundraiser","structs":{},"methods":[{"name":"create_campaign","args":[{"type":"uint64","name":"goal"},{"type":"uint64","name":"milestones"},{"type":"uint64","name":"deadline"},{"type":"address","name":"approver1"},{"type":"address","name":"approver2"},{"type":"address","name":"approver3"}],"returns":{"type":"uint64"},"actions":{"create":["NoOp"],"call":[]},"readonly":false,"desc":"Create campaign with 3 mandatory approvers\nAll 3 must approve each milestone before funds can be released","events":[],"recommendations":{}},{"name":"donate","args":[{"type":"pay","name":"payment"}],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Donate to the campaign","events":[],"recommendations":{}},{"name":"set_media_cid","args":[{"type":"byte[]","name":"cid"}],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Store IPFS CID for campaign media (image/video)\nCreator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters","events":[],"recommendations":{}},{"name":"get_media_cid","args":[],"returns":{"type":"byte[]"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Retrieve IPFS CID for campaign media\nReturns empty bytes if no media set","events":[],"recommendations":{}},{"name":"approve_milestone","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"🔐 DECENTRALIZED ON-CHAIN APPROVAL\nApprovers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)","events":[],"recommendations":{}},{"name":"release_milestone","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Release funds for current milestone (creator only)\n🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!","events":[],"recommendations":{}},{"name":"get_status","args":[],"returns":{"type":"(uint64,uint64,uint64,uint64,uint64,bool,bool)"},"actions":{"create":[],"call":["NoOp"]},"readonly":false,"desc":"Get campaign status","events":[],"recommendations":{}},{"name":"get_creator","args":[],"returns":{"type":"address"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get campaign creator address","events":[],"recommendations":{}},{"name":"get_deadline","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get campaign deadline","events":[],"recommendations":{}},{"name":"get_approvers","args":[],"returns":{"type":"(address,address,address)"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get all approver addresses (on-chain query)","events":[],"recommendations":{}},{"name":"get_approval_status","args":[],"returns":{"type":"(bool,bool,bool)"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get current approval status for each approver\nReturns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!","events":[],"recommendations":{}},{"name":"has_approved","args":[{"type":"address","name":"approver_address"}],"returns":{"type":"bool"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Check if a specific address has approved the current milestone","events":[],"recommendations":{}},{"name":"get_approval_count","args":[],"returns":{"type":"uint64"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Get number of approvals for current milestone","events":[],"recommendations":{}},{"name":"is_approver","args":[{"type":"address","name":"address"}],"returns":{"type":"bool"},"actions":{"create":[],"call":["NoOp"]},"readonly":true,"desc":"Check if an address is one of the approvers","events":[],"recommendations":{}}],"arcs":[22,28],"desc":"\n    CampusChain Multi-Signature Fundraiser Contract\n    Milestone-based crowdfunding with ON-CHAIN decentralized approvals\n    Requires ALL 3 approvers to sign before milestone release\n    100% DECENTRALIZED - No Firebase or centralized database!\n    ","networks":{},"state":{"schema":{"global":{"ints":12,"bytes":4},"local":{"ints":0,"bytes":0}},"keys":{"global":{"goal_amount":{"keyType":"AVMString","valueType":"AVMUint64","key":"Z29hbF9hbW91bnQ="},"raised_amount":{"keyType":"AVMString","valueType":"AVMUint64","key":"cmFpc2VkX2Ftb3VudA=="},"milestone_count":{"keyType":"AVMString","valueType":"AVMUint64","key":"bWlsZXN0b25lX2NvdW50"},"current_milestone":{"keyType":"AVMString","valueType":"AVMUint64","key":"Y3VycmVudF9taWxlc3RvbmU="},"deadline":{"keyType":"AVMString","valueType":"AVMUint64","key":"ZGVhZGxpbmU="},"is_active":{"keyType":"AVMString","valueType":"AVMUint64","key":"aXNfYWN0aXZl"},"creator":{"keyType":"AVMString","valueType":"address","key":"Y3JlYXRvcg=="},"contributor_count":{"keyType":"AVMString","valueType":"AVMUint64","key":"Y29udHJpYnV0b3JfY291bnQ="},"goal_reached":{"keyType":"AVMString","valueType":"AVMUint64","key":"Z29hbF9yZWFjaGVk"},"media_cid_length":{"keyType":"AVMString","valueType":"AVMUint64","key":"bWVkaWFfY2lkX2xlbmd0aA=="},"approver1":{"keyType":"AVMString","valueType":"address","key":"YXBwcm92ZXIx"},"approver2":{"keyType":"AVMString","valueType":"address","key":"YXBwcm92ZXIy"},"approver3":{"keyType":"AVMString","valueType":"address","key":"YXBwcm92ZXIz"},"approver1_approved":{"keyType":"AVMString","valueType":"AVMUint64","key":"YXBwcm92ZXIxX2FwcHJvdmVk"},"approver2_approved":{"keyType":"AVMString","valueType":"AVMUint64","key":"YXBwcm92ZXIyX2FwcHJvdmVk"},"approver3_approved":{"keyType":"AVMString","valueType":"AVMUint64","key":"YXBwcm92ZXIzX2FwcHJvdmVk"}},"local":{},"box":{}},"maps":{"global":{},"local":{},"box":{}}},"bareActions":{"create":[],"call":[]},"sourceInfo":{"approval":{"sourceInfo":[{"pc":[990,1132],"errorMessage":"All milestones completed"},{"pc":[1008,1084,1105],"errorMessage":"Already approved"},{"pc":[1143],"errorMessage":"Approver 1 has not approved"},{"pc":[1148],"errorMessage":"Approver 2 has not approved"},{"pc":[1153],"errorMessage":"Approver 3 has not approved"},{"pc":[933],"errorMessage":"CID too long (max 64 chars)"},{"pc":[833],"errorMessage":"Campaign ended"},{"pc":[824],"errorMessage":"Campaign not active"},{"pc":[978],"errorMessage":"Cannot approve - goal not reached"},{"pc":[1138],"errorMessage":"Cannot release funds - goal not reached"},{"pc":[939],"errorMessage":"Failed to create media box"},{"pc":[845],"errorMessage":"Goal already reached"},{"pc":[1175],"errorMessage":"Insufficient balance after MBR"},{"pc":[925],"errorMessage":"Media already set"},{"pc":[965],"errorMessage":"Media box not found"},{"pc":[861],"errorMessage":"Minimum 0.1 ALGO donation"},{"pc":[360,385,402,427,477,498,515,531,599,616,633,657,680,707],"errorMessage":"OnCompletion is not NoOp"},{"pc":[1099],"errorMessage":"Only approvers can approve milestones"},{"pc":[1120],"errorMessage":"Only creator can release"},{"pc":[918],"errorMessage":"Only creator can set media"},{"pc":[1169],"errorMessage":"account funded"},{"pc":[711],"errorMessage":"can only call when creating"},{"pc":[363,388,405,430,480,501,518,534,602,619,636,660,683],"errorMessage":"can only call when not creating"},{"pc":[998,1271,1303,1424],"errorMessage":"check self.approver1 exists"},{"pc":[1006,1018,1142,1286,1313,1358],"errorMessage":"check self.approver1_approved exists"},{"pc":[1072,1276,1319,1437],"errorMessage":"check self.approver2 exists"},{"pc":[1028,1082,1147,1290,1329,1368],"errorMessage":"check self.approver2_approved exists"},{"pc":[1095,1281,1335,1450],"errorMessage":"check self.approver3 exists"},{"pc":[1050,1103,1152,1294,1345,1390],"errorMessage":"check self.approver3_approved exists"},{"pc":[876,1243],"errorMessage":"check self.contributor_count exists"},{"pc":[916,1118,1181,1259,1411],"errorMessage":"check self.creator exists"},{"pc":[983,1125,1197,1217,1233],"errorMessage":"check self.current_milestone exists"},{"pc":[831,1265],"errorMessage":"check self.deadline exists"},{"pc":[843,892,1158,1223],"errorMessage":"check self.goal_amount exists"},{"pc":[977,1137,1253],"errorMessage":"check self.goal_reached exists"},{"pc":[823,1248],"errorMessage":"check self.is_active exists"},{"pc":[923,955],"errorMessage":"check self.media_cid_length exists"},{"pc":[988,1130,1163,1238],"errorMessage":"check self.milestone_count exists"},{"pc":[838,866,887,905,1228],"errorMessage":"check self.raised_amount exists"},{"pc":[693],"errorMessage":"transaction type is pay"}],"pcOffsetMethod":"none"},"clear":{"sourceInfo":[],"pcOffsetMethod":"none"}},"source":{"approval":"I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuYXBwcm92YWxfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIGludGNibG9jayAwIDEgMTAwMDAwCiAgICBieXRlY2Jsb2NrIDB4MTUxZjdjNzUgImFwcHJvdmVyMV9hcHByb3ZlZCIgImFwcHJvdmVyMl9hcHByb3ZlZCIgImFwcHJvdmVyM19hcHByb3ZlZCIgMHgwMCAicmFpc2VkX2Ftb3VudCIgImN1cnJlbnRfbWlsZXN0b25lIiAiY3JlYXRvciIgImdvYWxfYW1vdW50IiAibWlsZXN0b25lX2NvdW50IiAiZ29hbF9yZWFjaGVkIiAiYXBwcm92ZXIxIiAiYXBwcm92ZXIyIiAiYXBwcm92ZXIzIiAiY29udHJpYnV0b3JfY291bnQiICJtZWRpYV9jaWRfbGVuZ3RoIiAiZGVhZGxpbmUiICJpc19hY3RpdmUiIDB4NmQ2NTY0Njk2MQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NQogICAgLy8gY2xhc3MgRnVuZHJhaXNlcihBUkM0Q29udHJhY3QpOgogICAgdHhuIE51bUFwcEFyZ3MKICAgIGJ6IG1haW5fYWZ0ZXJfaWZfZWxzZUAyMAogICAgcHVzaGJ5dGVzcyAweGVmYTVkNmFlIDB4ZTRjM2UwMTAgMHg2MGZmNDA3ZCAweDUxMTA4ZGY4IDB4MzUzZWVlMTIgMHhjMjIxYzA1MSAweGFmNDU2OWRkIDB4MjAyYTBlMTkgMHg2NWY3ODc1NyAweGM5N2Q4MTA1IDB4ZWJhNjEzMmEgMHgwZmJjNzRmYyAweDMyYTRiMDE4IDB4ODAyMWRmODggLy8gbWV0aG9kICJjcmVhdGVfY2FtcGFpZ24odWludDY0LHVpbnQ2NCx1aW50NjQsYWRkcmVzcyxhZGRyZXNzLGFkZHJlc3MpdWludDY0IiwgbWV0aG9kICJkb25hdGUocGF5KXVpbnQ2NCIsIG1ldGhvZCAic2V0X21lZGlhX2NpZChieXRlW10pdWludDY0IiwgbWV0aG9kICJnZXRfbWVkaWFfY2lkKClieXRlW10iLCBtZXRob2QgImFwcHJvdmVfbWlsZXN0b25lKCl1aW50NjQiLCBtZXRob2QgInJlbGVhc2VfbWlsZXN0b25lKCl1aW50NjQiLCBtZXRob2QgImdldF9zdGF0dXMoKSh1aW50NjQsdWludDY0LHVpbnQ2NCx1aW50NjQsdWludDY0LGJvb2wsYm9vbCkiLCBtZXRob2QgImdldF9jcmVhdG9yKClhZGRyZXNzIiwgbWV0aG9kICJnZXRfZGVhZGxpbmUoKXVpbnQ2NCIsIG1ldGhvZCAiZ2V0X2FwcHJvdmVycygpKGFkZHJlc3MsYWRkcmVzcyxhZGRyZXNzKSIsIG1ldGhvZCAiZ2V0X2FwcHJvdmFsX3N0YXR1cygpKGJvb2wsYm9vbCxib29sKSIsIG1ldGhvZCAiaGFzX2FwcHJvdmVkKGFkZHJlc3MpYm9vbCIsIG1ldGhvZCAiZ2V0X2FwcHJvdmFsX2NvdW50KCl1aW50NjQiLCBtZXRob2QgImlzX2FwcHJvdmVyKGFkZHJlc3MpYm9vbCIKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDAKICAgIG1hdGNoIG1haW5fY3JlYXRlX2NhbXBhaWduX3JvdXRlQDMgbWFpbl9kb25hdGVfcm91dGVANCBtYWluX3NldF9tZWRpYV9jaWRfcm91dGVANSBtYWluX2dldF9tZWRpYV9jaWRfcm91dGVANiBtYWluX2FwcHJvdmVfbWlsZXN0b25lX3JvdXRlQDcgbWFpbl9yZWxlYXNlX21pbGVzdG9uZV9yb3V0ZUA4IG1haW5fZ2V0X3N0YXR1c19yb3V0ZUA5IG1haW5fZ2V0X2NyZWF0b3Jfcm91dGVAMTAgbWFpbl9nZXRfZGVhZGxpbmVfcm91dGVAMTEgbWFpbl9nZXRfYXBwcm92ZXJzX3JvdXRlQDEyIG1haW5fZ2V0X2FwcHJvdmFsX3N0YXR1c19yb3V0ZUAxMyBtYWluX2hhc19hcHByb3ZlZF9yb3V0ZUAxNCBtYWluX2dldF9hcHByb3ZhbF9jb3VudF9yb3V0ZUAxNSBtYWluX2lzX2FwcHJvdmVyX3JvdXRlQDE2CgptYWluX2FmdGVyX2lmX2Vsc2VAMjA6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICBpbnRjXzAgLy8gMAogICAgcmV0dXJuCgptYWluX2lzX2FwcHJvdmVyX3JvdXRlQDE2OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6Mjc4CiAgICAvLyBAYWJpbWV0aG9kKHJlYWRvbmx5PVRydWUpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUKICAgIC8vIGNsYXNzIEZ1bmRyYWlzZXIoQVJDNENvbnRyYWN0KToKICAgIHR4bmEgQXBwbGljYXRpb25BcmdzIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI3OAogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgY2FsbHN1YiBpc19hcHByb3ZlcgogICAgYnl0ZWMgNCAvLyAweDAwCiAgICBpbnRjXzAgLy8gMAogICAgdW5jb3ZlciAyCiAgICBzZXRiaXQKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fZ2V0X2FwcHJvdmFsX2NvdW50X3JvdXRlQDE1OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjY2CiAgICAvLyBAYWJpbWV0aG9kKHJlYWRvbmx5PVRydWUpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X2FwcHJvdmFsX2NvdW50CiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2hhc19hcHByb3ZlZF9yb3V0ZUAxNDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI1MgogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNTIKICAgIC8vIEBhYmltZXRob2QocmVhZG9ubHk9VHJ1ZSkKICAgIGNhbGxzdWIgaGFzX2FwcHJvdmVkCiAgICBieXRlYyA0IC8vIDB4MDAKICAgIGludGNfMCAvLyAwCiAgICB1bmNvdmVyIDIKICAgIHNldGJpdAogICAgYnl0ZWNfMCAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9nZXRfYXBwcm92YWxfc3RhdHVzX3JvdXRlQDEzOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjM5CiAgICAvLyBAYWJpbWV0aG9kKHJlYWRvbmx5PVRydWUpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X2FwcHJvdmFsX3N0YXR1cwogICAgYnl0ZWMgNCAvLyAweDAwCiAgICBpbnRjXzAgLy8gMAogICAgdW5jb3ZlciA0CiAgICBzZXRiaXQKICAgIGJ5dGVjIDQgLy8gMHgwMAogICAgaW50Y18wIC8vIDAKICAgIHVuY292ZXIgNAogICAgc2V0Yml0CiAgICBieXRlYyA0IC8vIDB4MDAKICAgIGludGNfMCAvLyAwCiAgICB1bmNvdmVyIDQKICAgIHNldGJpdAogICAgc3dhcAogICAgaW50Y18wIC8vIDAKICAgIGdldGJpdAogICAgdW5jb3ZlciAyCiAgICBpbnRjXzEgLy8gMQogICAgdW5jb3ZlciAyCiAgICBzZXRiaXQKICAgIHN3YXAKICAgIGludGNfMCAvLyAwCiAgICBnZXRiaXQKICAgIHB1c2hpbnQgMiAvLyAyCiAgICBzd2FwCiAgICBzZXRiaXQKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fZ2V0X2FwcHJvdmVyc19yb3V0ZUAxMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIzMAogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGdldF9hcHByb3ZlcnMKICAgIGNvdmVyIDIKICAgIGNvbmNhdAogICAgc3dhcAogICAgY29uY2F0CiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2dldF9kZWFkbGluZV9yb3V0ZUAxMToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIyNQogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGdldF9kZWFkbGluZQogICAgaXRvYgogICAgYnl0ZWNfMCAvLyAweDE1MWY3Yzc1CiAgICBzd2FwCiAgICBjb25jYXQKICAgIGxvZwogICAgaW50Y18xIC8vIDEKICAgIHJldHVybgoKbWFpbl9nZXRfY3JlYXRvcl9yb3V0ZUAxMDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIyMAogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGdldF9jcmVhdG9yCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2dldF9zdGF0dXNfcm91dGVAOToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIwNwogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X3N0YXR1cwogICAgdW5jb3ZlciA2CiAgICBpdG9iCiAgICB1bmNvdmVyIDYKICAgIGl0b2IKICAgIHVuY292ZXIgNgogICAgaXRvYgogICAgdW5jb3ZlciA2CiAgICBpdG9iCiAgICB1bmNvdmVyIDYKICAgIGl0b2IKICAgIGJ5dGVjIDQgLy8gMHgwMAogICAgaW50Y18wIC8vIDAKICAgIHVuY292ZXIgOAogICAgc2V0Yml0CiAgICBieXRlYyA0IC8vIDB4MDAKICAgIGludGNfMCAvLyAwCiAgICB1bmNvdmVyIDgKICAgIHNldGJpdAogICAgdW5jb3ZlciA2CiAgICB1bmNvdmVyIDYKICAgIGNvbmNhdAogICAgdW5jb3ZlciA1CiAgICBjb25jYXQKICAgIHVuY292ZXIgNAogICAgY29uY2F0CiAgICB1bmNvdmVyIDMKICAgIGNvbmNhdAogICAgdW5jb3ZlciAyCiAgICBjb25jYXQKICAgIHN3YXAKICAgIGludGNfMCAvLyAwCiAgICBnZXRiaXQKICAgIHB1c2hpbnQgMzIxIC8vIDMyMQogICAgc3dhcAogICAgc2V0Yml0CiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX3JlbGVhc2VfbWlsZXN0b25lX3JvdXRlQDg6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNjYKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIHJlbGVhc2VfbWlsZXN0b25lCiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2FwcHJvdmVfbWlsZXN0b25lX3JvdXRlQDc6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMjUKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICBjYWxsc3ViIGFwcHJvdmVfbWlsZXN0b25lCiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2dldF9tZWRpYV9jaWRfcm91dGVANjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjExMgogICAgLy8gQGFiaW1ldGhvZCgpCiAgICB0eG4gT25Db21wbGV0aW9uCiAgICAhCiAgICBhc3NlcnQgLy8gT25Db21wbGV0aW9uIGlzIG5vdCBOb09wCiAgICB0eG4gQXBwbGljYXRpb25JRAogICAgYXNzZXJ0IC8vIGNhbiBvbmx5IGNhbGwgd2hlbiBub3QgY3JlYXRpbmcKICAgIGNhbGxzdWIgZ2V0X21lZGlhX2NpZAogICAgZHVwCiAgICBsZW4KICAgIGl0b2IKICAgIGV4dHJhY3QgNiAyCiAgICBzd2FwCiAgICBjb25jYXQKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCm1haW5fc2V0X21lZGlhX2NpZF9yb3V0ZUA1OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6OTAKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAxCiAgICBleHRyYWN0IDIgMAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6OTAKICAgIC8vIEBhYmltZXRob2QoKQogICAgY2FsbHN1YiBzZXRfbWVkaWFfY2lkCiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2RvbmF0ZV9yb3V0ZUA0OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NzIKICAgIC8vIEBhYmltZXRob2QoKQogICAgdHhuIE9uQ29tcGxldGlvbgogICAgIQogICAgYXNzZXJ0IC8vIE9uQ29tcGxldGlvbiBpcyBub3QgTm9PcAogICAgdHhuIEFwcGxpY2F0aW9uSUQKICAgIGFzc2VydCAvLyBjYW4gb25seSBjYWxsIHdoZW4gbm90IGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICB0eG4gR3JvdXBJbmRleAogICAgaW50Y18xIC8vIDEKICAgIC0KICAgIGR1cAogICAgZ3R4bnMgVHlwZUVudW0KICAgIGludGNfMSAvLyBwYXkKICAgID09CiAgICBhc3NlcnQgLy8gdHJhbnNhY3Rpb24gdHlwZSBpcyBwYXkKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjcyCiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIGNhbGxzdWIgZG9uYXRlCiAgICBpdG9iCiAgICBieXRlY18wIC8vIDB4MTUxZjdjNzUKICAgIHN3YXAKICAgIGNvbmNhdAogICAgbG9nCiAgICBpbnRjXzEgLy8gMQogICAgcmV0dXJuCgptYWluX2NyZWF0ZV9jYW1wYWlnbl9yb3V0ZUAzOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MzUKICAgIC8vIEBhYmltZXRob2QoYWxsb3dfYWN0aW9ucz1bJ05vT3AnXSwgY3JlYXRlPSdyZXF1aXJlJykKICAgIHR4biBPbkNvbXBsZXRpb24KICAgICEKICAgIGFzc2VydCAvLyBPbkNvbXBsZXRpb24gaXMgbm90IE5vT3AKICAgIHR4biBBcHBsaWNhdGlvbklECiAgICAhCiAgICBhc3NlcnQgLy8gY2FuIG9ubHkgY2FsbCB3aGVuIGNyZWF0aW5nCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1CiAgICAvLyBjbGFzcyBGdW5kcmFpc2VyKEFSQzRDb250cmFjdCk6CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAxCiAgICBidG9pCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAyCiAgICBidG9pCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyAzCiAgICBidG9pCiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyA0CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyA1CiAgICB0eG5hIEFwcGxpY2F0aW9uQXJncyA2CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTozNQogICAgLy8gQGFiaW1ldGhvZChhbGxvd19hY3Rpb25zPVsnTm9PcCddLCBjcmVhdGU9J3JlcXVpcmUnKQogICAgY2FsbHN1YiBjcmVhdGVfY2FtcGFpZ24KICAgIGl0b2IKICAgIGJ5dGVjXzAgLy8gMHgxNTFmN2M3NQogICAgc3dhcAogICAgY29uY2F0CiAgICBsb2cKICAgIGludGNfMSAvLyAxCiAgICByZXR1cm4KCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLmNyZWF0ZV9jYW1wYWlnbihnb2FsOiB1aW50NjQsIG1pbGVzdG9uZXM6IHVpbnQ2NCwgZGVhZGxpbmU6IHVpbnQ2NCwgYXBwcm92ZXIxOiBieXRlcywgYXBwcm92ZXIyOiBieXRlcywgYXBwcm92ZXIzOiBieXRlcykgLT4gdWludDY0OgpjcmVhdGVfY2FtcGFpZ246CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTozNS00NAogICAgLy8gQGFiaW1ldGhvZChhbGxvd19hY3Rpb25zPVsnTm9PcCddLCBjcmVhdGU9J3JlcXVpcmUnKQogICAgLy8gZGVmIGNyZWF0ZV9jYW1wYWlnbigKICAgIC8vICAgICBzZWxmLAogICAgLy8gICAgIGdvYWw6IFVJbnQ2NCwKICAgIC8vICAgICBtaWxlc3RvbmVzOiBVSW50NjQsCiAgICAvLyAgICAgZGVhZGxpbmU6IFVJbnQ2NCwKICAgIC8vICAgICBhcHByb3ZlcjE6IEFkZHJlc3MsCiAgICAvLyAgICAgYXBwcm92ZXIyOiBBZGRyZXNzLAogICAgLy8gICAgIGFwcHJvdmVyMzogQWRkcmVzcwogICAgLy8gKSAtPiBVSW50NjQ6CiAgICBwcm90byA2IDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjQ5CiAgICAvLyBzZWxmLmdvYWxfYW1vdW50ID0gZ29hbAogICAgYnl0ZWMgOCAvLyAiZ29hbF9hbW91bnQiCiAgICBmcmFtZV9kaWcgLTYKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1MAogICAgLy8gc2VsZi5yYWlzZWRfYW1vdW50ID0gVUludDY0KDApCiAgICBieXRlYyA1IC8vICJyYWlzZWRfYW1vdW50IgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1MQogICAgLy8gc2VsZi5taWxlc3RvbmVfY291bnQgPSBtaWxlc3RvbmVzCiAgICBieXRlYyA5IC8vICJtaWxlc3RvbmVfY291bnQiCiAgICBmcmFtZV9kaWcgLTUKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1MgogICAgLy8gc2VsZi5jdXJyZW50X21pbGVzdG9uZSA9IFVJbnQ2NCgwKQogICAgYnl0ZWMgNiAvLyAiY3VycmVudF9taWxlc3RvbmUiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjUzCiAgICAvLyBzZWxmLmRlYWRsaW5lID0gZGVhZGxpbmUKICAgIGJ5dGVjIDE2IC8vICJkZWFkbGluZSIKICAgIGZyYW1lX2RpZyAtNAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjU0CiAgICAvLyBzZWxmLmlzX2FjdGl2ZSA9IFRydWUKICAgIGJ5dGVjIDE3IC8vICJpc19hY3RpdmUiCiAgICBpbnRjXzEgLy8gMQogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjU1CiAgICAvLyBzZWxmLmNyZWF0b3IgPSBUeG4uc2VuZGVyCiAgICBieXRlYyA3IC8vICJjcmVhdG9yIgogICAgdHhuIFNlbmRlcgogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjU2CiAgICAvLyBzZWxmLmNvbnRyaWJ1dG9yX2NvdW50ID0gVUludDY0KDApCiAgICBieXRlYyAxNCAvLyAiY29udHJpYnV0b3JfY291bnQiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjU3CiAgICAvLyBzZWxmLmdvYWxfcmVhY2hlZCA9IEZhbHNlCiAgICBieXRlYyAxMCAvLyAiZ29hbF9yZWFjaGVkIgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo1OS02MAogICAgLy8gIyBTdG9yZSBhcHByb3ZlciBhZGRyZXNzZXMgKGNvbnZlcnQgQVJDNCBBZGRyZXNzIHRvIG5hdGl2ZSBBY2NvdW50KQogICAgLy8gc2VsZi5hcHByb3ZlcjEgPSBhcHByb3ZlcjEubmF0aXZlCiAgICBieXRlYyAxMSAvLyAiYXBwcm92ZXIxIgogICAgZnJhbWVfZGlnIC0zCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjEKICAgIC8vIHNlbGYuYXBwcm92ZXIyID0gYXBwcm92ZXIyLm5hdGl2ZQogICAgYnl0ZWMgMTIgLy8gImFwcHJvdmVyMiIKICAgIGZyYW1lX2RpZyAtMgogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjYyCiAgICAvLyBzZWxmLmFwcHJvdmVyMyA9IGFwcHJvdmVyMy5uYXRpdmUKICAgIGJ5dGVjIDEzIC8vICJhcHByb3ZlcjMiCiAgICBmcmFtZV9kaWcgLTEKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo2NC02NQogICAgLy8gIyBJbml0aWFsaXplIGFsbCBhcHByb3ZhbHMgdG8gZmFsc2UKICAgIC8vIHNlbGYuYXBwcm92ZXIxX2FwcHJvdmVkID0gRmFsc2UKICAgIGJ5dGVjXzEgLy8gImFwcHJvdmVyMV9hcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjYKICAgIC8vIHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkID0gRmFsc2UKICAgIGJ5dGVjXzIgLy8gImFwcHJvdmVyMl9hcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjcKICAgIC8vIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkID0gRmFsc2UKICAgIGJ5dGVjXzMgLy8gImFwcHJvdmVyM19hcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NjgKICAgIC8vIHNlbGYubWVkaWFfY2lkX2xlbmd0aCA9IFVJbnQ2NCgwKQogICAgYnl0ZWMgMTUgLy8gIm1lZGlhX2NpZF9sZW5ndGgiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjcwCiAgICAvLyByZXR1cm4gVUludDY0KDEpCiAgICBpbnRjXzEgLy8gMQogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5kb25hdGUocGF5bWVudDogdWludDY0KSAtPiB1aW50NjQ6CmRvbmF0ZToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjcyLTczCiAgICAvLyBAYWJpbWV0aG9kKCkKICAgIC8vIGRlZiBkb25hdGUoc2VsZiwgcGF5bWVudDogZ3R4bi5QYXltZW50VHJhbnNhY3Rpb24pIC0+IFVJbnQ2NDoKICAgIHByb3RvIDEgMQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NzUKICAgIC8vIGFzc2VydCBzZWxmLmlzX2FjdGl2ZSwgIkNhbXBhaWduIG5vdCBhY3RpdmUiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTcgLy8gImlzX2FjdGl2ZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5pc19hY3RpdmUgZXhpc3RzCiAgICBhc3NlcnQgLy8gQ2FtcGFpZ24gbm90IGFjdGl2ZQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NzYKICAgIC8vIGFzc2VydCBHbG9iYWwubGF0ZXN0X3RpbWVzdGFtcCA8PSBzZWxmLmRlYWRsaW5lLCAiQ2FtcGFpZ24gZW5kZWQiCiAgICBnbG9iYWwgTGF0ZXN0VGltZXN0YW1wCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTYgLy8gImRlYWRsaW5lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmRlYWRsaW5lIGV4aXN0cwogICAgPD0KICAgIGFzc2VydCAvLyBDYW1wYWlnbiBlbmRlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6NzcKICAgIC8vIGFzc2VydCBzZWxmLnJhaXNlZF9hbW91bnQgPCBzZWxmLmdvYWxfYW1vdW50LCAiR29hbCBhbHJlYWR5IHJlYWNoZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNSAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDggLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgPAogICAgYXNzZXJ0IC8vIEdvYWwgYWxyZWFkeSByZWFjaGVkCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo3OAogICAgLy8gYXNzZXJ0IHBheW1lbnQucmVjZWl2ZXIgPT0gR2xvYmFsLmN1cnJlbnRfYXBwbGljYXRpb25fYWRkcmVzcwogICAgZnJhbWVfZGlnIC0xCiAgICBndHhucyBSZWNlaXZlcgogICAgZ2xvYmFsIEN1cnJlbnRBcHBsaWNhdGlvbkFkZHJlc3MKICAgID09CiAgICBhc3NlcnQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojc5CiAgICAvLyBhc3NlcnQgcGF5bWVudC5hbW91bnQgPj0gVUludDY0KDEwMDAwMCksICJNaW5pbXVtIDAuMSBBTEdPIGRvbmF0aW9uIgogICAgZnJhbWVfZGlnIC0xCiAgICBndHhucyBBbW91bnQKICAgIGR1cAogICAgaW50Y18yIC8vIDEwMDAwMAogICAgPj0KICAgIGFzc2VydCAvLyBNaW5pbXVtIDAuMSBBTEdPIGRvbmF0aW9uCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo4MQogICAgLy8gc2VsZi5yYWlzZWRfYW1vdW50ICs9IHBheW1lbnQuYW1vdW50CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNSAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgKwogICAgYnl0ZWMgNSAvLyAicmFpc2VkX2Ftb3VudCIKICAgIHN3YXAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo4MgogICAgLy8gc2VsZi5jb250cmlidXRvcl9jb3VudCArPSBVSW50NjQoMSkKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxNCAvLyAiY29udHJpYnV0b3JfY291bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY29udHJpYnV0b3JfY291bnQgZXhpc3RzCiAgICBpbnRjXzEgLy8gMQogICAgKwogICAgYnl0ZWMgMTQgLy8gImNvbnRyaWJ1dG9yX2NvdW50IgogICAgc3dhcAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojg0LTg1CiAgICAvLyAjIENoZWNrIGlmIGdvYWwgaXMgcmVhY2hlZAogICAgLy8gaWYgc2VsZi5yYWlzZWRfYW1vdW50ID49IHNlbGYuZ29hbF9hbW91bnQ6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNSAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDggLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgPj0KICAgIGJ6IGRvbmF0ZV9hZnRlcl9pZl9lbHNlQDIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojg2CiAgICAvLyBzZWxmLmdvYWxfcmVhY2hlZCA9IFRydWUKICAgIGJ5dGVjIDEwIC8vICJnb2FsX3JlYWNoZWQiCiAgICBpbnRjXzEgLy8gMQogICAgYXBwX2dsb2JhbF9wdXQKCmRvbmF0ZV9hZnRlcl9pZl9lbHNlQDI6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo4OAogICAgLy8gcmV0dXJuIHNlbGYucmFpc2VkX2Ftb3VudAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDUgLy8gInJhaXNlZF9hbW91bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYucmFpc2VkX2Ftb3VudCBleGlzdHMKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5mdW5kcmFpc2VyLmNvbnRyYWN0LkZ1bmRyYWlzZXIuc2V0X21lZGlhX2NpZChjaWQ6IGJ5dGVzKSAtPiB1aW50NjQ6CnNldF9tZWRpYV9jaWQ6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo5MC05MQogICAgLy8gQGFiaW1ldGhvZCgpCiAgICAvLyBkZWYgc2V0X21lZGlhX2NpZChzZWxmLCBjaWQ6IEJ5dGVzKSAtPiBVSW50NjQ6CiAgICBwcm90byAxIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5Ojk4CiAgICAvLyBhc3NlcnQgVHhuLnNlbmRlciA9PSBzZWxmLmNyZWF0b3IsICJPbmx5IGNyZWF0b3IgY2FuIHNldCBtZWRpYSIKICAgIHR4biBTZW5kZXIKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA3IC8vICJjcmVhdG9yIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmNyZWF0b3IgZXhpc3RzCiAgICA9PQogICAgYXNzZXJ0IC8vIE9ubHkgY3JlYXRvciBjYW4gc2V0IG1lZGlhCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weTo5OQogICAgLy8gYXNzZXJ0IHNlbGYubWVkaWFfY2lkX2xlbmd0aCA9PSBVSW50NjQoMCksICJNZWRpYSBhbHJlYWR5IHNldCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxNSAvLyAibWVkaWFfY2lkX2xlbmd0aCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5tZWRpYV9jaWRfbGVuZ3RoIGV4aXN0cwogICAgIQogICAgYXNzZXJ0IC8vIE1lZGlhIGFscmVhZHkgc2V0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMDEKICAgIC8vIGNpZF9sZW4gPSBjaWQubGVuZ3RoCiAgICBmcmFtZV9kaWcgLTEKICAgIGxlbgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTAyCiAgICAvLyBhc3NlcnQgY2lkX2xlbiA8PSBVSW50NjQoNjQpLCAiQ0lEIHRvbyBsb25nIChtYXggNjQgY2hhcnMpIgogICAgZHVwCiAgICBwdXNoaW50IDY0IC8vIDY0CiAgICA8PQogICAgYXNzZXJ0IC8vIENJRCB0b28gbG9uZyAobWF4IDY0IGNoYXJzKQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTA0LTEwNgogICAgLy8gIyBDcmVhdGUgYm94IHRvIHN0b3JlIHRoZSBDSUQKICAgIC8vICMgQm94IE1CUjogMjUwMCArIDQwMCAqICg1ICsgbGVuKGNpZCkpCiAgICAvLyBhc3NlcnQgb3AuQm94LmNyZWF0ZShCeXRlcyhiIm1lZGlhIiksIGNpZF9sZW4pLCAiRmFpbGVkIHRvIGNyZWF0ZSBtZWRpYSBib3giCiAgICBieXRlYyAxOCAvLyAweDZkNjU2NDY5NjEKICAgIGRpZyAxCiAgICBib3hfY3JlYXRlCiAgICBhc3NlcnQgLy8gRmFpbGVkIHRvIGNyZWF0ZSBtZWRpYSBib3gKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEwNwogICAgLy8gb3AuQm94LnB1dChCeXRlcyhiIm1lZGlhIiksIGNpZCkKICAgIGJ5dGVjIDE4IC8vIDB4NmQ2NTY0Njk2MQogICAgZnJhbWVfZGlnIC0xCiAgICBib3hfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMDkKICAgIC8vIHNlbGYubWVkaWFfY2lkX2xlbmd0aCA9IGNpZF9sZW4KICAgIGJ5dGVjIDE1IC8vICJtZWRpYV9jaWRfbGVuZ3RoIgogICAgZGlnIDEKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMTAKICAgIC8vIHJldHVybiBjaWRfbGVuCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLmdldF9tZWRpYV9jaWQoKSAtPiBieXRlczoKZ2V0X21lZGlhX2NpZDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjExOAogICAgLy8gaWYgc2VsZi5tZWRpYV9jaWRfbGVuZ3RoID09IFVJbnQ2NCgwKToKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxNSAvLyAibWVkaWFfY2lkX2xlbmd0aCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5tZWRpYV9jaWRfbGVuZ3RoIGV4aXN0cwogICAgYm56IGdldF9tZWRpYV9jaWRfYWZ0ZXJfaWZfZWxzZUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMTkKICAgIC8vIHJldHVybiBCeXRlcyhiIiIpCiAgICBwdXNoYnl0ZXMgMHgKICAgIHJldHN1YgoKZ2V0X21lZGlhX2NpZF9hZnRlcl9pZl9lbHNlQDI6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMjEKICAgIC8vIGNpZF9ieXRlcywgZXhpc3RzID0gb3AuQm94LmdldChCeXRlcyhiIm1lZGlhIikpCiAgICBieXRlYyAxOCAvLyAweDZkNjU2NDY5NjEKICAgIGJveF9nZXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEyMgogICAgLy8gYXNzZXJ0IGV4aXN0cywgIk1lZGlhIGJveCBub3QgZm91bmQiCiAgICBhc3NlcnQgLy8gTWVkaWEgYm94IG5vdCBmb3VuZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTIzCiAgICAvLyByZXR1cm4gY2lkX2J5dGVzCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLmFwcHJvdmVfbWlsZXN0b25lKCkgLT4gdWludDY0OgphcHByb3ZlX21pbGVzdG9uZToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEyNS0xMjYKICAgIC8vIEBhYmltZXRob2QoKQogICAgLy8gZGVmIGFwcHJvdmVfbWlsZXN0b25lKHNlbGYpIC0+IFVJbnQ2NDoKICAgIHByb3RvIDAgMQogICAgcHVzaGJ5dGVzICIiCiAgICBkdXAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjEzMwogICAgLy8gYXNzZXJ0IHNlbGYuZ29hbF9yZWFjaGVkLCAiQ2Fubm90IGFwcHJvdmUgLSBnb2FsIG5vdCByZWFjaGVkIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDEwIC8vICJnb2FsX3JlYWNoZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuZ29hbF9yZWFjaGVkIGV4aXN0cwogICAgYXNzZXJ0IC8vIENhbm5vdCBhcHByb3ZlIC0gZ29hbCBub3QgcmVhY2hlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTM0CiAgICAvLyBhc3NlcnQgc2VsZi5jdXJyZW50X21pbGVzdG9uZSA8IHNlbGYubWlsZXN0b25lX2NvdW50LCAiQWxsIG1pbGVzdG9uZXMgY29tcGxldGVkIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDYgLy8gImN1cnJlbnRfbWlsZXN0b25lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmN1cnJlbnRfbWlsZXN0b25lIGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDkgLy8gIm1pbGVzdG9uZV9jb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5taWxlc3RvbmVfY291bnQgZXhpc3RzCiAgICA8CiAgICBhc3NlcnQgLy8gQWxsIG1pbGVzdG9uZXMgY29tcGxldGVkCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxMzYtMTM3CiAgICAvLyAjIENoZWNrIGlmIHNlbmRlciBpcyBvbmUgb2YgdGhlIGFwcHJvdmVycyBhbmQgbWFyayB0aGVpciBhcHByb3ZhbAogICAgLy8gc2VuZGVyID0gVHhuLnNlbmRlcgogICAgdHhuIFNlbmRlcgogICAgZHVwCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNDAKICAgIC8vIGlmIHNlbmRlciA9PSBzZWxmLmFwcHJvdmVyMToKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxMSAvLyAiYXBwcm92ZXIxIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMSBleGlzdHMKICAgID09CiAgICBieiBhcHByb3ZlX21pbGVzdG9uZV9lbHNlX2JvZHlAMgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTQxCiAgICAvLyBhc3NlcnQgbm90IHNlbGYuYXBwcm92ZXIxX2FwcHJvdmVkLCAiQWxyZWFkeSBhcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18xIC8vICJhcHByb3ZlcjFfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIxX2FwcHJvdmVkIGV4aXN0cwogICAgIQogICAgYXNzZXJ0IC8vIEFscmVhZHkgYXBwcm92ZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE0MgogICAgLy8gc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQgPSBUcnVlCiAgICBieXRlY18xIC8vICJhcHByb3ZlcjFfYXBwcm92ZWQiCiAgICBpbnRjXzEgLy8gMQogICAgYXBwX2dsb2JhbF9wdXQKCmFwcHJvdmVfbWlsZXN0b25lX2FmdGVyX2lmX2Vsc2VAOToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE1NS0xNTYKICAgIC8vICMgQ291bnQgdG90YWwgYXBwcm92YWxzCiAgICAvLyBhcHByb3ZhbF9jb3VudCA9IFVJbnQ2NCgwKQogICAgaW50Y18wIC8vIDAKICAgIGZyYW1lX2J1cnkgMAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTU3CiAgICAvLyBpZiBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZDoKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18xIC8vICJhcHByb3ZlcjFfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIxX2FwcHJvdmVkIGV4aXN0cwogICAgYnogYXBwcm92ZV9taWxlc3RvbmVfYWZ0ZXJfaWZfZWxzZUAxMQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTU4CiAgICAvLyBhcHByb3ZhbF9jb3VudCArPSBVSW50NjQoMSkKICAgIGludGNfMSAvLyAxCiAgICBmcmFtZV9idXJ5IDAKCmFwcHJvdmVfbWlsZXN0b25lX2FmdGVyX2lmX2Vsc2VAMTE6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNTkKICAgIC8vIGlmIHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkOgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzIgLy8gImFwcHJvdmVyMl9hcHByb3ZlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQgZXhpc3RzCiAgICBmcmFtZV9kaWcgMAogICAgZnJhbWVfYnVyeSAxCiAgICBieiBhcHByb3ZlX21pbGVzdG9uZV9hZnRlcl9pZl9lbHNlQDEzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNjAKICAgIC8vIGFwcHJvdmFsX2NvdW50ICs9IFVJbnQ2NCgxKQogICAgZnJhbWVfZGlnIDAKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBmcmFtZV9idXJ5IDEKCmFwcHJvdmVfbWlsZXN0b25lX2FmdGVyX2lmX2Vsc2VAMTM6CiAgICBmcmFtZV9kaWcgMQogICAgZHVwCiAgICBmcmFtZV9idXJ5IDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE2MQogICAgLy8gaWYgc2VsZi5hcHByb3ZlcjNfYXBwcm92ZWQ6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMyAvLyAiYXBwcm92ZXIzX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZCBleGlzdHMKICAgIHN3YXAKICAgIGZyYW1lX2J1cnkgMQogICAgYnogYXBwcm92ZV9taWxlc3RvbmVfYWZ0ZXJfaWZfZWxzZUAxNQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTYyCiAgICAvLyBhcHByb3ZhbF9jb3VudCArPSBVSW50NjQoMSkKICAgIGZyYW1lX2RpZyAwCiAgICBpbnRjXzEgLy8gMQogICAgKwogICAgZnJhbWVfYnVyeSAxCgphcHByb3ZlX21pbGVzdG9uZV9hZnRlcl9pZl9lbHNlQDE1OgogICAgZnJhbWVfZGlnIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE2NAogICAgLy8gcmV0dXJuIGFwcHJvdmFsX2NvdW50CiAgICBmcmFtZV9idXJ5IDAKICAgIHJldHN1YgoKYXBwcm92ZV9taWxlc3RvbmVfZWxzZV9ib2R5QDI6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNDQKICAgIC8vIGVsaWYgc2VuZGVyID09IHNlbGYuYXBwcm92ZXIyOgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDEyIC8vICJhcHByb3ZlcjIiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIyIGV4aXN0cwogICAgZnJhbWVfZGlnIDIKICAgID09CiAgICBieiBhcHByb3ZlX21pbGVzdG9uZV9lbHNlX2JvZHlANAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTQ1CiAgICAvLyBhc3NlcnQgbm90IHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkLCAiQWxyZWFkeSBhcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJhcHByb3ZlcjJfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkIGV4aXN0cwogICAgIQogICAgYXNzZXJ0IC8vIEFscmVhZHkgYXBwcm92ZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE0NgogICAgLy8gc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQgPSBUcnVlCiAgICBieXRlY18yIC8vICJhcHByb3ZlcjJfYXBwcm92ZWQiCiAgICBpbnRjXzEgLy8gMQogICAgYXBwX2dsb2JhbF9wdXQKICAgIGIgYXBwcm92ZV9taWxlc3RvbmVfYWZ0ZXJfaWZfZWxzZUA5CgphcHByb3ZlX21pbGVzdG9uZV9lbHNlX2JvZHlANDoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE0OAogICAgLy8gZWxpZiBzZW5kZXIgPT0gc2VsZi5hcHByb3ZlcjM6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTMgLy8gImFwcHJvdmVyMyIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjMgZXhpc3RzCiAgICBmcmFtZV9kaWcgMgogICAgPT0KICAgIGFzc2VydCAvLyBPbmx5IGFwcHJvdmVycyBjYW4gYXBwcm92ZSBtaWxlc3RvbmVzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNDkKICAgIC8vIGFzc2VydCBub3Qgc2VsZi5hcHByb3ZlcjNfYXBwcm92ZWQsICJBbHJlYWR5IGFwcHJvdmVkIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzMgLy8gImFwcHJvdmVyM19hcHByb3ZlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjNfYXBwcm92ZWQgZXhpc3RzCiAgICAhCiAgICBhc3NlcnQgLy8gQWxyZWFkeSBhcHByb3ZlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTUwCiAgICAvLyBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZCA9IFRydWUKICAgIGJ5dGVjXzMgLy8gImFwcHJvdmVyM19hcHByb3ZlZCIKICAgIGludGNfMSAvLyAxCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgYiBhcHByb3ZlX21pbGVzdG9uZV9hZnRlcl9pZl9lbHNlQDkKCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLnJlbGVhc2VfbWlsZXN0b25lKCkgLT4gdWludDY0OgpyZWxlYXNlX21pbGVzdG9uZToKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE3MwogICAgLy8gYXNzZXJ0IFR4bi5zZW5kZXIgPT0gc2VsZi5jcmVhdG9yLCAiT25seSBjcmVhdG9yIGNhbiByZWxlYXNlIgogICAgdHhuIFNlbmRlcgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDcgLy8gImNyZWF0b3IiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3JlYXRvciBleGlzdHMKICAgID09CiAgICBhc3NlcnQgLy8gT25seSBjcmVhdG9yIGNhbiByZWxlYXNlCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxNzQKICAgIC8vIGFzc2VydCBzZWxmLmN1cnJlbnRfbWlsZXN0b25lIDwgc2VsZi5taWxlc3RvbmVfY291bnQsICJBbGwgbWlsZXN0b25lcyBjb21wbGV0ZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNiAvLyAiY3VycmVudF9taWxlc3RvbmUiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3VycmVudF9taWxlc3RvbmUgZXhpc3RzCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgOSAvLyAibWlsZXN0b25lX2NvdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLm1pbGVzdG9uZV9jb3VudCBleGlzdHMKICAgIDwKICAgIGFzc2VydCAvLyBBbGwgbWlsZXN0b25lcyBjb21wbGV0ZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE3NQogICAgLy8gYXNzZXJ0IHNlbGYuZ29hbF9yZWFjaGVkLCAiQ2Fubm90IHJlbGVhc2UgZnVuZHMgLSBnb2FsIG5vdCByZWFjaGVkIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDEwIC8vICJnb2FsX3JlYWNoZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuZ29hbF9yZWFjaGVkIGV4aXN0cwogICAgYXNzZXJ0IC8vIENhbm5vdCByZWxlYXNlIGZ1bmRzIC0gZ29hbCBub3QgcmVhY2hlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTc3LTE3OAogICAgLy8gIyDwn5SQIENSSVRJQ0FMOiBWZXJpZnkgQUxMIGFwcHJvdmVycyBoYXZlIGFwcHJvdmVkCiAgICAvLyBhc3NlcnQgc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQsICJBcHByb3ZlciAxIGhhcyBub3QgYXBwcm92ZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMSAvLyAiYXBwcm92ZXIxX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZCBleGlzdHMKICAgIGFzc2VydCAvLyBBcHByb3ZlciAxIGhhcyBub3QgYXBwcm92ZWQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE3OQogICAgLy8gYXNzZXJ0IHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkLCAiQXBwcm92ZXIgMiBoYXMgbm90IGFwcHJvdmVkIgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzIgLy8gImFwcHJvdmVyMl9hcHByb3ZlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQgZXhpc3RzCiAgICBhc3NlcnQgLy8gQXBwcm92ZXIgMiBoYXMgbm90IGFwcHJvdmVkCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxODAKICAgIC8vIGFzc2VydCBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZCwgIkFwcHJvdmVyIDMgaGFzIG5vdCBhcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJhcHByb3ZlcjNfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkIGV4aXN0cwogICAgYXNzZXJ0IC8vIEFwcHJvdmVyIDMgaGFzIG5vdCBhcHByb3ZlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTgyLTE4MwogICAgLy8gIyBDYWxjdWxhdGUgYW1vdW50IHBlciBtaWxlc3RvbmUKICAgIC8vIGFtb3VudF9wZXJfbWlsZXN0b25lID0gc2VsZi5nb2FsX2Ftb3VudCAvLyBzZWxmLm1pbGVzdG9uZV9jb3VudAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDggLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDkgLy8gIm1pbGVzdG9uZV9jb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5taWxlc3RvbmVfY291bnQgZXhpc3RzCiAgICAvCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxODcKICAgIC8vIGNvbnRyYWN0X2JhbGFuY2UgPSBHbG9iYWwuY3VycmVudF9hcHBsaWNhdGlvbl9hZGRyZXNzLmJhbGFuY2UKICAgIGdsb2JhbCBDdXJyZW50QXBwbGljYXRpb25BZGRyZXNzCiAgICBhY2N0X3BhcmFtc19nZXQgQWNjdEJhbGFuY2UKICAgIGFzc2VydCAvLyBhY2NvdW50IGZ1bmRlZAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTg4CiAgICAvLyBhc3NlcnQgY29udHJhY3RfYmFsYW5jZSA+PSBhbW91bnRfcGVyX21pbGVzdG9uZSArIG1pbl9iYWxhbmNlLCAiSW5zdWZmaWNpZW50IGJhbGFuY2UgYWZ0ZXIgTUJSIgogICAgZGlnIDEKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE4NS0xODYKICAgIC8vICMgUmVzZXJ2ZSBtaW5pbXVtIGJhbGFuY2UgKDAuMSBBTEdPKQogICAgLy8gbWluX2JhbGFuY2UgPSBVSW50NjQoMTAwMDAwKQogICAgaW50Y18yIC8vIDEwMDAwMAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTg4CiAgICAvLyBhc3NlcnQgY29udHJhY3RfYmFsYW5jZSA+PSBhbW91bnRfcGVyX21pbGVzdG9uZSArIG1pbl9iYWxhbmNlLCAiSW5zdWZmaWNpZW50IGJhbGFuY2UgYWZ0ZXIgTUJSIgogICAgKwogICAgPj0KICAgIGFzc2VydCAvLyBJbnN1ZmZpY2llbnQgYmFsYW5jZSBhZnRlciBNQlIKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE5MC0xOTUKICAgIC8vICMgU2VuZCBmdW5kcyB0byBjcmVhdG9yCiAgICAvLyBpdHhuLlBheW1lbnQoCiAgICAvLyAgICAgcmVjZWl2ZXI9c2VsZi5jcmVhdG9yLAogICAgLy8gICAgIGFtb3VudD1hbW91bnRfcGVyX21pbGVzdG9uZSwKICAgIC8vICAgICBmZWU9MAogICAgLy8gKS5zdWJtaXQoKQogICAgaXR4bl9iZWdpbgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MTkyCiAgICAvLyByZWNlaXZlcj1zZWxmLmNyZWF0b3IsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNyAvLyAiY3JlYXRvciIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jcmVhdG9yIGV4aXN0cwogICAgaXR4bl9maWVsZCBSZWNlaXZlcgogICAgaXR4bl9maWVsZCBBbW91bnQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE5MC0xOTEKICAgIC8vICMgU2VuZCBmdW5kcyB0byBjcmVhdG9yCiAgICAvLyBpdHhuLlBheW1lbnQoCiAgICBpbnRjXzEgLy8gcGF5CiAgICBpdHhuX2ZpZWxkIFR5cGVFbnVtCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToxOTQKICAgIC8vIGZlZT0wCiAgICBpbnRjXzAgLy8gMAogICAgaXR4bl9maWVsZCBGZWUKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE5MC0xOTUKICAgIC8vICMgU2VuZCBmdW5kcyB0byBjcmVhdG9yCiAgICAvLyBpdHhuLlBheW1lbnQoCiAgICAvLyAgICAgcmVjZWl2ZXI9c2VsZi5jcmVhdG9yLAogICAgLy8gICAgIGFtb3VudD1hbW91bnRfcGVyX21pbGVzdG9uZSwKICAgIC8vICAgICBmZWU9MAogICAgLy8gKS5zdWJtaXQoKQogICAgaXR4bl9zdWJtaXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjE5Ny0xOTgKICAgIC8vICMgSW5jcmVtZW50IG1pbGVzdG9uZSBjb3VudGVyCiAgICAvLyBzZWxmLmN1cnJlbnRfbWlsZXN0b25lICs9IFVJbnQ2NCgxKQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDYgLy8gImN1cnJlbnRfbWlsZXN0b25lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmN1cnJlbnRfbWlsZXN0b25lIGV4aXN0cwogICAgaW50Y18xIC8vIDEKICAgICsKICAgIGJ5dGVjIDYgLy8gImN1cnJlbnRfbWlsZXN0b25lIgogICAgc3dhcAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIwMC0yMDEKICAgIC8vICMg8J+UhCBSRVNFVCBhcHByb3ZhbHMgZm9yIG5leHQgbWlsZXN0b25lCiAgICAvLyBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZCA9IEZhbHNlCiAgICBieXRlY18xIC8vICJhcHByb3ZlcjFfYXBwcm92ZWQiCiAgICBpbnRjXzAgLy8gMAogICAgYXBwX2dsb2JhbF9wdXQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIwMgogICAgLy8gc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQgPSBGYWxzZQogICAgYnl0ZWNfMiAvLyAiYXBwcm92ZXIyX2FwcHJvdmVkIgogICAgaW50Y18wIC8vIDAKICAgIGFwcF9nbG9iYWxfcHV0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMDMKICAgIC8vIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkID0gRmFsc2UKICAgIGJ5dGVjXzMgLy8gImFwcHJvdmVyM19hcHByb3ZlZCIKICAgIGludGNfMCAvLyAwCiAgICBhcHBfZ2xvYmFsX3B1dAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjA1CiAgICAvLyByZXR1cm4gc2VsZi5jdXJyZW50X21pbGVzdG9uZQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDYgLy8gImN1cnJlbnRfbWlsZXN0b25lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmN1cnJlbnRfbWlsZXN0b25lIGV4aXN0cwogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5nZXRfc3RhdHVzKCkgLT4gdWludDY0LCB1aW50NjQsIHVpbnQ2NCwgdWludDY0LCB1aW50NjQsIHVpbnQ2NCwgdWludDY0OgpnZXRfc3RhdHVzOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjExCiAgICAvLyBzZWxmLmdvYWxfYW1vdW50LAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDggLy8gImdvYWxfYW1vdW50IgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmdvYWxfYW1vdW50IGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjEyCiAgICAvLyBzZWxmLnJhaXNlZF9hbW91bnQsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgNSAvLyAicmFpc2VkX2Ftb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5yYWlzZWRfYW1vdW50IGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjEzCiAgICAvLyBzZWxmLmN1cnJlbnRfbWlsZXN0b25lLAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDYgLy8gImN1cnJlbnRfbWlsZXN0b25lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmN1cnJlbnRfbWlsZXN0b25lIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjE0CiAgICAvLyBzZWxmLm1pbGVzdG9uZV9jb3VudCwKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyA5IC8vICJtaWxlc3RvbmVfY291bnQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYubWlsZXN0b25lX2NvdW50IGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjE1CiAgICAvLyBzZWxmLmNvbnRyaWJ1dG9yX2NvdW50LAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDE0IC8vICJjb250cmlidXRvcl9jb3VudCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5jb250cmlidXRvcl9jb3VudCBleGlzdHMKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIxNgogICAgLy8gc2VsZi5pc19hY3RpdmUsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTcgLy8gImlzX2FjdGl2ZSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5pc19hY3RpdmUgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMTcKICAgIC8vIHNlbGYuZ29hbF9yZWFjaGVkCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTAgLy8gImdvYWxfcmVhY2hlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5nb2FsX3JlYWNoZWQgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMTAtMjE4CiAgICAvLyByZXR1cm4gKAogICAgLy8gICAgIHNlbGYuZ29hbF9hbW91bnQsCiAgICAvLyAgICAgc2VsZi5yYWlzZWRfYW1vdW50LAogICAgLy8gICAgIHNlbGYuY3VycmVudF9taWxlc3RvbmUsCiAgICAvLyAgICAgc2VsZi5taWxlc3RvbmVfY291bnQsCiAgICAvLyAgICAgc2VsZi5jb250cmlidXRvcl9jb3VudCwKICAgIC8vICAgICBzZWxmLmlzX2FjdGl2ZSwKICAgIC8vICAgICBzZWxmLmdvYWxfcmVhY2hlZAogICAgLy8gKQogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5nZXRfY3JlYXRvcigpIC0+IGJ5dGVzOgpnZXRfY3JlYXRvcjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIyMwogICAgLy8gcmV0dXJuIHNlbGYuY3JlYXRvcgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDcgLy8gImNyZWF0b3IiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3JlYXRvciBleGlzdHMKICAgIHJldHN1YgoKCi8vIHNtYXJ0X2NvbnRyYWN0cy5mdW5kcmFpc2VyLmNvbnRyYWN0LkZ1bmRyYWlzZXIuZ2V0X2RlYWRsaW5lKCkgLT4gdWludDY0OgpnZXRfZGVhZGxpbmU6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMjgKICAgIC8vIHJldHVybiBzZWxmLmRlYWRsaW5lCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTYgLy8gImRlYWRsaW5lIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmRlYWRsaW5lIGV4aXN0cwogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5nZXRfYXBwcm92ZXJzKCkgLT4gYnl0ZXMsIGJ5dGVzLCBieXRlczoKZ2V0X2FwcHJvdmVyczoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjIzNAogICAgLy8gQWRkcmVzcyhzZWxmLmFwcHJvdmVyMS5ieXRlcyksCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTEgLy8gImFwcHJvdmVyMSIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjEgZXhpc3RzCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyMzUKICAgIC8vIEFkZHJlc3Moc2VsZi5hcHByb3ZlcjIuYnl0ZXMpLAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDEyIC8vICJhcHByb3ZlcjIiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIyIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjM2CiAgICAvLyBBZGRyZXNzKHNlbGYuYXBwcm92ZXIzLmJ5dGVzKQogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDEzIC8vICJhcHByb3ZlcjMiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIzIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjMzLTIzNwogICAgLy8gcmV0dXJuICgKICAgIC8vICAgICBBZGRyZXNzKHNlbGYuYXBwcm92ZXIxLmJ5dGVzKSwKICAgIC8vICAgICBBZGRyZXNzKHNlbGYuYXBwcm92ZXIyLmJ5dGVzKSwKICAgIC8vICAgICBBZGRyZXNzKHNlbGYuYXBwcm92ZXIzLmJ5dGVzKQogICAgLy8gKQogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5nZXRfYXBwcm92YWxfc3RhdHVzKCkgLT4gdWludDY0LCB1aW50NjQsIHVpbnQ2NDoKZ2V0X2FwcHJvdmFsX3N0YXR1czoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI0NwogICAgLy8gc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMSAvLyAiYXBwcm92ZXIxX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZCBleGlzdHMKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI0OAogICAgLy8gc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQsCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMiAvLyAiYXBwcm92ZXIyX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMl9hcHByb3ZlZCBleGlzdHMKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI0OQogICAgLy8gc2VsZi5hcHByb3ZlcjNfYXBwcm92ZWQKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJhcHByb3ZlcjNfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkIGV4aXN0cwogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjQ2LTI1MAogICAgLy8gcmV0dXJuICgKICAgIC8vICAgICBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZCwKICAgIC8vICAgICBzZWxmLmFwcHJvdmVyMl9hcHByb3ZlZCwKICAgIC8vICAgICBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZAogICAgLy8gKQogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5oYXNfYXBwcm92ZWQoYXBwcm92ZXJfYWRkcmVzczogYnl0ZXMpIC0+IHVpbnQ2NDoKaGFzX2FwcHJvdmVkOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjUyLTI1MwogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgLy8gZGVmIGhhc19hcHByb3ZlZChzZWxmLCBhcHByb3Zlcl9hZGRyZXNzOiBBZGRyZXNzKSAtPiBib29sOgogICAgcHJvdG8gMSAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNTcKICAgIC8vIGlmIHNlbmRlcl9hY2NvdW50ID09IHNlbGYuYXBwcm92ZXIxOgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDExIC8vICJhcHByb3ZlcjEiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIxIGV4aXN0cwogICAgZnJhbWVfZGlnIC0xCiAgICA9PQogICAgYnogaGFzX2FwcHJvdmVkX2Vsc2VfYm9keUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNTgKICAgIC8vIHJldHVybiBzZWxmLmFwcHJvdmVyMV9hcHByb3ZlZAogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjXzEgLy8gImFwcHJvdmVyMV9hcHByb3ZlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQgZXhpc3RzCiAgICByZXRzdWIKCmhhc19hcHByb3ZlZF9lbHNlX2JvZHlAMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI1OQogICAgLy8gZWxpZiBzZW5kZXJfYWNjb3VudCA9PSBzZWxmLmFwcHJvdmVyMjoKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxMiAvLyAiYXBwcm92ZXIyIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMiBleGlzdHMKICAgIGZyYW1lX2RpZyAtMQogICAgPT0KICAgIGJ6IGhhc19hcHByb3ZlZF9lbHNlX2JvZHlANAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjYwCiAgICAvLyByZXR1cm4gc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18yIC8vICJhcHByb3ZlcjJfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIyX2FwcHJvdmVkIGV4aXN0cwogICAgcmV0c3ViCgpoYXNfYXBwcm92ZWRfZWxzZV9ib2R5QDQ6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNjEKICAgIC8vIGVsaWYgc2VuZGVyX2FjY291bnQgPT0gc2VsZi5hcHByb3ZlcjM6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTMgLy8gImFwcHJvdmVyMyIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjMgZXhpc3RzCiAgICBmcmFtZV9kaWcgLTEKICAgID09CiAgICBieiBoYXNfYXBwcm92ZWRfZWxzZV9ib2R5QDYKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI2MgogICAgLy8gcmV0dXJuIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkCiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMyAvLyAiYXBwcm92ZXIzX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZCBleGlzdHMKICAgIHJldHN1YgoKaGFzX2FwcHJvdmVkX2Vsc2VfYm9keUA2OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjY0CiAgICAvLyByZXR1cm4gRmFsc2UKICAgIGludGNfMCAvLyAwCiAgICByZXRzdWIKCgovLyBzbWFydF9jb250cmFjdHMuZnVuZHJhaXNlci5jb250cmFjdC5GdW5kcmFpc2VyLmdldF9hcHByb3ZhbF9jb3VudCgpIC0+IHVpbnQ2NDoKZ2V0X2FwcHJvdmFsX2NvdW50OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjY2LTI2NwogICAgLy8gQGFiaW1ldGhvZChyZWFkb25seT1UcnVlKQogICAgLy8gZGVmIGdldF9hcHByb3ZhbF9jb3VudChzZWxmKSAtPiBVSW50NjQ6CiAgICBwcm90byAwIDEKICAgIHB1c2hieXRlcyAiIgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjY5CiAgICAvLyBjb3VudCA9IFVJbnQ2NCgwKQogICAgaW50Y18wIC8vIDAKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI3MAogICAgLy8gaWYgc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQ6CiAgICBkdXAKICAgIGJ5dGVjXzEgLy8gImFwcHJvdmVyMV9hcHByb3ZlZCIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjFfYXBwcm92ZWQgZXhpc3RzCiAgICBieiBnZXRfYXBwcm92YWxfY291bnRfYWZ0ZXJfaWZfZWxzZUAyCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNzEKICAgIC8vIGNvdW50ICs9IFVJbnQ2NCgxKQogICAgaW50Y18xIC8vIDEKICAgIGZyYW1lX2J1cnkgMQoKZ2V0X2FwcHJvdmFsX2NvdW50X2FmdGVyX2lmX2Vsc2VAMjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI3MgogICAgLy8gaWYgc2VsZi5hcHByb3ZlcjJfYXBwcm92ZWQ6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWNfMiAvLyAiYXBwcm92ZXIyX2FwcHJvdmVkIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMl9hcHByb3ZlZCBleGlzdHMKICAgIGZyYW1lX2RpZyAxCiAgICBmcmFtZV9idXJ5IDAKICAgIGJ6IGdldF9hcHByb3ZhbF9jb3VudF9hZnRlcl9pZl9lbHNlQDQKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI3MwogICAgLy8gY291bnQgKz0gVUludDY0KDEpCiAgICBmcmFtZV9kaWcgMQogICAgaW50Y18xIC8vIDEKICAgICsKICAgIGZyYW1lX2J1cnkgMAoKZ2V0X2FwcHJvdmFsX2NvdW50X2FmdGVyX2lmX2Vsc2VANDoKICAgIGZyYW1lX2RpZyAwCiAgICBkdXAKICAgIGZyYW1lX2J1cnkgMQogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6Mjc0CiAgICAvLyBpZiBzZWxmLmFwcHJvdmVyM19hcHByb3ZlZDoKICAgIGludGNfMCAvLyAwCiAgICBieXRlY18zIC8vICJhcHByb3ZlcjNfYXBwcm92ZWQiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIzX2FwcHJvdmVkIGV4aXN0cwogICAgc3dhcAogICAgZnJhbWVfYnVyeSAwCiAgICBieiBnZXRfYXBwcm92YWxfY291bnRfYWZ0ZXJfaWZfZWxzZUA2CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNzUKICAgIC8vIGNvdW50ICs9IFVJbnQ2NCgxKQogICAgZnJhbWVfZGlnIDEKICAgIGludGNfMSAvLyAxCiAgICArCiAgICBmcmFtZV9idXJ5IDAKCmdldF9hcHByb3ZhbF9jb3VudF9hZnRlcl9pZl9lbHNlQDY6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyNzYKICAgIC8vIHJldHVybiBjb3VudAogICAgcmV0c3ViCgoKLy8gc21hcnRfY29udHJhY3RzLmZ1bmRyYWlzZXIuY29udHJhY3QuRnVuZHJhaXNlci5pc19hcHByb3ZlcihhZGRyZXNzOiBieXRlcykgLT4gdWludDY0Ogppc19hcHByb3ZlcjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI3OC0yNzkKICAgIC8vIEBhYmltZXRob2QocmVhZG9ubHk9VHJ1ZSkKICAgIC8vIGRlZiBpc19hcHByb3ZlcihzZWxmLCBhZGRyZXNzOiBBZGRyZXNzKSAtPiBib29sOgogICAgcHJvdG8gMSAxCiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyODMKICAgIC8vIGlmIGFjY291bnQgPT0gc2VsZi5jcmVhdG9yOgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDcgLy8gImNyZWF0b3IiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuY3JlYXRvciBleGlzdHMKICAgIGZyYW1lX2RpZyAtMQogICAgPT0KICAgIGJ6IGlzX2FwcHJvdmVyX2FmdGVyX2lmX2Vsc2VAMgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6Mjg0CiAgICAvLyByZXR1cm4gVHJ1ZQogICAgaW50Y18xIC8vIDEKICAgIHJldHN1YgoKaXNfYXBwcm92ZXJfYWZ0ZXJfaWZfZWxzZUAyOgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6Mjg2CiAgICAvLyBpZiBhY2NvdW50ID09IHNlbGYuYXBwcm92ZXIxOgogICAgaW50Y18wIC8vIDAKICAgIGJ5dGVjIDExIC8vICJhcHByb3ZlcjEiCiAgICBhcHBfZ2xvYmFsX2dldF9leAogICAgYXNzZXJ0IC8vIGNoZWNrIHNlbGYuYXBwcm92ZXIxIGV4aXN0cwogICAgZnJhbWVfZGlnIC0xCiAgICA9PQogICAgYnogaXNfYXBwcm92ZXJfYWZ0ZXJfaWZfZWxzZUA0CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyODcKICAgIC8vIHJldHVybiBUcnVlCiAgICBpbnRjXzEgLy8gMQogICAgcmV0c3ViCgppc19hcHByb3Zlcl9hZnRlcl9pZl9lbHNlQDQ6CiAgICAvLyBzbWFydF9jb250cmFjdHMvZnVuZHJhaXNlci9jb250cmFjdC5weToyODgKICAgIC8vIGlmIGFjY291bnQgPT0gc2VsZi5hcHByb3ZlcjI6CiAgICBpbnRjXzAgLy8gMAogICAgYnl0ZWMgMTIgLy8gImFwcHJvdmVyMiIKICAgIGFwcF9nbG9iYWxfZ2V0X2V4CiAgICBhc3NlcnQgLy8gY2hlY2sgc2VsZi5hcHByb3ZlcjIgZXhpc3RzCiAgICBmcmFtZV9kaWcgLTEKICAgID09CiAgICBieiBpc19hcHByb3Zlcl9hZnRlcl9pZl9lbHNlQDYKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI4OQogICAgLy8gcmV0dXJuIFRydWUKICAgIGludGNfMSAvLyAxCiAgICByZXRzdWIKCmlzX2FwcHJvdmVyX2FmdGVyX2lmX2Vsc2VANjoKICAgIC8vIHNtYXJ0X2NvbnRyYWN0cy9mdW5kcmFpc2VyL2NvbnRyYWN0LnB5OjI5MAogICAgLy8gaWYgYWNjb3VudCA9PSBzZWxmLmFwcHJvdmVyMzoKICAgIGludGNfMCAvLyAwCiAgICBieXRlYyAxMyAvLyAiYXBwcm92ZXIzIgogICAgYXBwX2dsb2JhbF9nZXRfZXgKICAgIGFzc2VydCAvLyBjaGVjayBzZWxmLmFwcHJvdmVyMyBleGlzdHMKICAgIGZyYW1lX2RpZyAtMQogICAgPT0KICAgIGJ6IGlzX2FwcHJvdmVyX2FmdGVyX2lmX2Vsc2VAOAogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjkxCiAgICAvLyByZXR1cm4gVHJ1ZQogICAgaW50Y18xIC8vIDEKICAgIHJldHN1YgoKaXNfYXBwcm92ZXJfYWZ0ZXJfaWZfZWxzZUA4OgogICAgLy8gc21hcnRfY29udHJhY3RzL2Z1bmRyYWlzZXIvY29udHJhY3QucHk6MjkzCiAgICAvLyByZXR1cm4gRmFsc2UKICAgIGludGNfMCAvLyAwCiAgICByZXRzdWIK","clear":"I3ByYWdtYSB2ZXJzaW9uIDEwCiNwcmFnbWEgdHlwZXRyYWNrIGZhbHNlCgovLyBhbGdvcHkuYXJjNC5BUkM0Q29udHJhY3QuY2xlYXJfc3RhdGVfcHJvZ3JhbSgpIC0+IHVpbnQ2NDoKbWFpbjoKICAgIHB1c2hpbnQgMSAvLyAxCiAgICByZXR1cm4K"},"byteCode":{"approval":"CiADAAGgjQYmEwQVH3x1EmFwcHJvdmVyMV9hcHByb3ZlZBJhcHByb3ZlcjJfYXBwcm92ZWQSYXBwcm92ZXIzX2FwcHJvdmVkAQANcmFpc2VkX2Ftb3VudBFjdXJyZW50X21pbGVzdG9uZQdjcmVhdG9yC2dvYWxfYW1vdW50D21pbGVzdG9uZV9jb3VudAxnb2FsX3JlYWNoZWQJYXBwcm92ZXIxCWFwcHJvdmVyMglhcHByb3ZlcjMRY29udHJpYnV0b3JfY291bnQQbWVkaWFfY2lkX2xlbmd0aAhkZWFkbGluZQlpc19hY3RpdmUFbWVkaWExG0EAaYIOBO+l1q4E5MPgEARg/0B9BFEQjfgENT7uEgTCIcBRBK9Fad0EICoOGQRl94dXBMl9gQUE66YTKgQPvHT8BDKksBgEgCHfiDYaAI4OAV0BQgErARMBAgDxAK0AnQCMAHcARQAsABsAAiJDMRkURDEYRDYaAYgECicEIk8CVChMULAjQzEZFEQxGESIA70WKExQsCNDMRkURDEYRDYaAYgDdCcEIk8CVChMULAjQzEZFEQxGESIA1EnBCJPBFQnBCJPBFQnBCJPBFRMIlNPAiNPAlRMIlOBAkxUKExQsCNDMRkURDEYRIgDD04CUExQKExQsCNDMRkURDEYRIgC9BYoTFCwI0MxGRREMRhEiALdKExQsCNDMRkURDEYRIgCqU8GFk8GFk8GFk8GFk8GFicEIk8IVCcEIk8IVE8GTwZQTwVQTwRQTwNQTwJQTCJTgcECTFQoTFCwI0MxGRREMRhEiAH6FihMULAjQzEZFEQxGESIAVgWKExQsCNDMRkURDEYRIgBN0kVFlcGAkxQKExQsCNDMRkURDEYRDYaAVcCAIgA7RYoTFCwI0MxGRREMRhEMRYjCUk4ECMSRIgAdxYoTFCwI0MxGRREMRgURDYaARc2GgIXNhoDFzYaBDYaBTYaBogABxYoTFCwI0OKBgEnCIv6ZycFImcnCYv7ZycGImcnEIv8ZycRI2cnBzEAZycOImcnCiJnJwuL/WcnDIv+ZycNi/9nKSJnKiJnKyJnJw8iZyOJigEBIicRZUREMgciJxBlRA5EIicFZUQiJwhlRAxEi/84BzIKEkSL/zgISSQPRCInBWVECCcFTGciJw5lRCMIJw5MZyInBWVEIicIZUQPQQAEJwojZyInBWVEiYoBATEAIicHZUQSRCInD2VEFESL/xVJgUAORCcSSwG5RCcSi/+/Jw9LAWeJIicPZURAAAOAAIknEr5EiYoAAYAASSInCmVERCInBmVEIicJZUQMRDEASSInC2VEEkEAQSIpZUQURCkjZyKMACIpZURBAAMjjAAiKmVEiwCMAUEABosAIwiMAYsBSYwAIitlREyMAUEABosAIwiMAYsBjACJIicMZUSLAhJBAAwiKmVEFEQqI2dC/7EiJw1lRIsCEkQiK2VEFEQrI2dC/5wxACInB2VEEkQiJwZlRCInCWVEDEQiJwplREQiKWVERCIqZUREIitlREQiJwhlRCInCWVECjIKcwBESwEkCA9EsSInB2VEsgeyCCOyECKyAbMiJwZlRCMIJwZMZykiZyoiZysiZyInBmVEiSInCGVEIicFZUQiJwZlRCInCWVEIicOZUQiJxFlRCInCmVEiSInB2VEiSInEGVEiSInC2VEIicMZUQiJw1lRIkiKWVEIiplRCIrZUSJigEBIicLZUSL/xJBAAUiKWVEiSInDGVEi/8SQQAFIiplRIkiJw1lRIv/EkEABSIrZUSJIomKAAGAACJJKWVEQQADI4wBIiplRIsBjABBAAaLASMIjACLAEmMASIrZURMjABBAAaLASMIjACJigEBIicHZUSL/xJBAAIjiSInC2VEi/8SQQACI4kiJwxlRIv/EkEAAiOJIicNZUSL/xJBAAIjiSKJ","clear":"CoEBQw=="},"events":[],"templateVariables":{}} as unknown as Arc56Contract
 
 /**
  * A state record containing binary data
@@ -70,29 +70,54 @@ export type FundraiserArgs = {
    * The object representation of the arguments for each method
    */
   obj: {
-    'create_campaign(uint64,uint64,uint64)uint64': {
+    'create_campaign(uint64,uint64,uint64,address,address,address)uint64': {
       goal: bigint | number
       milestones: bigint | number
       deadline: bigint | number
+      approver1: string
+      approver2: string
+      approver3: string
     }
     'donate(pay)uint64': {
       payment: AppMethodCallTransactionArgument
     }
+    'set_media_cid(byte[])uint64': {
+      cid: Uint8Array
+    }
+    'get_media_cid()byte[]': Record<string, never>
+    'approve_milestone()uint64': Record<string, never>
     'release_milestone()uint64': Record<string, never>
     'get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)': Record<string, never>
     'get_creator()address': Record<string, never>
     'get_deadline()uint64': Record<string, never>
+    'get_approvers()(address,address,address)': Record<string, never>
+    'get_approval_status()(bool,bool,bool)': Record<string, never>
+    'has_approved(address)bool': {
+      approverAddress: string
+    }
+    'get_approval_count()uint64': Record<string, never>
+    'is_approver(address)bool': {
+      address: string
+    }
   }
   /**
    * The tuple representation of the arguments for each method
    */
   tuple: {
-    'create_campaign(uint64,uint64,uint64)uint64': [goal: bigint | number, milestones: bigint | number, deadline: bigint | number]
+    'create_campaign(uint64,uint64,uint64,address,address,address)uint64': [goal: bigint | number, milestones: bigint | number, deadline: bigint | number, approver1: string, approver2: string, approver3: string]
     'donate(pay)uint64': [payment: AppMethodCallTransactionArgument]
+    'set_media_cid(byte[])uint64': [cid: Uint8Array]
+    'get_media_cid()byte[]': []
+    'approve_milestone()uint64': []
     'release_milestone()uint64': []
     'get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)': []
     'get_creator()address': []
     'get_deadline()uint64': []
+    'get_approvers()(address,address,address)': []
+    'get_approval_status()(bool,bool,bool)': []
+    'has_approved(address)bool': [approverAddress: string]
+    'get_approval_count()uint64': []
+    'is_approver(address)bool': [address: string]
   }
 }
 
@@ -100,12 +125,20 @@ export type FundraiserArgs = {
  * The return type for each method
  */
 export type FundraiserReturns = {
-  'create_campaign(uint64,uint64,uint64)uint64': bigint
+  'create_campaign(uint64,uint64,uint64,address,address,address)uint64': bigint
   'donate(pay)uint64': bigint
+  'set_media_cid(byte[])uint64': bigint
+  'get_media_cid()byte[]': Uint8Array
+  'approve_milestone()uint64': bigint
   'release_milestone()uint64': bigint
   'get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)': [bigint, bigint, bigint, bigint, bigint, boolean, boolean]
   'get_creator()address': string
   'get_deadline()uint64': bigint
+  'get_approvers()(address,address,address)': [string, string, string]
+  'get_approval_status()(bool,bool,bool)': [boolean, boolean, boolean]
+  'has_approved(address)bool': boolean
+  'get_approval_count()uint64': bigint
+  'is_approver(address)bool': boolean
 }
 
 /**
@@ -116,15 +149,30 @@ export type FundraiserTypes = {
    * Maps method signatures / names to their argument and return types.
    */
   methods:
-    & Record<'create_campaign(uint64,uint64,uint64)uint64' | 'create_campaign', {
-      argsObj: FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64']
-      argsTuple: FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']
-      returns: FundraiserReturns['create_campaign(uint64,uint64,uint64)uint64']
+    & Record<'create_campaign(uint64,uint64,uint64,address,address,address)uint64' | 'create_campaign', {
+      argsObj: FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']
+      argsTuple: FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']
+      returns: FundraiserReturns['create_campaign(uint64,uint64,uint64,address,address,address)uint64']
     }>
     & Record<'donate(pay)uint64' | 'donate', {
       argsObj: FundraiserArgs['obj']['donate(pay)uint64']
       argsTuple: FundraiserArgs['tuple']['donate(pay)uint64']
       returns: FundraiserReturns['donate(pay)uint64']
+    }>
+    & Record<'set_media_cid(byte[])uint64' | 'set_media_cid', {
+      argsObj: FundraiserArgs['obj']['set_media_cid(byte[])uint64']
+      argsTuple: FundraiserArgs['tuple']['set_media_cid(byte[])uint64']
+      returns: FundraiserReturns['set_media_cid(byte[])uint64']
+    }>
+    & Record<'get_media_cid()byte[]' | 'get_media_cid', {
+      argsObj: FundraiserArgs['obj']['get_media_cid()byte[]']
+      argsTuple: FundraiserArgs['tuple']['get_media_cid()byte[]']
+      returns: FundraiserReturns['get_media_cid()byte[]']
+    }>
+    & Record<'approve_milestone()uint64' | 'approve_milestone', {
+      argsObj: FundraiserArgs['obj']['approve_milestone()uint64']
+      argsTuple: FundraiserArgs['tuple']['approve_milestone()uint64']
+      returns: FundraiserReturns['approve_milestone()uint64']
     }>
     & Record<'release_milestone()uint64' | 'release_milestone', {
       argsObj: FundraiserArgs['obj']['release_milestone()uint64']
@@ -146,6 +194,31 @@ export type FundraiserTypes = {
       argsTuple: FundraiserArgs['tuple']['get_deadline()uint64']
       returns: FundraiserReturns['get_deadline()uint64']
     }>
+    & Record<'get_approvers()(address,address,address)' | 'get_approvers', {
+      argsObj: FundraiserArgs['obj']['get_approvers()(address,address,address)']
+      argsTuple: FundraiserArgs['tuple']['get_approvers()(address,address,address)']
+      returns: FundraiserReturns['get_approvers()(address,address,address)']
+    }>
+    & Record<'get_approval_status()(bool,bool,bool)' | 'get_approval_status', {
+      argsObj: FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)']
+      argsTuple: FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']
+      returns: FundraiserReturns['get_approval_status()(bool,bool,bool)']
+    }>
+    & Record<'has_approved(address)bool' | 'has_approved', {
+      argsObj: FundraiserArgs['obj']['has_approved(address)bool']
+      argsTuple: FundraiserArgs['tuple']['has_approved(address)bool']
+      returns: FundraiserReturns['has_approved(address)bool']
+    }>
+    & Record<'get_approval_count()uint64' | 'get_approval_count', {
+      argsObj: FundraiserArgs['obj']['get_approval_count()uint64']
+      argsTuple: FundraiserArgs['tuple']['get_approval_count()uint64']
+      returns: FundraiserReturns['get_approval_count()uint64']
+    }>
+    & Record<'is_approver(address)bool' | 'is_approver', {
+      argsObj: FundraiserArgs['obj']['is_approver(address)bool']
+      argsTuple: FundraiserArgs['tuple']['is_approver(address)bool']
+      returns: FundraiserReturns['is_approver(address)bool']
+    }>
   /**
    * Defines the shape of the state of the application.
    */
@@ -161,6 +234,13 @@ export type FundraiserTypes = {
         creator: string
         contributorCount: bigint
         goalReached: bigint
+        mediaCidLength: bigint
+        approver1: string
+        approver2: string
+        approver3: string
+        approver1Approved: bigint
+        approver2Approved: bigint
+        approver3Approved: bigint
       }
       maps: {}
     }
@@ -204,8 +284,8 @@ export type GlobalKeysState = FundraiserTypes['state']['global']['keys']
  * Defines supported create method params for this smart contract
  */
 export type FundraiserCreateCallParams =
-  | Expand<CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & {method: 'create_campaign'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
-  | Expand<CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & {method: 'create_campaign(uint64,uint64,uint64)uint64'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
+  | Expand<CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & {method: 'create_campaign'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
+  | Expand<CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & {method: 'create_campaign(uint64,uint64,uint64,address,address,address)uint64'} & {onComplete?: OnApplicationComplete.NoOpOC} & CreateSchema>
 /**
  * Defines arguments required for the deploy method.
  */
@@ -229,23 +309,23 @@ export abstract class FundraiserParamsFactory {
       _resolveByMethod<TParams extends FundraiserCreateCallParams & {method: string}>(params: TParams) {
         switch(params.method) {
           case 'create_campaign':
-          case 'create_campaign(uint64,uint64,uint64)uint64':
+          case 'create_campaign(uint64,uint64,uint64,address,address,address)uint64':
             return FundraiserParamsFactory.create.createCampaign(params)
         }
         throw new Error(`Unknown ' + verb + ' method`)
       },
 
       /**
-       * Constructs create ABI call params for the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64)uint64 ABI method
+       * Constructs create ABI call params for the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64,address,address,address)uint64 ABI method
        *
        * @param params Parameters for the call
        * @returns An `AppClientMethodCallParams` object for the call
        */
-      createCampaign(params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & AppClientCompilationParams & {onComplete?: OnApplicationComplete.NoOpOC}): AppClientMethodCallParams & AppClientCompilationParams & {onComplete?: OnApplicationComplete.NoOpOC} {
+      createCampaign(params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & AppClientCompilationParams & {onComplete?: OnApplicationComplete.NoOpOC}): AppClientMethodCallParams & AppClientCompilationParams & {onComplete?: OnApplicationComplete.NoOpOC} {
         return {
           ...params,
-          method: 'create_campaign(uint64,uint64,uint64)uint64' as const,
-          args: Array.isArray(params.args) ? params.args : [params.args.goal, params.args.milestones, params.args.deadline],
+          method: 'create_campaign(uint64,uint64,uint64,address,address,address)uint64' as const,
+          args: Array.isArray(params.args) ? params.args : [params.args.goal, params.args.milestones, params.args.deadline, params.args.approver1, params.args.approver2, params.args.approver3],
         }
       },
     }
@@ -267,10 +347,61 @@ export abstract class FundraiserParamsFactory {
     }
   }
   /**
+   * Constructs a no op call for the set_media_cid(byte[])uint64 ABI method
+   *
+  * Store IPFS CID for campaign media (image/video)
+  Creator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters
+
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static setMediaCid(params: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'set_media_cid(byte[])uint64' as const,
+      args: Array.isArray(params.args) ? params.args : [params.args.cid],
+    }
+  }
+  /**
+   * Constructs a no op call for the get_media_cid()byte[] ABI method
+   *
+  * Retrieve IPFS CID for campaign media
+  Returns empty bytes if no media set
+
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static getMediaCid(params: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'get_media_cid()byte[]' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the approve_milestone()uint64 ABI method
+   *
+  * 🔐 DECENTRALIZED ON-CHAIN APPROVAL
+  Approvers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)
+
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static approveMilestone(params: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'approve_milestone()uint64' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
    * Constructs a no op call for the release_milestone()uint64 ABI method
    *
-  * Release funds for completed milestone (creator only)
-  NEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract
+  * Release funds for current milestone (creator only)
+  🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!
 
    *
    * @param params Parameters for the call
@@ -286,7 +417,7 @@ export abstract class FundraiserParamsFactory {
   /**
    * Constructs a no op call for the get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool) ABI method
    *
-   * Get campaign status (includes goal_reached)
+   * Get campaign status
    *
    * @param params Parameters for the call
    * @returns An `AppClientMethodCallParams` object for the call
@@ -326,6 +457,83 @@ export abstract class FundraiserParamsFactory {
       ...params,
       method: 'get_deadline()uint64' as const,
       args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the get_approvers()(address,address,address) ABI method
+   *
+   * Get all approver addresses (on-chain query)
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static getApprovers(params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'get_approvers()(address,address,address)' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the get_approval_status()(bool,bool,bool) ABI method
+   *
+  * Get current approval status for each approver
+  Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static getApprovalStatus(params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'get_approval_status()(bool,bool,bool)' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the has_approved(address)bool ABI method
+   *
+   * Check if a specific address has approved the current milestone
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static hasApproved(params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'has_approved(address)bool' as const,
+      args: Array.isArray(params.args) ? params.args : [params.args.approverAddress],
+    }
+  }
+  /**
+   * Constructs a no op call for the get_approval_count()uint64 ABI method
+   *
+   * Get number of approvals for current milestone
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static getApprovalCount(params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'get_approval_count()uint64' as const,
+      args: Array.isArray(params.args) ? params.args : [],
+    }
+  }
+  /**
+   * Constructs a no op call for the is_approver(address)bool ABI method
+   *
+   * Check if an address is one of the approvers
+   *
+   * @param params Parameters for the call
+   * @returns An `AppClientMethodCallParams` object for the call
+   */
+  static isApprover(params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']> & CallOnComplete): AppClientMethodCallParams & CallOnComplete {
+    return {
+      ...params,
+      method: 'is_approver(address)bool' as const,
+      args: Array.isArray(params.args) ? params.args : [params.args.address],
     }
   }
 }
@@ -416,14 +624,16 @@ export class FundraiserFactory {
      */
     create: {
       /**
-       * Creates a new instance of the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64)uint64 ABI method.
+       * Creates a new instance of the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64,address,address,address)uint64 ABI method.
        *
-       * Create a new fundraising campaign (called during contract creation)
+      * Create campaign with 3 mandatory approvers
+      All 3 must approve each milestone before funds can be released
+
        *
        * @param params The params for the smart contract call
        * @returns The create params
        */
-      createCampaign: (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & AppClientCompilationParams & CreateSchema & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      createCampaign: (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & AppClientCompilationParams & CreateSchema & {onComplete?: OnApplicationComplete.NoOpOC}) => {
         return this.appFactory.params.create(FundraiserParamsFactory.create.createCampaign(params))
       },
     },
@@ -439,14 +649,16 @@ export class FundraiserFactory {
      */
     create: {
       /**
-       * Creates a new instance of the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64)uint64 ABI method.
+       * Creates a new instance of the Fundraiser smart contract using the create_campaign(uint64,uint64,uint64,address,address,address)uint64 ABI method.
        *
-       * Create a new fundraising campaign (called during contract creation)
+      * Create campaign with 3 mandatory approvers
+      All 3 must approve each milestone before funds can be released
+
        *
        * @param params The params for the smart contract call
        * @returns The create transaction
        */
-      createCampaign: (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & AppClientCompilationParams & CreateSchema & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      createCampaign: (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & AppClientCompilationParams & CreateSchema & {onComplete?: OnApplicationComplete.NoOpOC}) => {
         return this.appFactory.createTransaction.create(FundraiserParamsFactory.create.createCampaign(params))
       },
     },
@@ -462,16 +674,18 @@ export class FundraiserFactory {
      */
     create: {
       /**
-       * Creates a new instance of the Fundraiser smart contract using an ABI method call using the create_campaign(uint64,uint64,uint64)uint64 ABI method.
+       * Creates a new instance of the Fundraiser smart contract using an ABI method call using the create_campaign(uint64,uint64,uint64,address,address,address)uint64 ABI method.
        *
-       * Create a new fundraising campaign (called during contract creation)
+      * Create campaign with 3 mandatory approvers
+      All 3 must approve each milestone before funds can be released
+
        *
        * @param params The params for the smart contract call
        * @returns The create result
        */
-      createCampaign: async (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64)uint64']> & AppClientCompilationParams & CreateSchema & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      createCampaign: async (params: CallParams<FundraiserArgs['obj']['create_campaign(uint64,uint64,uint64,address,address,address)uint64'] | FundraiserArgs['tuple']['create_campaign(uint64,uint64,uint64,address,address,address)uint64']> & AppClientCompilationParams & CreateSchema & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
         const result = await this.appFactory.send.create(FundraiserParamsFactory.create.createCampaign(params))
-        return { result: { ...result.result, return: result.result.return as unknown as (undefined | FundraiserReturns['create_campaign(uint64,uint64,uint64)uint64']) }, appClient: new FundraiserClient(result.appClient) }
+        return { result: { ...result.result, return: result.result.return as unknown as (undefined | FundraiserReturns['create_campaign(uint64,uint64,uint64,address,address,address)uint64']) }, appClient: new FundraiserClient(result.appClient) }
       },
     },
 
@@ -588,10 +802,52 @@ export class FundraiserClient {
     },
 
     /**
+     * Makes a call to the Fundraiser smart contract using the `set_media_cid(byte[])uint64` ABI method.
+     *
+    * Store IPFS CID for campaign media (image/video)
+    Creator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    setMediaCid: (params: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.setMediaCid(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_media_cid()byte[]` ABI method.
+     *
+    * Retrieve IPFS CID for campaign media
+    Returns empty bytes if no media set
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    getMediaCid: (params: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.getMediaCid(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `approve_milestone()uint64` ABI method.
+     *
+    * 🔐 DECENTRALIZED ON-CHAIN APPROVAL
+    Approvers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    approveMilestone: (params: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.approveMilestone(params))
+    },
+
+    /**
      * Makes a call to the Fundraiser smart contract using the `release_milestone()uint64` ABI method.
      *
-    * Release funds for completed milestone (creator only)
-    NEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract
+    * Release funds for current milestone (creator only)
+    🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!
 
      *
      * @param params The params for the smart contract call
@@ -604,7 +860,7 @@ export class FundraiserClient {
     /**
      * Makes a call to the Fundraiser smart contract using the `get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)` ABI method.
      *
-     * Get campaign status (includes goal_reached)
+     * Get campaign status
      *
      * @param params The params for the smart contract call
      * @returns The call params
@@ -641,6 +897,78 @@ export class FundraiserClient {
       return this.appClient.params.call(FundraiserParamsFactory.getDeadline(params))
     },
 
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approvers()(address,address,address)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get all approver addresses (on-chain query)
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    getApprovers: (params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.getApprovers(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_status()(bool,bool,bool)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+    * Get current approval status for each approver
+    Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    getApprovalStatus: (params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.getApprovalStatus(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `has_approved(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if a specific address has approved the current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    hasApproved: (params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.hasApproved(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_count()uint64` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get number of approvals for current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    getApprovalCount: (params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.getApprovalCount(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `is_approver(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if an address is one of the approvers
+     *
+     * @param params The params for the smart contract call
+     * @returns The call params
+     */
+    isApprover: (params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.params.call(FundraiserParamsFactory.isApprover(params))
+    },
+
   }
 
   /**
@@ -670,10 +998,52 @@ export class FundraiserClient {
     },
 
     /**
+     * Makes a call to the Fundraiser smart contract using the `set_media_cid(byte[])uint64` ABI method.
+     *
+    * Store IPFS CID for campaign media (image/video)
+    Creator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    setMediaCid: (params: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.setMediaCid(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_media_cid()byte[]` ABI method.
+     *
+    * Retrieve IPFS CID for campaign media
+    Returns empty bytes if no media set
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    getMediaCid: (params: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.getMediaCid(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `approve_milestone()uint64` ABI method.
+     *
+    * 🔐 DECENTRALIZED ON-CHAIN APPROVAL
+    Approvers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    approveMilestone: (params: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.approveMilestone(params))
+    },
+
+    /**
      * Makes a call to the Fundraiser smart contract using the `release_milestone()uint64` ABI method.
      *
-    * Release funds for completed milestone (creator only)
-    NEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract
+    * Release funds for current milestone (creator only)
+    🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!
 
      *
      * @param params The params for the smart contract call
@@ -686,7 +1056,7 @@ export class FundraiserClient {
     /**
      * Makes a call to the Fundraiser smart contract using the `get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)` ABI method.
      *
-     * Get campaign status (includes goal_reached)
+     * Get campaign status
      *
      * @param params The params for the smart contract call
      * @returns The call transaction
@@ -723,6 +1093,78 @@ export class FundraiserClient {
       return this.appClient.createTransaction.call(FundraiserParamsFactory.getDeadline(params))
     },
 
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approvers()(address,address,address)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get all approver addresses (on-chain query)
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    getApprovers: (params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.getApprovers(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_status()(bool,bool,bool)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+    * Get current approval status for each approver
+    Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    getApprovalStatus: (params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.getApprovalStatus(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `has_approved(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if a specific address has approved the current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    hasApproved: (params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.hasApproved(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_count()uint64` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get number of approvals for current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    getApprovalCount: (params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.getApprovalCount(params))
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `is_approver(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if an address is one of the approvers
+     *
+     * @param params The params for the smart contract call
+     * @returns The call transaction
+     */
+    isApprover: (params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      return this.appClient.createTransaction.call(FundraiserParamsFactory.isApprover(params))
+    },
+
   }
 
   /**
@@ -753,10 +1195,55 @@ export class FundraiserClient {
     },
 
     /**
+     * Makes a call to the Fundraiser smart contract using the `set_media_cid(byte[])uint64` ABI method.
+     *
+    * Store IPFS CID for campaign media (image/video)
+    Creator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    setMediaCid: async (params: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.setMediaCid(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['set_media_cid(byte[])uint64'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_media_cid()byte[]` ABI method.
+     *
+    * Retrieve IPFS CID for campaign media
+    Returns empty bytes if no media set
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    getMediaCid: async (params: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.getMediaCid(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['get_media_cid()byte[]'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `approve_milestone()uint64` ABI method.
+     *
+    * 🔐 DECENTRALIZED ON-CHAIN APPROVAL
+    Approvers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    approveMilestone: async (params: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.approveMilestone(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['approve_milestone()uint64'])}
+    },
+
+    /**
      * Makes a call to the Fundraiser smart contract using the `release_milestone()uint64` ABI method.
      *
-    * Release funds for completed milestone (creator only)
-    NEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract
+    * Release funds for current milestone (creator only)
+    🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!
 
      *
      * @param params The params for the smart contract call
@@ -770,7 +1257,7 @@ export class FundraiserClient {
     /**
      * Makes a call to the Fundraiser smart contract using the `get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool)` ABI method.
      *
-     * Get campaign status (includes goal_reached)
+     * Get campaign status
      *
      * @param params The params for the smart contract call
      * @returns The call result
@@ -808,6 +1295,83 @@ export class FundraiserClient {
     getDeadline: async (params: CallParams<FundraiserArgs['obj']['get_deadline()uint64'] | FundraiserArgs['tuple']['get_deadline()uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
       const result = await this.appClient.send.call(FundraiserParamsFactory.getDeadline(params))
       return {...result, return: result.return as unknown as (undefined | FundraiserReturns['get_deadline()uint64'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approvers()(address,address,address)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get all approver addresses (on-chain query)
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    getApprovers: async (params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovers(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['get_approvers()(address,address,address)'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_status()(bool,bool,bool)` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+    * Get current approval status for each approver
+    Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    getApprovalStatus: async (params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovalStatus(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['get_approval_status()(bool,bool,bool)'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `has_approved(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if a specific address has approved the current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    hasApproved: async (params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.hasApproved(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['has_approved(address)bool'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `get_approval_count()uint64` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Get number of approvals for current milestone
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    getApprovalCount: async (params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC} = {args: []}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovalCount(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['get_approval_count()uint64'])}
+    },
+
+    /**
+     * Makes a call to the Fundraiser smart contract using the `is_approver(address)bool` ABI method.
+     * 
+     * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+     *
+     * Check if an address is one of the approvers
+     *
+     * @param params The params for the smart contract call
+     * @returns The call result
+     */
+    isApprover: async (params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']> & SendParams & {onComplete?: OnApplicationComplete.NoOpOC}) => {
+      const result = await this.appClient.send.call(FundraiserParamsFactory.isApprover(params))
+      return {...result, return: result.return as unknown as (undefined | FundraiserReturns['is_approver(address)bool'])}
     },
 
   }
@@ -853,6 +1417,83 @@ export class FundraiserClient {
   }
 
   /**
+   * Makes a readonly (simulated) call to the Fundraiser smart contract using the `get_approvers()(address,address,address)` ABI method.
+   * 
+   * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+   *
+   * Get all approver addresses (on-chain query)
+   *
+   * @param params The params for the smart contract call
+   * @returns The call result
+   */
+  async getApprovers(params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> = {args: []}) {
+    const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovers(params))
+    return result.return as unknown as FundraiserReturns['get_approvers()(address,address,address)']
+  }
+
+  /**
+   * Makes a readonly (simulated) call to the Fundraiser smart contract using the `get_approval_status()(bool,bool,bool)` ABI method.
+   * 
+   * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+   *
+  * Get current approval status for each approver
+  Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+   *
+   * @param params The params for the smart contract call
+   * @returns The call result
+   */
+  async getApprovalStatus(params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> = {args: []}) {
+    const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovalStatus(params))
+    return result.return as unknown as FundraiserReturns['get_approval_status()(bool,bool,bool)']
+  }
+
+  /**
+   * Makes a readonly (simulated) call to the Fundraiser smart contract using the `has_approved(address)bool` ABI method.
+   * 
+   * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+   *
+   * Check if a specific address has approved the current milestone
+   *
+   * @param params The params for the smart contract call
+   * @returns The call result
+   */
+  async hasApproved(params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']>) {
+    const result = await this.appClient.send.call(FundraiserParamsFactory.hasApproved(params))
+    return result.return as unknown as FundraiserReturns['has_approved(address)bool']
+  }
+
+  /**
+   * Makes a readonly (simulated) call to the Fundraiser smart contract using the `get_approval_count()uint64` ABI method.
+   * 
+   * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+   *
+   * Get number of approvals for current milestone
+   *
+   * @param params The params for the smart contract call
+   * @returns The call result
+   */
+  async getApprovalCount(params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> = {args: []}) {
+    const result = await this.appClient.send.call(FundraiserParamsFactory.getApprovalCount(params))
+    return result.return as unknown as FundraiserReturns['get_approval_count()uint64']
+  }
+
+  /**
+   * Makes a readonly (simulated) call to the Fundraiser smart contract using the `is_approver(address)bool` ABI method.
+   * 
+   * This method is a readonly method; calling it with onComplete of NoOp will result in a simulated transaction rather than a real transaction.
+   *
+   * Check if an address is one of the approvers
+   *
+   * @param params The params for the smart contract call
+   * @returns The call result
+   */
+  async isApprover(params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']>) {
+    const result = await this.appClient.send.call(FundraiserParamsFactory.isApprover(params))
+    return result.return as unknown as FundraiserReturns['is_approver(address)bool']
+  }
+
+  /**
    * Methods to access state for the current Fundraiser app
    */
   state = {
@@ -875,6 +1516,13 @@ export class FundraiserClient {
           creator: result.creator,
           contributorCount: result.contributor_count,
           goalReached: result.goal_reached,
+          mediaCidLength: result.media_cid_length,
+          approver1: result.approver1,
+          approver2: result.approver2,
+          approver3: result.approver3,
+          approver1Approved: result.approver1_approved,
+          approver2Approved: result.approver2_approved,
+          approver3Approved: result.approver3_approved,
         }
       },
       /**
@@ -913,6 +1561,34 @@ export class FundraiserClient {
        * Get the current value of the goal_reached key in global state
        */
       goalReached: async (): Promise<bigint | undefined> => { return (await this.appClient.state.global.getValue("goal_reached")) as bigint | undefined },
+      /**
+       * Get the current value of the media_cid_length key in global state
+       */
+      mediaCidLength: async (): Promise<bigint | undefined> => { return (await this.appClient.state.global.getValue("media_cid_length")) as bigint | undefined },
+      /**
+       * Get the current value of the approver1 key in global state
+       */
+      approver1: async (): Promise<string | undefined> => { return (await this.appClient.state.global.getValue("approver1")) as string | undefined },
+      /**
+       * Get the current value of the approver2 key in global state
+       */
+      approver2: async (): Promise<string | undefined> => { return (await this.appClient.state.global.getValue("approver2")) as string | undefined },
+      /**
+       * Get the current value of the approver3 key in global state
+       */
+      approver3: async (): Promise<string | undefined> => { return (await this.appClient.state.global.getValue("approver3")) as string | undefined },
+      /**
+       * Get the current value of the approver1_approved key in global state
+       */
+      approver1Approved: async (): Promise<bigint | undefined> => { return (await this.appClient.state.global.getValue("approver1_approved")) as bigint | undefined },
+      /**
+       * Get the current value of the approver2_approved key in global state
+       */
+      approver2Approved: async (): Promise<bigint | undefined> => { return (await this.appClient.state.global.getValue("approver2_approved")) as bigint | undefined },
+      /**
+       * Get the current value of the approver3_approved key in global state
+       */
+      approver3Approved: async (): Promise<bigint | undefined> => { return (await this.appClient.state.global.getValue("approver3_approved")) as bigint | undefined },
     },
   }
 
@@ -928,6 +1604,30 @@ export class FundraiserClient {
       donate(params: CallParams<FundraiserArgs['obj']['donate(pay)uint64'] | FundraiserArgs['tuple']['donate(pay)uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
         promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.donate(params)))
         resultMappers.push((v) => client.decodeReturnValue('donate(pay)uint64', v))
+        return this
+      },
+      /**
+       * Add a set_media_cid(byte[])uint64 method call against the Fundraiser contract
+       */
+      setMediaCid(params: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.setMediaCid(params)))
+        resultMappers.push((v) => client.decodeReturnValue('set_media_cid(byte[])uint64', v))
+        return this
+      },
+      /**
+       * Add a get_media_cid()byte[] method call against the Fundraiser contract
+       */
+      getMediaCid(params: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getMediaCid(params)))
+        resultMappers.push((v) => client.decodeReturnValue('get_media_cid()byte[]', v))
+        return this
+      },
+      /**
+       * Add a approve_milestone()uint64 method call against the Fundraiser contract
+       */
+      approveMilestone(params: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.approveMilestone(params)))
+        resultMappers.push((v) => client.decodeReturnValue('approve_milestone()uint64', v))
         return this
       },
       /**
@@ -960,6 +1660,46 @@ export class FundraiserClient {
       getDeadline(params: CallParams<FundraiserArgs['obj']['get_deadline()uint64'] | FundraiserArgs['tuple']['get_deadline()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
         promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getDeadline(params)))
         resultMappers.push((v) => client.decodeReturnValue('get_deadline()uint64', v))
+        return this
+      },
+      /**
+       * Add a get_approvers()(address,address,address) method call against the Fundraiser contract
+       */
+      getApprovers(params: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getApprovers(params)))
+        resultMappers.push((v) => client.decodeReturnValue('get_approvers()(address,address,address)', v))
+        return this
+      },
+      /**
+       * Add a get_approval_status()(bool,bool,bool) method call against the Fundraiser contract
+       */
+      getApprovalStatus(params: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getApprovalStatus(params)))
+        resultMappers.push((v) => client.decodeReturnValue('get_approval_status()(bool,bool,bool)', v))
+        return this
+      },
+      /**
+       * Add a has_approved(address)bool method call against the Fundraiser contract
+       */
+      hasApproved(params: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.hasApproved(params)))
+        resultMappers.push((v) => client.decodeReturnValue('has_approved(address)bool', v))
+        return this
+      },
+      /**
+       * Add a get_approval_count()uint64 method call against the Fundraiser contract
+       */
+      getApprovalCount(params: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.getApprovalCount(params)))
+        resultMappers.push((v) => client.decodeReturnValue('get_approval_count()uint64', v))
+        return this
+      },
+      /**
+       * Add a is_approver(address)bool method call against the Fundraiser contract
+       */
+      isApprover(params: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']> & {onComplete?: OnApplicationComplete.NoOpOC}) {
+        promiseChain = promiseChain.then(async () => composer.addAppCallMethodCall(await client.params.isApprover(params)))
+        resultMappers.push((v) => client.decodeReturnValue('is_approver(address)bool', v))
         return this
       },
       /**
@@ -1009,10 +1749,49 @@ export type FundraiserComposer<TReturns extends [...any[]] = []> = {
   donate(params?: CallParams<FundraiserArgs['obj']['donate(pay)uint64'] | FundraiserArgs['tuple']['donate(pay)uint64']>): FundraiserComposer<[...TReturns, FundraiserReturns['donate(pay)uint64'] | undefined]>
 
   /**
+   * Calls the set_media_cid(byte[])uint64 ABI method.
+   *
+  * Store IPFS CID for campaign media (image/video)
+  Creator only, can be called once Requires box MBR funding: 2500 + 400 * (5 + cid_length) microAlgos Max CID length: 64 characters
+
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  setMediaCid(params?: CallParams<FundraiserArgs['obj']['set_media_cid(byte[])uint64'] | FundraiserArgs['tuple']['set_media_cid(byte[])uint64']>): FundraiserComposer<[...TReturns, FundraiserReturns['set_media_cid(byte[])uint64'] | undefined]>
+
+  /**
+   * Calls the get_media_cid()byte[] ABI method.
+   *
+  * Retrieve IPFS CID for campaign media
+  Returns empty bytes if no media set
+
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  getMediaCid(params?: CallParams<FundraiserArgs['obj']['get_media_cid()byte[]'] | FundraiserArgs['tuple']['get_media_cid()byte[]']>): FundraiserComposer<[...TReturns, FundraiserReturns['get_media_cid()byte[]'] | undefined]>
+
+  /**
+   * Calls the approve_milestone()uint64 ABI method.
+   *
+  * 🔐 DECENTRALIZED ON-CHAIN APPROVAL
+  Approvers call this to approve the current milestone Replaces Firebase - all approvals stored on blockchain! Returns: number of approvals received (1, 2, or 3)
+
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  approveMilestone(params?: CallParams<FundraiserArgs['obj']['approve_milestone()uint64'] | FundraiserArgs['tuple']['approve_milestone()uint64']>): FundraiserComposer<[...TReturns, FundraiserReturns['approve_milestone()uint64'] | undefined]>
+
+  /**
    * Calls the release_milestone()uint64 ABI method.
    *
-  * Release funds for completed milestone (creator only)
-  NEW: Can ONLY release if goal is met! FIXED: Reserves minimum balance (0.1 ALGO) in contract
+  * Release funds for current milestone (creator only)
+  🔒 REQUIRES ALL 3 APPROVERS TO HAVE APPROVED FIRST This ensures multi-signature security on-chain!
 
    *
    * @param args The arguments for the contract call
@@ -1024,7 +1803,7 @@ export type FundraiserComposer<TReturns extends [...any[]] = []> = {
   /**
    * Calls the get_status()(uint64,uint64,uint64,uint64,uint64,bool,bool) ABI method.
    *
-   * Get campaign status (includes goal_reached)
+   * Get campaign status
    *
    * @param args The arguments for the contract call
    * @param params Any additional parameters for the call
@@ -1053,6 +1832,63 @@ export type FundraiserComposer<TReturns extends [...any[]] = []> = {
    * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
    */
   getDeadline(params?: CallParams<FundraiserArgs['obj']['get_deadline()uint64'] | FundraiserArgs['tuple']['get_deadline()uint64']>): FundraiserComposer<[...TReturns, FundraiserReturns['get_deadline()uint64'] | undefined]>
+
+  /**
+   * Calls the get_approvers()(address,address,address) ABI method.
+   *
+   * Get all approver addresses (on-chain query)
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  getApprovers(params?: CallParams<FundraiserArgs['obj']['get_approvers()(address,address,address)'] | FundraiserArgs['tuple']['get_approvers()(address,address,address)']>): FundraiserComposer<[...TReturns, FundraiserReturns['get_approvers()(address,address,address)'] | undefined]>
+
+  /**
+   * Calls the get_approval_status()(bool,bool,bool) ABI method.
+   *
+  * Get current approval status for each approver
+  Returns (approver1_approved, approver2_approved, approver3_approved) Frontend can use this instead of Firebase!
+
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  getApprovalStatus(params?: CallParams<FundraiserArgs['obj']['get_approval_status()(bool,bool,bool)'] | FundraiserArgs['tuple']['get_approval_status()(bool,bool,bool)']>): FundraiserComposer<[...TReturns, FundraiserReturns['get_approval_status()(bool,bool,bool)'] | undefined]>
+
+  /**
+   * Calls the has_approved(address)bool ABI method.
+   *
+   * Check if a specific address has approved the current milestone
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  hasApproved(params?: CallParams<FundraiserArgs['obj']['has_approved(address)bool'] | FundraiserArgs['tuple']['has_approved(address)bool']>): FundraiserComposer<[...TReturns, FundraiserReturns['has_approved(address)bool'] | undefined]>
+
+  /**
+   * Calls the get_approval_count()uint64 ABI method.
+   *
+   * Get number of approvals for current milestone
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  getApprovalCount(params?: CallParams<FundraiserArgs['obj']['get_approval_count()uint64'] | FundraiserArgs['tuple']['get_approval_count()uint64']>): FundraiserComposer<[...TReturns, FundraiserReturns['get_approval_count()uint64'] | undefined]>
+
+  /**
+   * Calls the is_approver(address)bool ABI method.
+   *
+   * Check if an address is one of the approvers
+   *
+   * @param args The arguments for the contract call
+   * @param params Any additional parameters for the call
+   * @returns The typed transaction composer so you can fluently chain multiple calls or call execute to execute all queued up transactions
+   */
+  isApprover(params?: CallParams<FundraiserArgs['obj']['is_approver(address)bool'] | FundraiserArgs['tuple']['is_approver(address)bool']>): FundraiserComposer<[...TReturns, FundraiserReturns['is_approver(address)bool'] | undefined]>
 
   /**
    * Makes a clear_state call to an existing instance of the Fundraiser smart contract.
