@@ -8,6 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { TicketingFactory, TicketingClient } from '../contracts/TicketingClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 import { getEventState, type EventState } from '../utils/blockchainData'
+import { listenToEvents, initializeFirebase } from '../utils/firebase'
 import { QRCodeSVG } from 'qrcode.react'
 import TicketScanner from '../components/TicketScanner'
 import algosdk from 'algosdk'
@@ -132,8 +133,34 @@ const TicketingPageDecentralized = () => {
 
   useEffect(() => {
     loadEvents()
-    // Poll for updates every 5 seconds for faster cross-device discovery
-    const interval = setInterval(loadEvents, 5000)
+    
+    // 🔥 Real-time Firebase listener for instant cross-device sync
+    initializeFirebase()
+    const unsubscribeFirebase = listenToEvents(async (firebaseEvents) => {
+      console.log(`🔥 Firebase events updated: ${firebaseEvents.length} events`)
+      
+      // Merge Firebase events with blockchain state
+      const eventStates: EventState[] = []
+      for (const fbEvent of firebaseEvents) {
+        const metadata = {
+          appId: fbEvent.appId,
+          creator: fbEvent.creator,
+          createdAt: fbEvent.createdAt,
+          title: fbEvent.title,
+          description: fbEvent.description,
+          venue: fbEvent.venue
+        }
+        const state = await getEventState(algorand, metadata)
+        if (state) {
+          eventStates.push(state)
+        }
+      }
+      
+      setEvents(eventStates)
+    })
+    
+    // Fallback: Poll for blockchain updates every 30 seconds (reduced from 5s since Firebase handles real-time)
+    const interval = setInterval(loadEvents, 30000)
     
     // Also refresh when page becomes visible (for cross-device sync)
     const handleVisibilityChange = () => {
@@ -146,6 +173,7 @@ const TicketingPageDecentralized = () => {
     
     return () => {
       clearInterval(interval)
+      unsubscribeFirebase()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, [])

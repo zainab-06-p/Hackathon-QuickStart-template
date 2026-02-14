@@ -8,6 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
 import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
+import { saveCampaignToFirebase, initializeFirebase } from '../utils/firebase'
 
 const CreateCampaignPage = () => {
   const navigate = useNavigate()
@@ -93,6 +94,25 @@ const CreateCampaignPage = () => {
         title: newCampaign.title,
         description: newCampaign.description
       })
+
+      // 🔥 Save to Firebase for real-time cross-device sync
+      try {
+        initializeFirebase()
+        await saveCampaignToFirebase({
+          appId: String(appId),
+          title: newCampaign.title,
+          description: newCampaign.description,
+          goal: newCampaign.goal,
+          creator: activeAddress,
+          createdAt: Date.now(),
+          blockchainTxId: result.confirmations?.[0]?.txId
+        })
+        console.log('🔥 Campaign saved to Firebase for real-time sync')
+        enqueueSnackbar('🔥 Campaign synced across all devices!', { variant: 'info' })
+      } catch (firebaseError) {
+        console.warn('Firebase save failed (non-critical):', firebaseError)
+        // Non-blocking: blockchain + localStorage still work
+      }
 
       // 🎯 Register with on-chain registry for cross-device discovery
       const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID

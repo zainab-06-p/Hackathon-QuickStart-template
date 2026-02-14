@@ -8,6 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 import { getCampaignState, getCampaignContributors, type CampaignState } from '../utils/blockchainData'
+import { listenToCampaigns, initializeFirebase } from '../utils/firebase'
 import YieldTracker from '../components/YieldTracker'
 
 const FundraisingPageDecentralized = () => {
@@ -67,8 +68,34 @@ const FundraisingPageDecentralized = () => {
 
   useEffect(() => {
     loadCampaigns()
-    // Poll for updates every 5 seconds for faster cross-device discovery
-    const interval = setInterval(() => loadCampaigns(), 5000)
+    
+    // 🔥 Real-time Firebase listener for instant cross-device sync
+    initializeFirebase()
+    const unsubscribeFirebase = listenToCampaigns(async (firebaseCampaigns) => {
+      console.log(`🔥 Firebase campaigns updated: ${firebaseCampaigns.length} campaigns`)
+      
+      // Merge Firebase campaigns with blockchain state
+      const campaignStates: CampaignState[] = []
+      for (const fbCampaign of firebaseCampaigns) {
+        const metadata = {
+          appId: fbCampaign.appId,
+          creator: fbCampaign.creator,
+          createdAt: fbCampaign.createdAt,
+          title: fbCampaign.title,
+          description: fbCampaign.description
+        }
+        const state = await getCampaignState(algorand, metadata)
+        if (state) {
+          campaignStates.push(state)
+        }
+      }
+      
+      setCampaigns(campaignStates)
+      setLastUpdated(new Date())
+    })
+    
+    // Fallback: Poll for blockchain updates every 30 seconds (reduced from 5s since Firebase handles real-time)
+    const interval = setInterval(() => loadCampaigns(), 30000)
     
     // Also refresh when page becomes visible (for cross-device sync)
     const handleVisibilityChange = () => {
@@ -81,6 +108,7 @@ const FundraisingPageDecentralized = () => {
     
     return () => {
       clearInterval(interval)
+      unsubscribeFirebase()
       document.removeEventListener('visibilitychange', handleVisibilityChange)
     }
   }, []) // ⚠️ IMPORTANT: No activeAddress dependency - all users see the same campaigns

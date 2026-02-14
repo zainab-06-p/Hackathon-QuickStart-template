@@ -8,6 +8,7 @@ import * as algokit from '@algorandfoundation/algokit-utils'
 import { TicketingFactory } from '../contracts/TicketingClient'
 import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
+import { saveEventToFirebase, initializeFirebase } from '../utils/firebase'
 
 const CreateEventPage = () => {
   const navigate = useNavigate()
@@ -106,6 +107,28 @@ const CreateEventPage = () => {
         description: newEvent.description,
         venue: newEvent.venue
       })
+
+      // 🔥 Save to Firebase for real-time cross-device sync
+      try {
+        initializeFirebase()
+        await saveEventToFirebase({
+          appId: String(appId),
+          title: newEvent.title,
+          description: newEvent.description,
+          venue: newEvent.venue,
+          eventDate: newEvent.dateTime,
+          totalTickets: newEvent.totalTickets,
+          ticketPrice: newEvent.ticketPrice,
+          creator: activeAddress,
+          createdAt: Date.now(),
+          blockchainTxId: result.confirmations?.[0]?.txId
+        })
+        console.log('🔥 Event saved to Firebase for real-time sync')
+        enqueueSnackbar('🔥 Event synced across all devices!', { variant: 'info' })
+      } catch (firebaseError) {
+        console.warn('Firebase save failed (non-critical):', firebaseError)
+        // Non-blocking: blockchain + localStorage still work
+      }
 
       // 🎯 Register with on-chain registry for cross-device discovery
       const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID
