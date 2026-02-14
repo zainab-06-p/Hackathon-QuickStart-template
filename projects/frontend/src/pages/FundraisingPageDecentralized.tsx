@@ -33,6 +33,7 @@ const FundraisingPageDecentralized = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
+  algorand.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
 
   // 🔥 FIREBASE ONLY - No blockchain discovery on page load
   // Firebase real-time listener handles ALL data synchronization
@@ -603,21 +604,6 @@ const FundraisingPageDecentralized = () => {
                       )
                     })()}
                     
-                    {Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) && (
-                      <p className="text-sm text-center mt-2">All milestones have been released! 🎉</p>
-                    )}
-                            description: selectedCampaign.description,
-                            imageUrl: selectedCampaign.imageUrl
-                          })
-                          if (updated) setSelectedCampaign(updated)
-                        } catch (e) {
-                          console.error('Release error:', e)
-                          enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
-                        }
-                      }}
-                    >
-                      💰 Release Next Milestone
-                    </button>
                     {Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) && (
                       <p className="text-sm text-center mt-2">All milestones have been released! 🎉</p>
                     )}

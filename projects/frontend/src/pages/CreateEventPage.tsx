@@ -21,9 +21,10 @@ const CreateEventPage = () => {
     date: new Date(Date.now() + 604800000).toISOString().substring(0, 16),
     saleEndDate: new Date(Date.now() + 518400000).toISOString().substring(0, 16), // 6 days (1 day before event)
     ticketPrice: '2',
-    maxSupply: '100',
-    organizerAddresses: '' // Comma-separated wallet addresses
+    maxSupply: '100'
   })
+  
+  const [organizerAddresses, setOrganizerAddresses] = useState<string[]>([''])
 
   const { enqueueSnackbar } = useSnackbar()
   const { activeAddress, transactionSigner } = useWallet()
@@ -36,6 +37,7 @@ const CreateEventPage = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
+  algorand.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
 
   const createEvent = async () => {
     if (!activeAddress) {
@@ -113,9 +115,8 @@ const CreateEventPage = () => {
       // 🔥 Save to Firebase for real-time cross-device sync
       try {
         initializeFirebase()
-        // Parse organizer addresses
-        const organizerAddresses = newEvent.organizerAddresses
-          .split(',')
+        // Filter out empty organizer addresses
+        const validOrganizerAddresses = organizerAddresses
           .map(addr => addr.trim())
           .filter(addr => addr.length > 0)
         
@@ -128,7 +129,7 @@ const CreateEventPage = () => {
           totalTickets: newEvent.maxSupply,
           ticketPrice: newEvent.ticketPrice,
           creator: activeAddress,
-          organizers: [activeAddress, ...organizerAddresses], // Creator is always an organizer
+          organizers: [activeAddress, ...validOrganizerAddresses], // Creator is always an organizer
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -313,15 +314,42 @@ const CreateEventPage = () => {
                 <label className="label">
                   <span className="label-text font-semibold">Additional Organizers (Optional)</span>
                 </label>
-                <textarea
-                  className="textarea textarea-bordered h-20"
-                  value={newEvent.organizerAddresses}
-                  onChange={(e) => setNewEvent({...newEvent, organizerAddresses: e.target.value})}
-                  placeholder="Enter wallet addresses separated by commas (e.g., ADDR1..., ADDR2..., ADDR3...)&#10;Organizers can scan tickets at entry. You are automatically an organizer."
-                />
                 <label className="label">
-                  <span className="label-text-alt text-info">👥 Add wallet addresses of co-organizers who can scan tickets at the event entrance</span>
+                  <span className="label-text-alt text-info">👥 Add wallet addresses of co-organizers who can scan tickets at the event entrance. You are automatically an organizer.</span>
                 </label>
+                <div className="space-y-2">
+                  {organizerAddresses.map((addr, idx) => (
+                    <div key={idx} className="flex gap-2">
+                      <input
+                        type="text"
+                        className="input input-bordered flex-1 font-mono text-xs"
+                        value={addr}
+                        onChange={(e) => {
+                          const newAddresses = [...organizerAddresses]
+                          newAddresses[idx] = e.target.value
+                          setOrganizerAddresses(newAddresses)
+                        }}
+                        placeholder="ALGORAND_WALLET_ADDRESS..."
+                      />
+                      {organizerAddresses.length > 1 && (
+                        <button
+                          type="button"
+                          className="btn btn-error btn-sm"
+                          onClick={() => setOrganizerAddresses(organizerAddresses.filter((_, i) => i !== idx))}
+                        >
+                          −
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    className="btn btn-success btn-sm w-full"
+                    onClick={() => setOrganizerAddresses([...organizerAddresses, ''])}
+                  >
+                    + Add Another Organizer
+                  </button>
+                </div>
               </div>
             </div>
 

@@ -20,11 +20,10 @@ const CreateCampaignPage = () => {
     description: '',
     goal: '100',
     milestones: '3',
-    daysUntilDeadline: '30',
-    approver1: '',
-    approver2: '',
-    approver3: ''
+    daysUntilDeadline: '30'
   })
+  
+  const [approverAddresses, setApproverAddresses] = useState<string[]>(['', '', ''])
 
   const { enqueueSnackbar } = useSnackbar()
   const { activeAddress, transactionSigner } = useWallet()
@@ -37,6 +36,7 @@ const CreateCampaignPage = () => {
   })
   
   algorand.setDefaultSigner(transactionSigner)
+  algorand.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
 
   const createCampaign = async () => {
     if (!activeAddress) {
@@ -119,8 +119,8 @@ const CreateCampaignPage = () => {
         initializeFirebase()
         
         // Validate approver addresses
-        const approvers = [newCampaign.approver1, newCampaign.approver2, newCampaign.approver3]
-        if (!approvers.every(addr => addr.trim().length > 0)) {
+        const approvers = approverAddresses.map(a => a.trim()).filter(a => a.length > 0)
+        if (approvers.length < 3) {
           enqueueSnackbar('⚠️ All 3 approver addresses are required!', { variant: 'warning' })
         }
         
@@ -130,7 +130,7 @@ const CreateCampaignPage = () => {
           description: newCampaign.description,
           goal: newCampaign.goal,
           creator: activeAddress,
-          approvers: approvers.map(a => a.trim()),
+          approvers: approvers,
           createdAt: Date.now(),
           blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
         })
@@ -295,47 +295,48 @@ const CreateCampaignPage = () => {
                     <p>All 3 approvers must sign to release each milestone. This prevents unauthorized fund access.</p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="form-control">
+                <div className="space-y-2">
+                  {approverAddresses.map((addr, idx) => (
+                    <div key={idx}>
+                      <label className="label">
+                        <span className="label-text font-semibold">Approver {idx + 1} Address *</span>
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          className="input input-bordered flex-1 font-mono text-xs"
+                          value={addr}
+                          onChange={(e) => {
+                            const newAddresses = [...approverAddresses]
+                            newAddresses[idx] = e.target.value
+                            setApproverAddresses(newAddresses)
+                          }}
+                          placeholder="ALGORAND_WALLET_ADDRESS..."
+                        />
+                        {approverAddresses.length > 3 && (
+                          <button
+                            type="button"
+                            className="btn btn-error btn-sm"
+                            onClick={() => setApproverAddresses(approverAddresses.filter((_, i) => i !== idx))}
+                          >
+                            −
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {approverAddresses.length < 5 && (
+                    <button
+                      type="button"
+                      className="btn btn-success btn-sm w-full mt-2"
+                      onClick={() => setApproverAddresses([...approverAddresses, ''])}
+                    >
+                      + Add Another Approver
+                    </button>
+                  )}
+                </div>
                 <label className="label">
-                  <span className="label-text font-semibold">Approver 1 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-xs"
-                  value={newCampaign.approver1}
-                  onChange={(e) => setNewCampaign({...newCampaign, approver1: e.target.value})}
-                  placeholder="ALGORAND_ADDRESS_1..."
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Approver 2 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-xs"
-                  value={newCampaign.approver2}
-                  onChange={(e) => setNewCampaign({...newCampaign, approver2: e.target.value})}
-                  placeholder="ALGORAND_ADDRESS_2..."
-                />
-              </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Approver 3 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-xs"
-                  value={newCampaign.approver3}
-                  onChange={(e) => setNewCampaign({...newCampaign, approver3: e.target.value})}
-                  placeholder="ALGORAND_ADDRESS_3..."
-                />
-                <label className="label">
-                  <span className="label-text-alt text-info">ℹ️ These 3 addresses must all approve before any milestone can be released</span>
+                  <span className="label-text-alt text-info">ℹ️ All approver addresses must approve before any milestone can be released (minimum 3 required)</span>
                 </label>
               </div>
             </div>
@@ -345,7 +346,7 @@ const CreateCampaignPage = () => {
             <button 
               className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 border-0 text-white'}`}
               onClick={createCampaign}
-              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description || !newCampaign.approver1 || !newCampaign.approver2 || !newCampaign.approver3}
+              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description || approverAddresses.filter(a => a.trim().length > 0).length < 3}
             >
               {creating ? 'Deploying Contract...' : '⛓️ Deploy Campaign Contract'}
             </button>

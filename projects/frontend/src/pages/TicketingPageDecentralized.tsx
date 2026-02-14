@@ -42,6 +42,7 @@ const TicketingPageDecentralized = () => {
       indexerConfig,
     })
     client.setDefaultSigner(transactionSigner)
+    client.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
     return client
   }, [transactionSigner, algodConfig, indexerConfig])
 
