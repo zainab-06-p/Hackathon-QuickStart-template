@@ -1,175 +1,189 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
-  Rocket, 
-  ShieldCheck, 
-  Users, 
-  ShoppingBag, 
-  TrendingUp, 
-  Globe, 
-  ArrowRight,
-  Zap
-} from 'lucide-react';
-import { motion } from 'framer-motion';
-import { BrandButton } from './components/Base/BrandButton';
-import { Card } from './components/Base/Card';
+import { useWallet } from '@txnlab/use-wallet-react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import ConnectWallet from './components/ConnectWallet'
+import SendAlgo from './components/SendAlgo'
+import CreateASA from './components/CreateASA'
+import AssetOptIn from './components/AssetOptIn'
+import AppCalls from './components/AppCalls'
+import Bank from './components/Bank'
 
-const Home: React.FC = () => {
-  const features = [
-    {
-      title: 'Start a Project',
-      desc: 'Launch your fundraising campaign and gather community support.',
-      icon: Rocket,
-      link: '/create-campaign',
-      color: 'text-indigo-400'
-    },
-    {
-      title: 'Explore Ideas',
-      desc: 'Discover innovative student projects waiting for your backing.',
-      icon: Globe,
-      link: '/fundraise',
-      color: 'text-emerald-400'
-    },
-    {
-      title: 'Transparent Tracking',
-      desc: 'Monitor milestone progress and escrow usage in real-time.',
-      icon: ShieldCheck,
-      link: '/fund-tracker',
-      color: 'text-amber-400'
-    },
-    {
-      title: 'Asset Marketplace',
-      desc: 'Trade project assets and services securely.',
-      icon: ShoppingBag,
-      link: '/marketplace',
-      color: 'text-rose-400'
-    },
-    {
-      title: 'Savings Pools',
-      desc: 'Collaborative saving pools for collective goals.',
-      icon: TrendingUp,
-      link: '/savings',
-      color: 'text-sky-400'
-    },
-    {
-      title: 'Study Groups',
-      desc: 'Learn together with incentivized staking mechanisms.',
-      icon: Users,
-      link: '/study-group',
-      color: 'text-violet-400'
-    }
-  ];
+const Home = () => {
+  const navigate = useNavigate()
+  const { activeAddress } = useWallet()
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+  // Modal state
+  const [openWalletModal, setOpenWalletModal] = useState(false)
+  const [sendAlgoModal, setSendAlgoModal] = useState(false)
+  const [createAsaModal, setCreateAsaModal] = useState(false)
+  const [assetOptInModal, setAssetOptInModal] = useState(false)
+  const [appCallsDemoModal, setAppCallsDemoModal] = useState(false)
+  const [bankModal, setBankModal] = useState(false)
+
+  const toggleWalletModal = () => setOpenWalletModal(!openWalletModal)
 
   return (
-    <div className="flex flex-col gap-24 pb-20">
-      {/* Hero Section */}
-      <section className="pt-20 md:pt-32 text-center max-w-4xl mx-auto space-y-8 px-4 relative">
-        <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-3xl -z-10" />
-        
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-zinc-800/50 border border-zinc-700 text-sm text-zinc-400 mb-6">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            Live on Testnet
-          </div>
-          <h1 className="text-5xl md:text-7xl font-display font-medium tracking-tight text-white">
-            Turn student ideas into <br />
-            <span className="text-zinc-500">real-world impact.</span>
-          </h1>
-        </motion.div>
+    <div className="min-h-screen bg-gradient-to-tr from-teal-400 via-cyan-400 to-blue-500 bg-300% animate-gradient-shift relative flex items-center justify-center px-4 -mt-20 pt-20">
+      {/* Wallet Connect — Top Right */}
+      <button
+        className="absolute top-24 right-6 z-10 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-bold px-6 py-3 rounded-full shadow-2xl hover:shadow-cyan-500/50 hover:scale-110 transition-all duration-300 border-0"
+        onClick={toggleWalletModal}
+        disabled={!!activeAddress}
+      >
+        {activeAddress ? '✅ Wallet Connected' : '🔗 Connect Wallet'}
+      </button>
 
-        <motion.p 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.6 }}
-          className="text-xl text-zinc-400 font-light max-w-2xl mx-auto leading-relaxed"
-        >
-          The decentralized platform for fundraising, tracking, and scaling student initiatives.
-        </motion.p>
+      {/* Main Frosted Card */}
+      <div className="max-w-6xl w-full p-10 backdrop-blur-xl bg-white/80 border-4 border-white/50 hover:border-purple-300 rounded-3xl shadow-2xl transition-all duration-500">
+        {/* Heading */}
+        <h1 className="text-4xl md:text-5xl font-extrabold text-center mb-3 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent animate-pulse">
+          CampusChain: Simple Campus Finance on Algorand
+        </h1>
+        <p className="text-center text-xl font-semibold text-gray-700 mb-10">
+          Blockchain operations, decentralized and powerful. 🚀
+        </p>
 
-        <motion.div 
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
-        >
-          <Link to="/create-campaign">
-            <BrandButton size="lg" className="group">
-              Start Building
-              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-            </BrandButton>
-          </Link>
-          <Link to="/fundraise">
-            <BrandButton variant="secondary" size="lg">
-              Browse Projects
-            </BrandButton>
-          </Link>
-        </motion.div>
-      </section>
+        {/* Card Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-      {/* Features Grid */}
-      <section className="px-4 md:px-0">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-display font-semibold text-white">Platform Features</h2>
-        </div>
-        
-        <motion.div 
-          variants={containerVariants}
-          initial="hidden"
-          whileInView="show"
-          viewport={{ once: true }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
-          {features.map((item, idx) => (
-            <motion.div key={idx} variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}>
-              <Link to={item.link}>
-                <Card hoverable className="h-full group">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className={`p-3 rounded-lg bg-zinc-800/50 group-hover:bg-zinc-800 transition-colors ${item.color}`}>
-                      <item.icon className="h-6 w-6" />
-                    </div>
-                    <ArrowRight className="h-5 w-5 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                  </div>
-                  <h3 className="text-lg font-medium text-white mb-2">{item.title}</h3>
-                  <p className="text-zinc-400 text-sm leading-relaxed">{item.desc}</p>
-                </Card>
-              </Link>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
+          {/* ──── Row 1: Basic Operations ──── */}
 
-      {/* Stats / Social Proof */}
-      <section className="bg-zinc-900/30 border-y border-zinc-800 py-16">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[ 
-            { label: 'Total Volume', value: '4.5k' },
-            { label: 'Active Projects', value: '86' },
-            { label: 'Contributors', value: '1.2k+' },
-            { label: 'Success Rate', value: '94%' },
-          ].map((stat, i) => (
-            <div key={i}>
-              <div className="text-3xl font-display font-semibold text-white mb-1">{stat.value}</div>
-              <div className="text-sm text-zinc-500 uppercase tracking-wider">{stat.label}</div>
+          {/* Send Algo */}
+          <div className="card bg-gradient-to-br from-sky-500 to-cyan-500 text-white shadow-xl hover:scale-105 hover:shadow-sky-500/50 transition-all duration-300">
+            <div className="card-body">
+              <h2 className="card-title">💸 Send Algo</h2>
+              <p>Send a payment transaction to any address.</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline border-white/60 text-white hover:bg-white hover:text-sky-600"
+                  disabled={!activeAddress}
+                  onClick={() => setSendAlgoModal(true)}
+                >
+                  Open
+                </button>
+              </div>
             </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-};
+          </div>
 
-export default Home;
+          {/* Create Token (ASA) */}
+          <div className="card bg-gradient-to-br from-emerald-500 to-teal-500 text-white shadow-xl hover:scale-105 hover:shadow-emerald-500/50 transition-all duration-300">
+            <div className="card-body">
+              <h2 className="card-title">🪙 Create Token (ASA)</h2>
+              <p>Mint a fungible ASA with custom supply and decimals.</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline border-white/60 text-white hover:bg-white hover:text-emerald-600"
+                  disabled={!activeAddress}
+                  onClick={() => setCreateAsaModal(true)}
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Asset Opt-In */}
+          <div className="card bg-gradient-to-br from-indigo-500 to-blue-500 text-white shadow-xl hover:scale-105 hover:shadow-indigo-500/50 transition-all duration-300">
+            <div className="card-body">
+              <h2 className="card-title">✅ Asset Opt-In</h2>
+              <p>Opt-in to any existing ASA to receive tokens.</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline border-white/60 text-white hover:bg-white hover:text-indigo-600"
+                  disabled={!activeAddress}
+                  onClick={() => setAssetOptInModal(true)}
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* ──── Row 2: Demo Apps ──── */}
+
+          {/* Counter */}
+          <div className="card bg-gradient-to-br from-orange-500 to-amber-500 text-white shadow-xl md:col-span-2 lg:col-span-1 hover:scale-105 hover:shadow-orange-500/50 transition-all duration-300">
+            <div className="card-body">
+              <h2 className="card-title">🔢 Counter</h2>
+              <p>Interact with the shared on-chain counter app.</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline border-white/60 text-white hover:bg-white hover:text-orange-600"
+                  data-test-id="appcalls-demo"
+                  disabled={!activeAddress}
+                  onClick={() => setAppCallsDemoModal(true)}
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Bank */}
+          <div className="card bg-gradient-to-br from-rose-500 to-red-500 text-white shadow-xl md:col-span-2 lg:col-span-1 hover:scale-105 hover:shadow-rose-500/50 transition-all duration-300">
+            <div className="card-body">
+              <h2 className="card-title">🏛️ Bank</h2>
+              <p>Deposit and withdraw ALGOs and view statements.</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline border-white/60 text-white hover:bg-white hover:text-rose-600"
+                  disabled={!activeAddress}
+                  onClick={() => setBankModal(true)}
+                >
+                  Open
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Spacer on desktop so Row 3 starts fresh */}
+          <div className="hidden lg:block" />
+
+          {/* ──── Row 3: MAIN FEATURE CARDS ──── */}
+
+          {/* Campaign */}
+          <div className="card bg-gradient-to-br from-purple-500 to-violet-600 text-white shadow-2xl md:col-span-2 lg:col-span-1 hover:scale-105 hover:shadow-purple-500/50 transition-all duration-300 border-2 border-purple-300">
+            <div className="card-body">
+              <h2 className="card-title text-2xl">🏦 Campaign</h2>
+              <p className="text-purple-100">Milestone-based crowdfunding • 100% goal protection</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline hover:bg-white hover:text-purple-600 border-2 text-white"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Launch 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Event Ticket System */}
+          <div className="card bg-gradient-to-br from-pink-600 to-rose-600 text-white shadow-2xl md:col-span-2 lg:col-span-1 hover:scale-105 hover:shadow-pink-500/50 transition-all duration-300 border-2 border-pink-300">
+            <div className="card-body">
+              <h2 className="card-title text-2xl">🎫 Event Ticket System</h2>
+              <p className="text-pink-100">NFT tickets • QR verification • Anti-scalping</p>
+              <div className="card-actions justify-end">
+                <button
+                  className="btn btn-outline hover:bg-white hover:text-pink-600 border-2 text-white"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Launch 🚀
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Modals */}
+      <ConnectWallet openModal={openWalletModal} closeModal={toggleWalletModal} />
+      <SendAlgo openModal={sendAlgoModal} closeModal={() => setSendAlgoModal(false)} />
+      <CreateASA openModal={createAsaModal} closeModal={() => setCreateAsaModal(false)} />
+      <AssetOptIn openModal={assetOptInModal} closeModal={() => setAssetOptInModal(false)} />
+      <AppCalls openModal={appCallsDemoModal} setModalState={setAppCallsDemoModal} />
+      <Bank openModal={bankModal} closeModal={() => setBankModal(false)} />
+    </div>
+  )
+}
+
+export default Home

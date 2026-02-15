@@ -15,6 +15,7 @@ import CreateEventPage from './pages/CreateEventPage';
 import FederationPage from './pages/FederationPage';
 import NFTEvolutionPage from './pages/NFTEvolutionPage';
 import ExplorerPage from './pages/ExplorerPage';
+import DashboardPage from './pages/DashboardPage';
 import { Navbar } from './components/Navbar';
 import { Toaster } from 'react-hot-toast';
 import { VotingProvider } from './utils/votingContext';
@@ -44,6 +45,7 @@ function App() {
             <Route path='/ticketing/nft-evolution' element={<NFTEvolutionPage />} />
             <Route path='/federation' element={<FederationPage />} />
             <Route path='/explorer' element={<ExplorerPage />} />
+            <Route path='/dashboard' element={<DashboardPage />} />
             <Route path='/ticket-resale' element={<Navigate to="/marketplace" replace />} />
           </Routes>
         </main>

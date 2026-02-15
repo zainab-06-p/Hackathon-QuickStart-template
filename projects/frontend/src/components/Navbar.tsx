@@ -21,7 +21,7 @@ export const Navbar: React.FC = () => {
   };
 
   const navLinks = [
-    { name: 'Dashboard', path: '/', icon: LayoutDashboard },
+    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Projects', path: '/fundraise', icon: Search },
     { name: 'Activity', path: '/fund-tracker', icon: Activity },
     { name: 'Market', path: '/marketplace', icon: ShoppingBag },
