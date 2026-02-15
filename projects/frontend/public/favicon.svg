@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Shield body -->
+  <path d="M32 4 L56 16 V34 C56 48 44 58 32 62 C20 58 8 48 8 34 V16 Z" fill="#6366f1" stroke="#818cf8" stroke-width="1.5"/>
+  <!-- Inner shield highlight -->
+  <path d="M32 10 L50 19 V33 C50 44 41 52 32 56 C23 52 14 44 14 33 V19 Z" fill="#4f46e5"/>
+  <!-- Tower left -->
+  <rect x="22" y="26" width="6" height="18" rx="1" fill="#c7d2fe"/>
+  <!-- Tower right -->
+  <rect x="36" y="26" width="6" height="18" rx="1" fill="#c7d2fe"/>
+  <!-- Tower center -->
+  <rect x="29" y="22" width="6" height="22" rx="1" fill="#e0e7ff"/>
+  <!-- Battlements -->
+  <rect x="22" y="24" width="2" height="4" fill="#e0e7ff"/>
+  <rect x="26" y="24" width="2" height="4" fill="#e0e7ff"/>
+  <rect x="29" y="20" width="2" height="4" fill="#e0e7ff"/>
+  <rect x="33" y="20" width="2" height="4" fill="#e0e7ff"/>
+  <rect x="36" y="24" width="2" height="4" fill="#e0e7ff"/>
+  <rect x="40" y="24" width="2" height="4" fill="#e0e7ff"/>
+  <!-- Gate -->
+  <path d="M30 44 V38 Q32 35 34 38 V44 Z" fill="#4f46e5"/>
+</svg>

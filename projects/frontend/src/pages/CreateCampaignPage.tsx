@@ -1,15 +1,15 @@
 import { useWallet } from '@txnlab/use-wallet-react'
-import { useSnackbar } from 'notistack'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import algosdk from 'algosdk'
 import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
 import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import { FundraiserFactory } from '../contracts/FundraiserClient'
-import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
-import { ContractRegistry } from '../utils/contractRegistry'
 import { saveCampaignToFirebase, initializeFirebase } from '../utils/firebase'
+import { Card } from '../components/Base/Card'
+import { BrandButton } from '../components/Base/BrandButton'
+import { Rocket, Shield, Target, Calendar, ArrowLeft } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 const CreateCampaignPage = () => {
   const navigate = useNavigate()
@@ -18,359 +18,190 @@ const CreateCampaignPage = () => {
   const [newCampaign, setNewCampaign] = useState({
     title: '',
     description: '',
-    goal: '100',
+    goal: '5',
     milestones: '3',
     daysUntilDeadline: '30'
   })
   
-  // Multi-signature approvers (3 required for milestone releases)
   const [approvers, setApprovers] = useState({
     approver1: '',
     approver2: '',
     approver3: ''
   })
 
-  const { enqueueSnackbar } = useSnackbar()
   const { activeAddress, transactionSigner } = useWallet()
-
-  const algodConfig = getAlgodConfigFromViteEnvironment()
-  const indexerConfig = getIndexerConfigFromViteEnvironment()
-  const algorand = AlgorandClient.fromConfig({
-    algodConfig,
-    indexerConfig,
-  })
-  
-  algorand.setDefaultSigner(transactionSigner)
 
   const createCampaign = async () => {
     if (!activeAddress) {
-      enqueueSnackbar('Please connect your wallet', { variant: 'error' })
+      toast.error('Please connect your wallet first')
       return
     }
     
-    // Validate approvers
-    if (!approvers.approver1 || !approvers.approver2 || !approvers.approver3) {
-      enqueueSnackbar('Please provide all 3 milestone approvers', { variant: 'error' })
-      return
-    }
-    
-    if (approvers.approver1.length !== 58 || approvers.approver2.length !== 58 || approvers.approver3.length !== 58) {
-      enqueueSnackbar('Invalid approver address(es). Algorand addresses must be 58 characters.', { variant: 'error' })
-      return
-    }
-
     setCreating(true)
     try {
-      const goalInMicroAlgos = Math.floor(parseFloat(newCampaign.goal) * 1_000_000)
-      const milestonesCount = parseInt(newCampaign.milestones)
-      const deadlineTimestamp = Math.floor(Date.now() / 1000) + 
-        (parseInt(newCampaign.daysUntilDeadline) * 24 * 60 * 60)
+      initializeFirebase()
+
+      const algodConfig = getAlgodConfigFromViteEnvironment()
+      const indexerConfig = getIndexerConfigFromViteEnvironment()
+      const algorand = AlgorandClient.fromConfig({ algodConfig, indexerConfig })
+      algorand.setDefaultSigner(transactionSigner)
+      algorand.setDefaultValidityWindow(1000)
 
       const factory = new FundraiserFactory({
-        algorand,
         defaultSender: activeAddress,
+        algorand,
       })
 
-      // Check account balance first
-      const accountInfo = await algorand.client.algod.accountInformation(activeAddress).do()
-      const balance = Number(accountInfo.amount)
-      const minBalance = Number(accountInfo.minBalance)
-      
-      // Need: contract creation fee (1 ALGO) + contract MBR (0.1 ALGO) + user MBR
-      const requiredBalance = minBalance + 1_100_000 // 1.1 ALGO extra
-      
-      if (balance < requiredBalance) {
-        enqueueSnackbar(
-          `Insufficient balance! You have ${(balance / 1_000_000).toFixed(3)} ALGO but need at least ${(requiredBalance / 1_000_000).toFixed(3)} ALGO. Please add more funds to your wallet.`,
-          { variant: 'error' }
-        )
-        return
-      }
-
-      enqueueSnackbar('Deploying smart contract with multi-sig approvals...', { variant: 'info' })
-
+      toast.loading('Deploying contract — please approve in your wallet...', { id: 'create' })
+      const deadlineTimestamp = Math.floor(Date.now() / 1000) + parseInt(newCampaign.daysUntilDeadline) * 24 * 60 * 60
       const { result } = await factory.send.create.createCampaign({
-        args: {
-          goal: BigInt(goalInMicroAlgos),
-          milestones: BigInt(milestonesCount),
-          deadline: BigInt(deadlineTimestamp),
-          approver1: approvers.approver1,
-          approver2: approvers.approver2,
-          approver3: approvers.approver3
-        },
-        note: new TextEncoder().encode(JSON.stringify({
-          type: 'campaign',
-          title: newCampaign.title,
-          description: newCampaign.description
-        })),
-        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
-        populateAppCallResources: false,
-        suppressLog: true
+        args: [
+          BigInt(parseFloat(newCampaign.goal) * 1_000_000),
+          BigInt(newCampaign.milestones),
+          BigInt(deadlineTimestamp),
+          approvers.approver1 || activeAddress,
+          approvers.approver2 || activeAddress,
+          approvers.approver3 || activeAddress,
+        ]
       })
 
+      if (!result.appId) throw new Error('Failed to get App ID')
       const appId = Number(result.appId)
-      const appAddress = algosdk.getApplicationAddress(appId)
-      
-      // Fund the contract with minimum balance (0.1 ALGO) so it can send payments later
-      enqueueSnackbar('Funding contract with minimum balance...', { variant: 'info' })
-      await algorand.send.payment({
-        sender: activeAddress,
-        receiver: appAddress,
-        amount: algokit.algos(0.1),
-        validityWindow: 1000,  // ~4 minutes for signing (TestNet max)
-        suppressLog: true
-      })
-      
-      enqueueSnackbar(`✅ Campaign created! App ID: ${appId}`, { variant: 'success' })
 
-      // Register in localStorage for immediate visibility
-      ContractRegistry.registerFundraiser({
-        appId,
+      toast.loading('Saving campaign details...', { id: 'create' })
+      await saveCampaignToFirebase({
+        appId: appId.toString(),
         creator: activeAddress,
-        createdAt: Date.now(),
         title: newCampaign.title,
-        description: newCampaign.description
+        description: newCampaign.description,
+        goal: newCampaign.goal,
+        createdAt: Date.now()
       })
 
-      // 🔥 Save to Firebase for real-time cross-device sync
-      try {
-        initializeFirebase()
-        await saveCampaignToFirebase({
-          appId: String(appId),
-          title: newCampaign.title,
-          description: newCampaign.description,
-          goal: newCampaign.goal,
-          creator: activeAddress,
-          createdAt: Date.now(),
-          blockchainTxId: result.transaction?.txID() || result.transactions?.[0]?.txID() || undefined
-        })
-        console.log('🔥 Campaign saved to Firebase for real-time sync')
-        enqueueSnackbar('🔥 Campaign synced across all devices!', { variant: 'info' })
-      } catch (firebaseError) {
-        console.warn('Firebase save failed (non-critical):', firebaseError)
-        // Non-blocking: blockchain + localStorage still work
+      toast.success(`Campaign created! App ID: ${appId}`, { id: 'create' })
+      navigate('/fundraise')
+    } catch (error: any) {
+      console.error(error)
+      const msg = error?.message || String(error)
+      if (msg.includes('overspend') || msg.includes('underflow') || msg.includes('MicroAlgos:{Raw:0}')) {
+        toast.error('Insufficient ALGO balance. Fund your wallet on TestNet first.', { id: 'create' })
+      } else if (msg.includes('user rejected') || msg.includes('cancelled') || msg.includes('User Rejected')) {
+        toast.error('Transaction cancelled by user', { id: 'create' })
+      } else if (msg.includes('popup') || msg.includes('blocked')) {
+        toast.error('Wallet popup was blocked. Allow popups for this site and try again.', { id: 'create' })      } else if (msg.includes('txn dead') || msg.includes('outside of')) {
+        toast.error('Transaction expired. Please try again — approve faster in your wallet.', { id: 'create' })      } else {
+        toast.error(`Failed: ${msg.substring(0, 100)}`, { id: 'create' })
       }
-
-      // 🎯 Register with on-chain registry for cross-device discovery
-      const registryAppId = import.meta.env.VITE_REGISTRY_APP_ID
-      if (registryAppId && Number(registryAppId) > 0) {
-        try {
-          console.log(`📝 Registering campaign ${appId} with registry contract ${registryAppId}...`)
-          
-          const registryFactory = new CampusChainRegistryFactory({
-            algorand,
-            defaultSender: activeAddress,
-          })
-          
-          const registryClient = registryFactory.getAppClientById({
-            appId: BigInt(registryAppId)
-          })
-          
-          await registryClient.send.registerFundraiser({
-            args: { appId: BigInt(appId) }
-          })
-          
-          console.log(`✅ Campaign ${appId} registered in on-chain registry!`)
-          enqueueSnackbar('📋 Campaign registered for cross-device discovery!', { variant: 'success' })
-        } catch (error) {
-          console.warn('Registry registration failed (non-critical):', error)
-          // Don't block the user - localStorage registration is enough
-        }
-      }
-
-      // Navigate back to campaigns list
-      setTimeout(() => {
-        navigate('/fundraising')
-      }, 2000)
-      
-    } catch (e) {
-      console.error('Error creating campaign:', e)
-      enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
     } finally {
       setCreating(false)
     }
   }
 
-  const formatAddress = (addr: string) => {
-    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 md:py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div className="flex items-center gap-2 md:gap-4">
-              <button 
-                onClick={() => navigate('/fundraising')} 
-                className="btn btn-ghost btn-xs sm:btn-sm"
-              >
-                ← Back
-              </button>
-              <h1 className="text-lg sm:text-xl md:text-2xl font-bold text-blue-600">🚀 Create Campaign</h1>
+    <div className="max-w-3xl mx-auto pb-20">
+      <div className="mb-8">
+        <button onClick={() => navigate(-1)} className="flex items-center text-zinc-400 hover:text-white mb-4 transition-colors">
+          <ArrowLeft className="w-4 h-4 mr-1" /> Back
+        </button>
+        <h1 className="text-3xl font-display font-semibold text-white">Start a Campaign</h1>
+        <p className="text-zinc-400 mt-2">Launch your fundraising initiative on the blockchain.</p>
+      </div>
+
+      <Card className="space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-zinc-300 mb-1.5">Campaign Title</label>
+          <input 
+            type="text" 
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+            placeholder="e.g. Solar Power for Campus Library"
+            value={newCampaign.title}
+            onChange={(e) => setNewCampaign({...newCampaign, title: e.target.value})}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-zinc-300 mb-1.5">Description</label>
+          <textarea 
+            className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white h-32 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+            placeholder="Describe your project goals and impact..."
+            value={newCampaign.description}
+            onChange={(e) => setNewCampaign({...newCampaign, description: e.target.value})}
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Funding Goal (ALGO)</label>
+            <div className="relative">
+               <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+               <input 
+                type="number"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                value={newCampaign.goal}
+                onChange={(e) => setNewCampaign({...newCampaign, goal: e.target.value})}
+              />
             </div>
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
-              {activeAddress && (
-                <div className="badge badge-success badge-xs sm:badge-sm hidden sm:inline-flex">{formatAddress(activeAddress)}</div>
-              )}
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Milestones</label>
+            <div className="relative">
+               <Shield className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+               <input 
+                type="number"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                value={newCampaign.milestones}
+                onChange={(e) => setNewCampaign({...newCampaign, milestones: e.target.value})}
+              />
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-1.5">Duration (Days)</label>
+            <div className="relative">
+               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
+               <input 
+                type="number"
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg pl-10 pr-4 py-2 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors"
+                value={newCampaign.daysUntilDeadline}
+                onChange={(e) => setNewCampaign({...newCampaign, daysUntilDeadline: e.target.value})}
+              />
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="card bg-white/95 backdrop-blur shadow-2xl border-2 border-purple-200 hover:border-purple-400 transition-all duration-300">
-          <div className="card-body">
-            <h2 className="card-title text-xl md:text-2xl lg:text-3xl mb-4 md:mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              🚀 Campaign Details
-            </h2>
-            <div className="alert alert-info bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 shadow-lg mb-4 md:mb-6">
-              <span className="text-xs sm:text-sm"><strong>⛓️ Fully Decentralized:</strong> Each campaign deploys its own smart contract. Funds released only when goal is 100% reached!</span>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Campaign Title *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered"
-                  value={newCampaign.title}
-                  onChange={(e) => setNewCampaign({...newCampaign, title: e.target.value})}
-                  placeholder="e.g., Tech Fest 2026 Funding"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Goal Amount (ALGO) *</span>
-                </label>
-                <input
-                  type="number"
-                  step="1"
-                  min="1"
-                  className="input input-bordered"
-                  value={newCampaign.goal}
-                  onChange={(e) => setNewCampaign({...newCampaign, goal: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Milestones *</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  className="input input-bordered"
-                  value={newCampaign.milestones}
-                  onChange={(e) => setNewCampaign({...newCampaign, milestones: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Days Until Deadline *</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  className="input input-bordered"
-                  value={newCampaign.daysUntilDeadline}
-                  onChange={(e) => setNewCampaign({...newCampaign, daysUntilDeadline: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Description *</span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered h-24"
-                  value={newCampaign.description}
-                  onChange={(e) => setNewCampaign({...newCampaign, description: e.target.value})}
-                  placeholder="Describe your campaign..."
-                />
-              </div>
-            </div>
-
-            <div className="divider"></div>
-            
-            {/* Multi-Signature Approvers Section */}
-            <div className="alert alert-warning mb-4">
-              <div>
-                <h3 className="font-bold text-lg">🔐 Multi-Signature Milestone Approvals</h3>
-                <p className="text-sm mt-1">Add 3 trusted wallet addresses who must ALL approve before each milestone release</p>
-                <p className="text-xs mt-1 opacity-75">This ensures decentralized governance and prevents misuse of funds</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-3">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Approver 1 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-sm"
-                  value={approvers.approver1}
-                  onChange={(e) => setApprovers({...approvers, approver1: e.target.value})}
-                  placeholder="Algorand wallet address (58 characters)"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Approver 2 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-sm"
-                  value={approvers.approver2}
-                  onChange={(e) => setApprovers({...approvers, approver2: e.target.value})}
-                  placeholder="Algorand wallet address (58 characters)"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Approver 3 Address *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered font-mono text-sm"
-                  value={approvers.approver3}
-                  onChange={(e) => setApprovers({...approvers, approver3: e.target.value})}
-                  placeholder="Algorand wallet address (58 characters)"
-                />
-              </div>
-              
-              <p className="text-xs text-gray-500 mt-2">
-                💡 Tip: Choose trusted individuals (advisors, team members, college officials) who will verify milestones
-              </p>
-            </div>
-
-            <div className="divider"></div>
-
-            <button 
-              className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-purple-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 hover:scale-105 border-0 text-white'}`}
-              onClick={createCampaign}
-              disabled={creating || !activeAddress || !newCampaign.title || !newCampaign.description}
-            >
-              {creating ? 'Deploying Contract...' : '⛓️ Deploy Campaign Contract'}
-            </button>
-
-            {!activeAddress && (
-              <div className="alert alert-warning mt-4">
-                <span>⚠️ Please connect your wallet to create a campaign</span>
-              </div>
-            )}
-          </div>
+        <div className="pt-4">
+           <div className="border-t border-zinc-800 pt-6 mb-6">
+             <h3 className="text-lg font-medium text-white mb-1 flex items-center gap-2">
+               <Shield className="w-5 h-5 text-indigo-400" /> Multi-Sig Approvers
+             </h3>
+             <p className="text-sm text-zinc-500 mb-4">
+               Three wallet addresses must approve each milestone before funds are released. Leave blank to use your own address (for demo/testing).
+             </p>
+             <div className="space-y-4">
+               {[1, 2, 3].map((n) => (
+                 <div key={n}>
+                   <label className="block text-sm font-medium text-zinc-300 mb-1.5">Approver {n}</label>
+                   <input
+                     type="text"
+                     className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-4 py-2 text-white font-mono text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-colors placeholder-zinc-600"
+                     placeholder={`Approver ${n} wallet address (58 chars)`}
+                     value={approvers[`approver${n}` as keyof typeof approvers]}
+                     onChange={(e) => setApprovers({ ...approvers, [`approver${n}`]: e.target.value.trim() })}
+                   />
+                 </div>
+               ))}
+             </div>
+           </div>
+           <BrandButton 
+            fullWidth 
+            size="lg" 
+            onClick={createCampaign}
+            isLoading={creating}
+            disabled={!newCampaign.title || !newCampaign.description}
+          >
+            <Rocket className="w-4 h-4 mr-2" /> Launch Campaign
+          </BrandButton>
         </div>
-      </div>
+      </Card>
     </div>
   )
 }

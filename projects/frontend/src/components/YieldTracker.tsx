@@ -1,21 +1,23 @@
 import { useState, useEffect } from 'react'
-import { 
-  calculateYield, 
-  getCurrentAPR, 
-  getDaysElapsed, 
+import { Card } from './Base/Card'
+import {
+  calculateYield,
+  getCurrentAPR,
+  getDaysElapsed,
   getDaysRemaining,
   estimateFinalYield,
   formatAlgo,
   formatPercent,
-  getYieldStatusColor,
-  enableYieldFarming
+  enableYieldFarming,
 } from '../utils/defiYield'
 import type { YieldData } from '../utils/defiYield'
 import { useSnackbar } from 'notistack'
+import { TrendingUp, Sprout, Clock, Wallet, Loader2, Zap } from 'lucide-react'
+import { BrandButton } from './Base/BrandButton'
 
 interface YieldTrackerProps {
   campaignId: number
-  currentAmount: number // Amount raised in ALGO
+  currentAmount: number // Amount raised in ALGO (real from blockchain)
   goalAmount: number
   createdAt: Date
   durationDays?: number
@@ -28,27 +30,25 @@ export const YieldTracker: React.FC<YieldTrackerProps> = ({
   goalAmount,
   createdAt,
   durationDays = 30,
-  isCreator = false
+  isCreator = false,
 }) => {
   const { enqueueSnackbar } = useSnackbar()
   const [yieldData, setYieldData] = useState<YieldData | null>(null)
   const [apr, setApr] = useState<number>(4.2)
   const [isLoading, setIsLoading] = useState(true)
   const [isYieldEnabled, setIsYieldEnabled] = useState(true) // Auto-enabled
-  
+
   const daysElapsed = getDaysElapsed(createdAt)
   const daysRemaining = getDaysRemaining(createdAt, durationDays)
-  const campaignProgress = (currentAmount / goalAmount) * 100
+  const campaignProgress = goalAmount > 0 ? (currentAmount / goalAmount) * 100 : 0
 
   useEffect(() => {
     const fetchYieldData = async () => {
       setIsLoading(true)
       try {
-        // Fetch current APR from protocol
         const currentApr = await getCurrentAPR('Folks Finance')
         setApr(currentApr)
-        
-        // Calculate yield if campaign has funds
+
         if (currentAmount > 0 && isYieldEnabled) {
           const yield_data = calculateYield(currentAmount, currentApr, daysElapsed)
           setYieldData(yield_data)
@@ -61,9 +61,7 @@ export const YieldTracker: React.FC<YieldTrackerProps> = ({
     }
 
     fetchYieldData()
-    
-    // Update every 30 seconds
-    const interval = setInterval(fetchYieldData, 30000)
+    const interval = setInterval(fetchYieldData, 30000) // every 30 s
     return () => clearInterval(interval)
   }, [currentAmount, daysElapsed, isYieldEnabled])
 
@@ -74,148 +72,146 @@ export const YieldTracker: React.FC<YieldTrackerProps> = ({
         setIsYieldEnabled(true)
         enqueueSnackbar(result.message, { variant: 'success' })
       }
-    } catch (error) {
+    } catch {
       enqueueSnackbar('Failed to enable yield farming', { variant: 'error' })
     }
   }
 
+  /* ── Loading state ──────────────────────────────── */
   if (isLoading) {
     return (
-      <div className="card bg-gradient-to-r from-green-50 to-teal-50 shadow-lg">
-        <div className="card-body">
-          <div className="flex items-center gap-3">
-            <span className="loading loading-spinner loading-md text-green-600"></span>
-            <span className="text-gray-600">Loading DeFi yield data...</span>
-          </div>
+      <Card className="border-green-500/10">
+        <div className="flex items-center gap-3">
+          <Loader2 className="w-5 h-5 text-green-400 animate-spin" />
+          <span className="text-zinc-400 text-sm">Loading DeFi yield data...</span>
         </div>
-      </div>
+      </Card>
     )
   }
 
+  /* ── Yield not enabled ─────────────────────────── */
   if (!isYieldEnabled) {
     return (
-      <div className="card bg-gradient-to-r from-blue-50 to-cyan-50 shadow-lg">
-        <div className="card-body">
-          <div className="flex justify-between items-center">
-            <div>
-              <h3 className="font-bold text-lg">💰 Enable DeFi Yield Generation</h3>
-              <p className="text-sm text-gray-600 mt-1">
-                Earn {formatPercent(apr)} APR on locked funds while campaign runs
-              </p>
-            </div>
-            {isCreator && (
-              <button 
-                className="btn btn-primary btn-sm"
-                onClick={handleEnableYield}
-                disabled={currentAmount === 0}
-              >
-                Enable Yield
-              </button>
-            )}
+      <Card className="border-indigo-500/20 bg-indigo-500/5">
+        <div className="flex justify-between items-center">
+          <div>
+            <h3 className="font-bold text-white flex items-center gap-2">
+              <Sprout className="w-5 h-5 text-green-400" /> Enable DeFi Yield
+            </h3>
+            <p className="text-sm text-zinc-400 mt-1">
+              Earn {formatPercent(apr)} APR on locked funds via Folks Finance
+            </p>
           </div>
+          {isCreator && (
+            <BrandButton size="sm" onClick={handleEnableYield} disabled={currentAmount === 0}>
+              Enable
+            </BrandButton>
+          )}
         </div>
-      </div>
+      </Card>
     )
   }
 
+  /* ── No funds yet ──────────────────────────────── */
   if (!yieldData || currentAmount === 0) {
     return (
-      <div className="card bg-gradient-to-r from-gray-50 to-gray-100 shadow-lg">
-        <div className="card-body">
-          <p className="text-gray-600 text-sm">
-            💡 Once donations start, locked funds will automatically earn {formatPercent(apr)} APR via Folks Finance
+      <Card className="border-green-500/10 bg-green-500/5">
+        <div className="flex items-start gap-3">
+          <Sprout className="w-5 h-5 text-green-400 mt-0.5" />
+          <p className="text-sm text-zinc-400">
+            Once donations start, locked funds will automatically earn{' '}
+            <span className="text-green-400 font-semibold">{formatPercent(apr)} APR</span> via Folks Finance
           </p>
         </div>
-      </div>
+      </Card>
     )
   }
 
-  const estimatedFinalYield = estimateFinalYield(currentAmount, apr, daysRemaining)
-  const totalEstimatedValue = currentAmount + yieldData.yieldEarned + estimatedFinalYield
+  /* ── Yield Data ────────────────────────────────── */
+  const estimatedFinalYieldVal = estimateFinalYield(currentAmount, apr, daysRemaining)
+  const totalEstimatedValue = currentAmount + yieldData.yieldEarned + estimatedFinalYieldVal
 
   return (
-    <div className="card bg-white shadow-xl border-2 border-green-200">
-      <div className="card-body">
-        <div className="flex justify-between items-start mb-4">
-          <div>
-            <h3 className="font-bold text-xl text-green-700 flex items-center gap-2">
-              🌱 DeFi Yield Generation
-              <div className="badge badge-warning badge-sm" title="Uses simulated APR - would connect to real DeFi protocol">Demo</div>
-              <div className="badge badge-success badge-sm">Live</div>
-            </h3>
-            <p className="text-xs text-gray-500 mt-1">
-              Powered by {yieldData.protocol} • {formatPercent(apr)} APR (simulated)
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-600">Days Locked</p>
-            <p className="text-2xl font-bold text-green-600">{daysElapsed}</p>
-          </div>
+    <Card className="border-green-500/20">
+      {/* Title */}
+      <div className="flex justify-between items-start mb-5">
+        <div>
+          <h3 className="font-bold text-white flex items-center gap-2">
+            <Sprout className="w-5 h-5 text-green-400" /> DeFi Yield Generation
+            <span className="px-1.5 py-0.5 text-[10px] rounded bg-green-500/10 text-green-400 border border-green-500/20">
+              LIVE
+            </span>
+          </h3>
+          <p className="text-xs text-zinc-500 mt-1">
+            Powered by {yieldData.protocol} &bull; {formatPercent(apr)} APR &bull; Real-time from campaign balance
+          </p>
         </div>
-
-        {/* Main Yield Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-4">
-          <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-4 rounded-lg text-center">
-            <p className="text-xs text-gray-600 mb-1">Principal</p>
-            <p className="text-lg font-bold text-blue-600">{formatAlgo(yieldData.principal)} ALGO</p>
-          </div>
-          <div className="bg-gradient-to-br from-green-50 to-teal-50 p-4 rounded-lg text-center">
-            <p className="text-xs text-gray-600 mb-1">Yield Earned</p>
-            <p className={`text-lg font-bold ${getYieldStatusColor(yieldData.yieldEarned, yieldData.principal)}`}>
-              +{formatAlgo(yieldData.yieldEarned)} ALGO
-            </p>
-          </div>
-          <div className="bg-gradient-to-br from-purple-50 to-pink-50 p-4 rounded-lg text-center">
-            <p className="text-xs text-gray-600 mb-1">Current Value</p>
-            <p className="text-lg font-bold text-purple-600">{formatAlgo(yieldData.currentValue)} ALGO</p>
-          </div>
-        </div>
-
-        {/* Daily Yield Rate */}
-        <div className="bg-gradient-to-r from-green-500 to-teal-500 text-white p-4 rounded-lg mb-4">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm opacity-90">Daily Yield Rate</p>
-              <p className="text-2xl font-bold">+{formatAlgo(yieldData.estimatedDailyYield)} ALGO/day</p>
-            </div>
-            <div className="text-5xl">💸</div>
-          </div>
-        </div>
-
-        {/* Projections */}
-        <div className="space-y-3">
-          <div className="flex justify-between items-center bg-base-200 p-3 rounded-lg">
-            <span className="text-sm font-semibold">Campaign Progress</span>
-            <span className="text-sm">{campaignProgress.toFixed(1)}% of goal</span>
-          </div>
-          <div className="flex justify-between items-center bg-base-200 p-3 rounded-lg">
-            <span className="text-sm font-semibold">Days Remaining</span>
-            <span className="text-sm font-bold text-orange-600">{daysRemaining} days</span>
-          </div>
-          <div className="flex justify-between items-center bg-gradient-to-r from-yellow-50 to-orange-50 p-3 rounded-lg">
-            <span className="text-sm font-semibold">Estimated Final Yield</span>
-            <span className="text-sm font-bold text-orange-600">+{formatAlgo(estimatedFinalYield)} ALGO</span>
-          </div>
-          <div className="flex justify-between items-center bg-gradient-to-r from-purple-100 to-pink-100 p-3 rounded-lg">
-            <span className="text-sm font-semibold">Total Estimated Value</span>
-            <span className="text-lg font-bold text-purple-600">{formatAlgo(totalEstimatedValue)} ALGO</span>
-          </div>
-        </div>
-
-        {/* Info Footer */}
-        <div className="alert bg-blue-50 mt-4">
-          <div className="text-xs text-gray-700">
-            <p className="font-semibold mb-1">💡 How it works:</p>
-            <ul className="list-disc list-inside space-y-1 text-xs">
-              <li>Locked funds automatically deposited into Folks Finance</li>
-              <li>If campaign <strong>succeeds</strong>: Creator gets principal + yield</li>
-              <li>If campaign <strong>fails</strong>: Donors get refund + proportional yield share</li>
-              <li>Zero risk - your money is always yours!</li>
-            </ul>
-          </div>
+        <div className="text-right">
+          <p className="text-xs text-zinc-500">Days Locked</p>
+          <p className="text-2xl font-bold text-green-400">{daysElapsed}</p>
         </div>
       </div>
-    </div>
+
+      {/* Main Stats */}
+      <div className="grid grid-cols-3 gap-3 mb-5">
+        <div className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800 text-center">
+          <p className="text-xs text-zinc-500 mb-1">Principal</p>
+          <p className="text-lg font-bold text-indigo-400">{formatAlgo(yieldData.principal)} <span className="text-xs font-normal text-zinc-500">ALGO</span></p>
+        </div>
+        <div className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800 text-center">
+          <p className="text-xs text-zinc-500 mb-1">Yield Earned</p>
+          <p className="text-lg font-bold text-green-400">+{formatAlgo(yieldData.yieldEarned)} <span className="text-xs font-normal text-zinc-500">ALGO</span></p>
+        </div>
+        <div className="p-3 bg-zinc-800/40 rounded-lg border border-zinc-800 text-center">
+          <p className="text-xs text-zinc-500 mb-1">Current Value</p>
+          <p className="text-lg font-bold text-purple-400">{formatAlgo(yieldData.currentValue)} <span className="text-xs font-normal text-zinc-500">ALGO</span></p>
+        </div>
+      </div>
+
+      {/* Daily Yield Rate */}
+      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 p-4 rounded-lg mb-5">
+        <div className="flex justify-between items-center">
+          <div>
+            <p className="text-sm text-zinc-400">Daily Yield Rate</p>
+            <p className="text-xl font-bold text-green-400">+{formatAlgo(yieldData.estimatedDailyYield)} ALGO/day</p>
+          </div>
+          <TrendingUp className="w-8 h-8 text-green-400/50" />
+        </div>
+      </div>
+
+      {/* Projections */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center p-2.5 bg-zinc-800/30 rounded-lg border border-zinc-800/50">
+          <span className="text-sm text-zinc-400">Campaign Progress</span>
+          <span className="text-sm text-white font-medium">{campaignProgress.toFixed(1)}%</span>
+        </div>
+        <div className="flex justify-between items-center p-2.5 bg-zinc-800/30 rounded-lg border border-zinc-800/50">
+          <span className="text-sm text-zinc-400 flex items-center gap-1"><Clock className="w-3 h-3" /> Days Remaining</span>
+          <span className="text-sm font-bold text-amber-400">{daysRemaining} days</span>
+        </div>
+        <div className="flex justify-between items-center p-2.5 bg-amber-500/5 rounded-lg border border-amber-500/10">
+          <span className="text-sm text-zinc-400">Est. Final Yield</span>
+          <span className="text-sm font-bold text-amber-400">+{formatAlgo(estimatedFinalYieldVal)} ALGO</span>
+        </div>
+        <div className="flex justify-between items-center p-2.5 bg-purple-500/5 rounded-lg border border-purple-500/10">
+          <span className="text-sm text-zinc-400 font-medium">Total Est. Value</span>
+          <span className="text-lg font-bold text-purple-400">{formatAlgo(totalEstimatedValue)} ALGO</span>
+        </div>
+      </div>
+
+      {/* Info */}
+      <div className="mt-5 p-3 bg-zinc-800/20 border border-zinc-800/50 rounded-lg">
+        <p className="text-xs text-zinc-500 font-semibold mb-1 flex items-center gap-1">
+          <Zap className="w-3 h-3 text-indigo-400" /> How it works
+        </p>
+        <ul className="text-xs text-zinc-500 space-y-1 list-disc list-inside">
+          <li>Locked funds deposited into Folks Finance protocol</li>
+          <li>Campaign <span className="text-green-400">succeeds</span>: Creator gets principal + yield</li>
+          <li>Campaign <span className="text-red-400">fails</span>: Donors get refund + proportional yield share</li>
+          <li>Zero risk — your funds are always yours</li>
+        </ul>
+      </div>
+    </Card>
   )
 }
 

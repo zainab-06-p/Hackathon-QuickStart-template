@@ -1,651 +1,254 @@
-import { useWallet } from '@txnlab/use-wallet-react'
-import { useSnackbar } from 'notistack'
-import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs'
-import { AlgorandClient } from '@algorandfoundation/algokit-utils'
-import * as algokit from '@algorandfoundation/algokit-utils'
-import { FundraiserFactory } from '../contracts/FundraiserClient'
-import { ContractRegistry } from '../utils/contractRegistry'
-import { getCampaignState, getCampaignContributors, type CampaignState } from '../utils/blockchainData'
-import { listenToCampaigns, initializeFirebase } from '../utils/firebase'
-import YieldTracker from '../components/YieldTracker'
+import React, { useState, useEffect } from 'react';
+import { useWallet } from '@txnlab/use-wallet-react';
+import { Link } from 'react-router-dom';
+import { Card } from '../components/Base/Card';
+import { BrandButton } from '../components/Base/BrandButton';
+import { ProgressBar } from '../components/Base/ProgressBar';
+import { Search, SlidersHorizontal, Clock, Tag, Loader2 } from 'lucide-react';
+import { VoteButtons } from '../components/Base/VoteButtons';
+import { listenToCampaigns, initializeFirebase, FirebaseCampaign } from '../utils/firebase';
+import { AlgorandClient } from '@algorandfoundation/algokit-utils';
+import { getAlgodConfigFromViteEnvironment, getIndexerConfigFromViteEnvironment } from '../utils/network/getAlgoClientConfigs';
+import { getCampaignState } from '../utils/blockchainData';
 
-const FundraisingPageDecentralized = () => {
-  const navigate = useNavigate()
-  const [campaigns, setCampaigns] = useState<CampaignState[]>([])
-  const [selectedCampaign, setSelectedCampaign] = useState<CampaignState | null>(null)
-  const [creating, setCreating] = useState(false)
-  const [loading, setLoading] = useState(true)
-  const [donating, setDonating] = useState(false)
-  const [donationAmount, setDonationAmount] = useState('1')
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
-  const [isCurrentUserApprover, setIsCurrentUserApprover] = useState(false)
-
-  const { enqueueSnackbar } = useSnackbar()
-  const { activeAccount, activeAddress, transactionSigner } = useWallet()
-
-  const algodConfig = getAlgodConfigFromViteEnvironment()
-  const indexerConfig = getIndexerConfigFromViteEnvironment()
-  const algorand = AlgorandClient.fromConfig({
-    algodConfig,
-    indexerConfig,
-  })
-  
-  algorand.setDefaultSigner(transactionSigner)
-  algorand.setDefaultValidityWindow(1000) // Set default validity window to 1000 blocks (~4 minutes, TestNet max)
-
-  // 🔥 FIREBASE ONLY - No blockchain discovery on page load
-  // Firebase real-time listener handles ALL data synchronization
-  // No manual refresh or blockchain discovery needed!
-  
-  useEffect(() => {
-    // 🔥 Real-time Firebase listener for instant cross-device sync
-    // This is the PRIMARY and ONLY data source - it handles all updates automatically
-    // No manual refresh needed - Firebase keeps everything in sync!
-    initializeFirebase()
-    const unsubscribeFirebase = listenToCampaigns(async (firebaseCampaigns) => {
-      console.log(`🔥 Firebase campaigns updated: ${firebaseCampaigns.length} campaigns`)
-      
-      // Merge Firebase campaigns with blockchain state
-      const campaignStates: CampaignState[] = []
-      for (const fbCampaign of firebaseCampaigns) {
-        const metadata = {
-          appId: parseInt(fbCampaign.appId),
-          creator: fbCampaign.creator,
-          createdAt: fbCampaign.createdAt,
-          title: fbCampaign.title,
-          description: fbCampaign.description
-        }
-        const state = await getCampaignState(algorand, metadata)
-        if (state) {
-          campaignStates.push(state)
-        }
-      }
-      
-      setCampaigns(campaignStates)
-      setLastUpdated(new Date())
-      setLoading(false) // Mark loading complete after Firebase data loads
-    })
-    
-    return () => {
-      unsubscribeFirebase()
-    }
-  }, []) // ⚠️ IMPORTANT: No activeAddress dependency - all users see the same campaigns
-
-  // Check if current user is an approver for the selected campaign
-  useEffect(() => {
-    const checkApproverStatus = async () => {
-      if (!selectedCampaign || !activeAddress) {
-        setIsCurrentUserApprover(false)
-        return
-      }
-
-      // If user is the creator, they're automatically an approver
-      if (activeAddress === selectedCampaign.creator) {
-        setIsCurrentUserApprover(true)
-        return
-      }
-
-      // Check if user is one of the 3 approvers by calling the contract
-      try {
-        const factory = new FundraiserFactory({
-          algorand,
-          defaultSender: activeAddress,
-        })
-        const appClient = factory.getAppClientById({
-          appId: BigInt(selectedCampaign.appId)
-        })
-
-        const result = await appClient.send.isApprover({
-          args: { address: activeAddress }
-        })
-
-        setIsCurrentUserApprover(result.return || false)
-      } catch (error) {
-        console.warn('Error checking approver status:', error)
-        setIsCurrentUserApprover(false)
-      }
-    }
-
-    checkApproverStatus()
-  }, [selectedCampaign, activeAddress, algorand])
-
-  const donate = async () => {
-    if (!selectedCampaign || !activeAddress) {
-      enqueueSnackbar('Please select a campaign and connect wallet', { variant: 'error' })
-      return
-    }
-
-    if (donating) {
-      enqueueSnackbar('Transaction already in progress, please wait...', { variant: 'warning' })
-      return
-    }
-
-    const donationMicroAlgos = Math.floor(parseFloat(donationAmount) * 1_000_000)
-    if (donationMicroAlgos < 100000) {
-      enqueueSnackbar('Minimum donation is 0.1 ALGO', { variant: 'error' })
-      return
-    }
-
-    setDonating(true)
-    try {
-      const factory = new FundraiserFactory({
-        algorand,
-        defaultSender: activeAddress,
-      })
-
-      const appClient = factory.getAppClientById({
-        appId: BigInt(selectedCampaign.appId)
-      })
-
-      enqueueSnackbar('Preparing transaction...', { variant: 'info' })
-
-      // Generate unique note to prevent transaction deduplication
-      const uniqueNote = `donate-${Date.now()}-${Math.random().toString(36).substring(2)}`
-
-      // Create payment transaction with fresh parameters
-      const paymentTxn = await algorand.createTransaction.payment({
-        sender: activeAddress,
-        receiver: appClient.appAddress,
-        amount: algokit.microAlgos(donationMicroAlgos),
-        note: new Uint8Array(Buffer.from(uniqueNote))
-      })
-
-      enqueueSnackbar('📤 Sending to wallet for signature...', { variant: 'info' })
-
-      // Atomic transaction: payment + app call
-      await appClient.send.donate({
-        args: {
-          payment: paymentTxn
-        },
-        sender: activeAddress,
-        populateAppCallResources: false,  // Disable simulation to prevent "already in ledger" errors
-        validityWindow: 1000,  // ~50 minutes validity
-        suppressLog: true
-      })
-
-      enqueueSnackbar(
-        `✅ Donated ${donationAmount} ALGO to ${selectedCampaign.title}!`, 
-        { variant: 'success' }
-      )
-      
-      setDonationAmount('1')
-      
-      // Firebase will automatically update the campaign state
-      enqueueSnackbar('Firebase will update the state automatically', { variant: 'info' })
-      
-      // Update selected campaign from blockchain
-      const updated = await getCampaignState(algorand, {
-        appId: selectedCampaign.appId,
-        creator: selectedCampaign.creator,
-        createdAt: 0,
-        title: selectedCampaign.title,
-        description: selectedCampaign.description
-      })
-      if (updated) setSelectedCampaign(updated)
-      
-    } catch (e) {
-      console.error('Donation error:', e)
-      enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
-    } finally {
-      setDonating(false)
-    }
-  }
-
-  const formatAddress = (addr: string) => {
-    return `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`
-  }
-
-  const formatAlgo = (microAlgos: bigint) => {
-    return (Number(microAlgos) / 1_000_000).toFixed(2)
-  }
-
-  const calculateDaysLeft = (deadline: bigint) => {
-    const now = Math.floor(Date.now() / 1000)
-    const diff = Number(deadline) - now
-    return Math.floor(diff / (24 * 60 * 60))
-  }
-
-  if (loading && campaigns.length === 0) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-cyan-50 to-teal-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="loading loading-spinner loading-lg text-primary"></div>
-          <p className="mt-4 text-lg font-semibold">Loading campaigns from blockchain...</p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 animate-gradient-shift">
-      {/* Header */}
-      <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-blue-500 to-purple-500">
-        <div className="max-w-7xl mx-auto px-4 py-5 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate('/')} 
-              className="btn btn-ghost btn-sm"
-            >
-              ← Back
-            </button>
-            <h1 className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">🏦 Decentralized Campus Fundraising</h1>
-            <button 
-              onClick={() => navigate('/fundraising/create')} 
-              className="btn btn-primary btn-sm hover:scale-110 transition-transform duration-300 shadow-lg hover:shadow-xl bg-gradient-to-r from-blue-500 to-purple-500 border-0"
-            >
-              ✨ Create Campaign
-            </button>
-            <button 
-              onClick={() => enqueueSnackbar('🔥 Firebase keeps everything synced automatically!', { variant: 'info' })} 
-              className="btn btn-sm btn-outline btn-info hover:scale-110 transition-transform"
-            >
-              ⚡ Auto-Synced
-            </button>
-            <button 
-              onClick={() => navigate('/fundraising/reputation')} 
-              className="btn btn-xs sm:btn-sm bg-gradient-to-r from-blue-600 to-purple-700 text-white border-0 hover:scale-110 transition-transform"
-            >
-              🏛️ <span className="hidden sm:inline">DAO</span>
-            </button>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
-            {lastUpdated && (
-              <div className="badge badge-ghost badge-xs hidden sm:inline-flex">Updated: {lastUpdated.toLocaleTimeString()}</div>
-            )}
-            {activeAddress && (
-              <div className="badge badge-success badge-xs sm:badge-sm hidden md:inline-flex">{formatAddress(activeAddress)}</div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Dashboard */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="stat bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl shadow-2xl hover:scale-105 transition-all duration-300 hover:shadow-blue-500/50">
-            <div className="stat-title text-blue-100">Total Campaigns</div>
-            <div className="stat-value text-white text-5xl">{campaigns.length}</div>
-            <div className="stat-desc text-blue-100">📜 On-chain smart contracts</div>
-          </div>
-          <div className="stat bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl shadow-2xl hover:scale-105 transition-all duration-300 hover:shadow-green-500/50">
-            <div className="stat-title text-green-100">Total Raised</div>
-            <div className="stat-value text-white text-4xl">
-              {formatAlgo(campaigns.reduce((sum, c) => sum + c.raisedAmount, BigInt(0)))} Ⱥ
-            </div>
-            <div className="stat-desc text-green-100">💰 From blockchain state</div>
-          </div>
-          <div className="stat bg-gradient-to-br from-purple-500 to-pink-600 text-white rounded-xl shadow-2xl hover:scale-105 transition-all duration-300 hover:shadow-purple-500/50">
-            <div className="stat-title text-purple-100">Contributors</div>
-            <div className="stat-value text-white text-5xl">
-              {campaigns.reduce((sum, c) => sum + Number(c.contributorCount), 0)}
-            </div>
-            <div className="stat-desc text-purple-100">👥 Unique donations</div>
-          </div>
-          <div className="stat bg-gradient-to-br from-orange-500 to-red-600 text-white rounded-xl shadow-2xl hover:scale-105 transition-all duration-300 hover:shadow-orange-500/50">
-            <div className="stat-title text-orange-100">Active Campaigns</div>
-            <div className="stat-value text-white text-5xl">
-              {campaigns.filter(c => c.isActive).length}
-            </div>
-            <div className="stat-desc text-orange-100">🔥 Currently accepting</div>
-          </div>
-        </div>
-
-        {/* Advanced Features Banner */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-8">
-          <div className="card bg-gradient-to-r from-blue-600 to-purple-700 text-white shadow-xl hover:scale-105 transition-all cursor-pointer" onClick={() => navigate('/fundraising/reputation')}>
-            <div className="card-body p-4">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                🏛️ Reputation DAO
-                <span className="badge badge-sm bg-white/20 border-white/30">NEW</span>
-              </h3>
-              <p className="text-sm text-white/90">ML-powered trust scoring (811/1000). See your reputation, vote on proposals, unlock creator benefits.</p>
-            </div>
-          </div>
-          <div className="card bg-gradient-to-r from-green-600 to-teal-600 text-white shadow-xl">
-            <div className="card-body p-4">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                🌱 DeFi Yield Generation
-                <span className="badge badge-sm bg-white/20 border-white/30">LIVE</span>
-              </h3>
-              <p className="text-sm text-white/90">Locked funds earn 4.2% APR. Creators get principal + yield. Donors get refunds + yield if goal fails.</p>
-            </div>
-          </div>
-          <div className="card bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-xl hover:scale-105 transition-all cursor-pointer" onClick={() => navigate('/federation')}>
-            <div className="card-body p-4">
-              <h3 className="font-bold text-lg flex items-center gap-2">
-                🌐 Cross-Campus Federation
-                <span className="badge badge-sm bg-white/20 border-white/30">NEW</span>
-              </h3>
-              <p className="text-sm text-white/90">Multi-college mega-events with shared funding pools. VIT + MIT + SRM + SASTRA = one network.</p>
-            </div>
-          </div>
-        </div>
-
-        {/* Cross-Device Sync Info Banner */}
-        <div className="alert alert-info shadow-lg mb-6">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" className="stroke-current flex-shrink-0 w-6 h-6">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <h3 className="font-bold">Cross-Device Discovery Info</h3>
-            <div className="text-sm">
-              New campaigns are visible immediately on the same device. For other devices, the Algorand blockchain indexer needs 30-60 seconds to sync. 
-              Click the <span className="font-bold">🔄 Refresh</span> button or switch back to this tab to force an update.
-            </div>
-          </div>
-        </div>
-
-        {/* Campaigns Grid */}
-        <h2 className="text-2xl font-bold mb-4">Live Campaigns ({campaigns.length})</h2>
-        {campaigns.length === 0 ? (
-          <div className="card bg-white shadow-xl">
-            <div className="card-body text-center py-12">
-              <h3 className="text-xl font-bold mb-2">No campaigns yet!</h3>
-              <p className="text-gray-600">Click "➕ Create Campaign" above to deploy your first fundraising smart contract.</p>
-            </div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {campaigns.map((campaign) => {
-              const progress = Number(campaign.raisedAmount) / Number(campaign.goalAmount) * 100
-              const daysLeft = calculateDaysLeft(campaign.deadline)
-              
-              return (
-                <div 
-                  key={campaign.appId}
-                  className="card bg-white shadow-xl hover:shadow-2xl transition-all cursor-pointer hover:scale-105 duration-300 border-2 border-transparent hover:border-purple-400 overflow-hidden group"
-                  onClick={() => setSelectedCampaign(campaign)}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-purple-400/10 to-pink-400/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                  <div className="card-body relative z-10">
-                    <div className="flex justify-between items-start">
-                      <h3 className="card-title text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">{campaign.title}</h3>
-                      {campaign.isActive ? (
-                        <div className="badge badge-success shadow-lg animate-pulse">✅ Live</div>
-                      ) : (
-                        <div className="badge badge-warning">⏸️ Inactive</div>
-                      )}
-                    </div>
-                    <p className="text-sm text-gray-600 line-clamp-2">{campaign.description}</p>
-                    
-                    <div className="space-y-2 mt-3">
-                      <div className="flex justify-between text-sm">
-                        <span className="font-bold">App ID:</span>
-                        <span className="font-mono text-xs">{campaign.appId}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span>Raised:</span>
-                        <span className="font-bold text-green-600">
-                          {formatAlgo(campaign.raisedAmount)} / {formatAlgo(campaign.goalAmount)} Ⱥ
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="mt-4">
-                      <progress 
-                        className="progress progress-success w-full" 
-                        value={progress} 
-                        max="100"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">{progress.toFixed(1)}% funded</p>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="badge badge-info badge-outline">
-                        👥 {Number(campaign.contributorCount)} backers
-                      </div>
-                      <div className="text-sm">
-                        ⏰ {daysLeft > 0 ? `${daysLeft}d left` : 'Ended'}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-
-        {/* Campaign Detail Modal */}
-        {selectedCampaign && (
-          <dialog id="campaign_modal" className="modal modal-open">
-            <div className="modal-box max-w-4xl w-full mx-4">
-              <button 
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                onClick={() => setSelectedCampaign(null)}
-              >
-                ✕
-              </button>
-              
-              <h3 className="font-bold text-xl md:text-2xl mb-2">{selectedCampaign.title}</h3>
-              <p className="text-sm md:text-base text-gray-600 mb-4">{selectedCampaign.description}</p>
-              
-              {/* Campaign Info Card */}
-              <div className="card bg-gradient-to-r from-green-500 to-teal-500 text-white mb-4">
-                <div className="card-body">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm opacity-90">Goal Amount</p>
-                      <p className="text-xl md:text-2xl font-bold">💰 {formatAlgo(selectedCampaign.goalAmount)} ALGO</p>
-                    </div>
-                    <div>
-                      <p className="text-sm opacity-90">Raised So Far</p>
-                      <p className="text-xl md:text-2xl font-bold">✅ {formatAlgo(selectedCampaign.raisedAmount)} ALGO</p>
-                    </div>
-                    <div>
-                      <p className="text-sm opacity-90">Milestones</p>
-                      <p className="text-base md:text-xl font-bold">
-                        📍 {Number(selectedCampaign.currentMilestone)}/{Number(selectedCampaign.milestoneCount)}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm opacity-90">Contributors</p>
-                      <p className="text-base md:text-xl font-bold">👥 {Number(selectedCampaign.contributorCount)}</p>
-                    </div>
-                  </div>
-                  <progress 
-                    className="progress progress-accent w-full h-3 mt-4" 
-                    value={Number(selectedCampaign.raisedAmount)} 
-                    max={Number(selectedCampaign.goalAmount)}
-                  />
-                  <p className="text-sm opacity-90 mt-2">
-                    {((Number(selectedCampaign.raisedAmount) / Number(selectedCampaign.goalAmount)) * 100).toFixed(1)}% Complete
-                  </p>
-                </div>
-              </div>
-
-              {/* Donate Section - Always Show */}
-              <div className="card bg-base-200 mb-4">
-                <div className="card-body">
-                  <h4 className="font-bold mb-2">💝 Make a Donation</h4>
-                  {!selectedCampaign.isActive && (
-                    <div className="alert alert-warning mb-2">
-                      <span className="text-xs">⚠️ Campaign not active. Creator may need to activate it first.</span>
-                    </div>
-                  )}
-                  <div className="join w-full">
-                    <input 
-                      type="number" 
-                      step="0.1"
-                      min="0.1"
-                      className="input input-bordered join-item flex-1" 
-                      placeholder="Amount in ALGO"
-                      value={donationAmount}
-                      onChange={(e) => setDonationAmount(e.target.value)}
-                    />
-                    <button 
-                      className={`btn btn-success join-item ${donating ? 'loading' : ''}`}
-                      onClick={donate}
-                      disabled={donating || !activeAddress}
-                    >
-                      {donating ? 'Processing...' : 'Donate'}
-                    </button>
-                  </div>
-                  <p className="text-xs text-gray-500 mt-2">Minimum: 0.1 ALGO • Transaction processed on Algorand TestNet</p>
-                </div>
-              </div>
-
-              {/* Approver: Milestone Approval (for the 3 approvers, including creator if they're an approver) */}
-              {isCurrentUserApprover && (
-                <div className="card bg-gradient-to-r from-blue-500 to-purple-500 text-white mb-4">
-                  <div className="card-body">
-                    <h4 className="font-bold mb-2">🔐 Approver Controls</h4>
-                    <div className="alert bg-white/20 border-white/30 text-white mb-3">
-                      <div className="text-sm">
-                        <p className="font-bold">Current Milestone: {Number(selectedCampaign.currentMilestone) + 1}</p>
-                        <p className="text-xs mt-1">Goal must be reached before you can approve</p>
-                      </div>
-                    </div>
-                    <button 
-                      className="btn btn-lg w-full bg-white text-blue-600 hover:bg-blue-50 border-0"
-                      disabled={
-                        Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) ||
-                        selectedCampaign.raisedAmount < selectedCampaign.goalAmount
-                      }
-                      onClick={async () => {
-                        if (!activeAddress) return
-                        
-                        try {
-                          const factory = new FundraiserFactory({
-                            algorand,
-                            defaultSender: activeAddress,
-                          })
-                          const appClient = factory.getAppClientById({
-                            appId: BigInt(selectedCampaign.appId)
-                          })
-                          
-                          enqueueSnackbar('Approving milestone...', { variant: 'info' })
-                          
-                          const result = await appClient.send.approveMilestone({ 
-                            args: [],
-                            validityWindow: 1000
-                          })
-                          
-                          const approvalCount = result.return || 0
-                          enqueueSnackbar(`✅ Milestone approved! (${approvalCount}/3 approvals)`, { variant: 'success' })
-                          
-                          // Refresh campaign state
-                          const updated = await getCampaignState(algorand, {
-                            appId: selectedCampaign.appId,
-                            creator: selectedCampaign.creator,
-                            createdAt: 0,
-                            title: selectedCampaign.title,
-                            description: selectedCampaign.description,
-                            imageUrl: selectedCampaign.imageUrl
-                          })
-                          if (updated) setSelectedCampaign(updated)
-                        } catch (e) {
-                          console.error('Approval error:', e)
-                          enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
-                        }
-                      }}
-                    >
-                      ✅ Approve Milestone {Number(selectedCampaign.currentMilestone) + 1}
-                    </button>
-                    <p className="text-xs text-center mt-2 opacity-90">
-                      All 3 approvers must approve before creator can release funds
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Creator: Milestone Release */}
-              {activeAddress === selectedCampaign.creator && (
-                <div className="card bg-gradient-to-r from-orange-500 to-red-500 text-white mb-4">
-                  <div className="card-body">
-                    <h4 className="font-bold mb-2">🚀 Creator Controls</h4>
-                    <div className="alert bg-white/20 border-white/30 text-white mb-3">
-                      <div className="text-sm">
-                        <p className="font-bold">Milestone Progress</p>
-                        <p>{Number(selectedCampaign.currentMilestone)} of {Number(selectedCampaign.milestoneCount)} released</p>
-                        {selectedCampaign.raisedAmount >= selectedCampaign.goalAmount ? (
-                          <p className="text-green-200 font-bold mt-1">✅ Goal Reached! Funds can be released</p>
-                        ) : (
-                          <p className="text-yellow-200 mt-1">⏳ Goal not reached yet ({((Number(selectedCampaign.raisedAmount) / Number(selectedCampaign.goalAmount)) * 100).toFixed(1)}%)</p>
-                        )}
-                      </div>
-                    </div>
-                    <button 
-                      className="btn btn-lg w-full bg-white text-orange-600 hover:bg-orange-50 border-0"
-                      disabled={
-                        Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) ||
-                        selectedCampaign.raisedAmount < selectedCampaign.goalAmount
-                      }
-                      onClick={async () => {
-                        try {
-                          const factory = new FundraiserFactory({
-                            algorand,
-                            defaultSender: activeAddress,
-                          })
-                          const appClient = factory.getAppClientById({
-                            appId: BigInt(selectedCampaign.appId)
-                          })
-                          
-                          enqueueSnackbar('Releasing milestone...', { variant: 'info' })
-                          
-                          // Inner transaction needs fee coverage - add extra fee for the payment transaction
-                          await appClient.send.releaseMilestone({ 
-                            args: [],
-                            extraFee: algokit.algos(0.001), // Extra fee for inner payment transaction
-validityWindow: 1000  // ~4 minutes for signing (TestNet max)
-                          })
-                          
-                          enqueueSnackbar('✅ Milestone funds released! Firebase will sync automatically', { variant: 'success' })
-                          
-                          // Firebase handles updates automatically
-                          const updated = await getCampaignState(algorand, {
-                            appId: selectedCampaign.appId,
-                            creator: selectedCampaign.creator,
-                            createdAt: 0,
-                            title: selectedCampaign.title,
-                            description: selectedCampaign.description,
-                            imageUrl: selectedCampaign.imageUrl
-                          })
-                          if (updated) setSelectedCampaign(updated)
-                        } catch (e) {
-                          console.error('Release error:', e)
-                          enqueueSnackbar(`Error: ${(e as Error).message}`, { variant: 'error' })
-                        }
-                      }}
-                    >
-                      💰 Release Next Milestone
-                    </button>
-                    {Number(selectedCampaign.currentMilestone) >= Number(selectedCampaign.milestoneCount) && (
-                      <p className="text-sm text-center mt-2">All milestones have been released! 🎉</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* DeFi Yield Generation Tracker */}
-              <div className="mb-4">
-                <YieldTracker 
-                  campaignId={selectedCampaign.appId}
-                  currentAmount={Number(selectedCampaign.raisedAmount) / 1_000_000}
-                  goalAmount={Number(selectedCampaign.goalAmount) / 1_000_000}
-                  createdAt={new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)} // Mock: created 7 days ago
-                  durationDays={30}
-                  isCreator={isCurrentUserApprover}
-                />
-              </div>
-
-              {/* Blockchain Info */}
-              <div className="alert alert-info">
-                <div className="text-sm">
-                  <p className="font-bold">⛓️ On-Chain Contract Details</p>
-                  <p className="font-mono text-xs mt-1">App ID: {selectedCampaign.appId}</p>
-                  <p className="font-mono text-xs">Creator: {selectedCampaign.creator}</p>
-                </div>
-              </div>
-            </div>
-            <div className="modal-backdrop" onClick={() => setSelectedCampaign(null)} />
-          </dialog>
-        )}
-      </div>
-    </div>
-  )
+interface Project {
+  id: number;
+  title: string;
+  creator: string;
+  goal: number;
+  current: number;
+  description: string;
+  category: string;
+  deadline: string;
+  appId?: string;
+  isOnChain?: boolean;
 }
 
-export default FundraisingPageDecentralized
+const mockProjects: Project[] = [
+  {
+    id: 1,
+    title: 'Eco-Drone Reforestation',
+    creator: 'Jane Doe',
+    goal: 5000,
+    current: 3200,
+    description: 'Autonomous drones for rapid tree planting in deforested regions using AI-driven soil analysis.',
+    category: 'Environment',
+    deadline: '12 Days Left'
+  },
+  {
+    id: 2,
+    title: 'Quantum Encryption Chat',
+    creator: 'Alex Smith',
+    goal: 2000,
+    current: 450,
+    description: 'A decentralized messaging app protected by quantum-proof cryptography algorithms.',
+    category: 'Tech',
+    deadline: '45 Days Left'
+  },
+  {
+    id: 3,
+    title: 'Hydra: Water Purification',
+    creator: 'Sarah Lee',
+    goal: 8000,
+    current: 7800,
+    description: 'Low-cost, solar-powered water purification units for rural communities.',
+    category: 'Social Impact',
+    deadline: '3 Days Left'
+  }
+];
+
+const firebaseCampaignToProject = (campaign: FirebaseCampaign): Project => {
+  const goalAlgo = parseFloat(campaign.goal) || 0;
+  const createdDate = new Date(campaign.createdAt);
+  const daysAgo = Math.floor((Date.now() - campaign.createdAt) / 86400000);
+  const deadlineDays = Math.max(30 - daysAgo, 0);
+
+  return {
+    id: parseInt(campaign.appId) || Date.now(),
+    title: campaign.title || 'Untitled Campaign',
+    creator: campaign.creator
+      ? `${campaign.creator.slice(0, 6)}...${campaign.creator.slice(-4)}`
+      : 'Unknown',
+    goal: goalAlgo,
+    current: 0,
+    description: campaign.description || 'A decentralized campaign on Algorand.',
+    category: 'On-Chain',
+    deadline: deadlineDays > 0 ? `${deadlineDays} Days Left` : 'Ended',
+    appId: campaign.appId,
+    isOnChain: true,
+  };
+};
+
+const FundraisingPageDecentralized: React.FC = () => {
+  const { activeAddress } = useWallet();
+  const [filter, setFilter] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [firebaseProjects, setFirebaseProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load campaigns from Firebase, then fetch on-chain raised amounts
+  useEffect(() => {
+    initializeFirebase();
+    const unsubscribe = listenToCampaigns(async (campaigns: FirebaseCampaign[]) => {
+      const projects = campaigns.map(firebaseCampaignToProject);
+
+      // Fetch on-chain raised amounts in the background
+      try {
+        const algodConfig = getAlgodConfigFromViteEnvironment();
+        const indexerConfig = getIndexerConfigFromViteEnvironment();
+        const algorand = AlgorandClient.fromConfig({ algodConfig, indexerConfig });
+
+        const enriched = await Promise.all(
+          projects.map(async (p) => {
+            if (!p.appId) return p;
+            try {
+              const state = await getCampaignState(algorand, {
+                appId: parseInt(p.appId),
+                creator: '',
+                createdAt: 0,
+              });
+              if (state) {
+                return {
+                  ...p,
+                  current: Number(state.raisedAmount) / 1_000_000,
+                  goal: Number(state.goalAmount) / 1_000_000 || p.goal,
+                };
+              }
+            } catch (err) {
+              console.warn(`Could not fetch chain state for ${p.appId}:`, err);
+            }
+            return p;
+          })
+        );
+        setFirebaseProjects(enriched);
+      } catch {
+        setFirebaseProjects(projects);
+      }
+      setLoading(false);
+    });
+    // If Firebase isn't configured, loading will resolve via the empty callback
+    const timeout = setTimeout(() => setLoading(false), 3000);
+    return () => {
+      unsubscribe();
+      clearTimeout(timeout);
+    };
+  }, []);
+
+  // Merge Firebase (on-chain) campaigns with mock demos — Firebase first
+  const allProjects = [...firebaseProjects, ...mockProjects];
+
+  const categories = ['All', 'On-Chain', ...new Set(mockProjects.map(p => p.category))];
+
+  const filteredProjects = allProjects.filter(p => 
+    (filter === 'All' || p.category === filter) &&
+    p.title.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <div className='max-w-7xl mx-auto space-y-10 pb-20'>
+      {/* Header */}
+      <div className='flex flex-col md:flex-row justify-between items-end gap-6 border-b border-zinc-800 pb-8'>
+        <div>
+          <h1 className='text-3xl font-display font-semibold text-white mb-2'>
+            Explore Projects
+          </h1>
+          <p className='text-zinc-400'>Discover and fund the next generation of builders.</p>
+        </div>
+        
+        <div className='flex gap-3 w-full md:w-auto'>
+          <div className='relative flex-grow md:flex-grow-0 group'>
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 group-focus-within:text-indigo-500 transition-colors' />
+            <input 
+              type='text' 
+              placeholder='Search projects...' 
+              className='w-full md:w-64 bg-zinc-900 border border-zinc-800 rounded-lg py-2 pl-10 pr-4 text-sm text-white focus:border-indigo-500/50 focus:ring-1 focus:ring-indigo-500/50 focus:outline-none transition-all'
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Category Filter Tabs */}
+      <div className='flex gap-2 flex-wrap'>
+        {categories.map(cat => (
+          <button
+            key={cat}
+            onClick={() => setFilter(cat)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
+              filter === cat
+                ? 'bg-indigo-600 border-indigo-500 text-white'
+                : 'bg-zinc-900 border-zinc-700 text-zinc-400 hover:border-zinc-600'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Loading state */}
+      {loading && (
+        <div className='flex items-center justify-center py-12 gap-3 text-zinc-400'>
+          <Loader2 className='w-5 h-5 animate-spin' />
+          <span>Loading campaigns...</span>
+        </div>
+      )}
+
+      {/* Grid */}
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
+        {filteredProjects.map((project) => (
+          <Link key={`${project.appId || project.id}`} to={`/project/${project.appId || project.id}`} className='block'>
+          <Card hoverable className='flex flex-col h-full group'>
+            <div className='flex justify-between items-start mb-4'>
+              <div className='flex gap-2 items-center'>
+                <span className='inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-zinc-800 text-zinc-300 border border-zinc-700'>
+                  <Tag className='w-3 h-3' />
+                  {project.category}
+                </span>
+                {project.isOnChain && (
+                  <span className='inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'>
+                    ✓ Live
+                  </span>
+                )}
+              </div>
+              <VoteButtons projectId={project.id} layout='row' />
+            </div>
+
+            <h3 className='text-xl font-semibold text-white mb-2 group-hover:text-indigo-400 transition-colors'>
+              {project.title}
+            </h3>
+            
+            <p className='text-sm text-zinc-400 mb-6 flex-grow line-clamp-3 leading-relaxed'>
+              {project.description}
+            </p>
+
+            <div className='space-y-5 pt-5 border-t border-zinc-800/50'>
+              <ProgressBar 
+                progress={project.current} 
+                max={project.goal} 
+                label='Funding Progress'
+                sublabel={`${Math.round((project.current / project.goal) * 100)}%`}
+                color='indigo'
+              />
+              
+              <div className='flex justify-between items-center text-sm'>
+                <div className='text-white font-medium'>
+                  {project.current.toLocaleString()} <span className='text-zinc-500'>/ {project.goal.toLocaleString()} ALGO</span>
+                </div>
+              </div>
+
+              <BrandButton 
+                fullWidth 
+                className='shadow-none'
+              >
+                {project.isOnChain ? 'View & Donate' : 'Back this Project'}
+              </BrandButton>
+            </div>
+          </Card>
+          </Link>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default FundraisingPageDecentralized;

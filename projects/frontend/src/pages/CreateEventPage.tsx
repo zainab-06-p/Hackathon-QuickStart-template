@@ -7,9 +7,16 @@ import { AlgorandClient } from '@algorandfoundation/algokit-utils'
 import * as algokit from '@algorandfoundation/algokit-utils'
 import algosdk from 'algosdk'
 import { TicketingFactory } from '../contracts/TicketingClient'
-import { CampusChainRegistryFactory } from '../contracts/RegistryClient'
+import { CitadelRegistryFactory } from '../contracts/RegistryClient'
 import { ContractRegistry } from '../utils/contractRegistry'
 import { saveEventToFirebase, initializeFirebase } from '../utils/firebase'
+import { Card } from '../components/Base/Card'
+import { BrandButton } from '../components/Base/BrandButton'
+import { ImpactBadge } from '../components/Base/ImpactBadge'
+import {
+  ArrowLeft, Calendar, MapPin, Ticket, Users, Plus, X, Info,
+  AlertTriangle, Loader2, Zap, Globe,
+} from 'lucide-react'
 
 const CreateEventPage = () => {
   const navigate = useNavigate()
@@ -224,7 +231,7 @@ const CreateEventPage = () => {
         try {
           console.log(`📝 Registering event ${appId} with registry contract ${registryAppId}...`)
           
-          const registryFactory = new CampusChainRegistryFactory({
+          const registryFactory = new CitadelRegistryFactory({
             algorand,
             defaultSender: activeAddress,
           })
@@ -263,203 +270,247 @@ const CreateEventPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 animate-gradient-shift">
-      <div className="bg-white/90 backdrop-blur-md shadow-lg border-b-4 border-gradient-to-r from-purple-500 to-pink-500">
-        <div className="max-w-7xl mx-auto px-4 py-3 md:py-5">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-            <div className="flex items-center gap-2 md:gap-4">
-              <button 
-                onClick={() => navigate('/ticketing')} 
-                className="btn btn-ghost btn-xs sm:btn-sm hover:scale-110 transition-transform"
-              >
-                ← Back
-              </button>
-              <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-extrabold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">✨ Create Event</h1>
-            </div>
-            <div className="flex items-center gap-2 md:gap-3">
-              <div className="badge badge-info badge-xs sm:badge-sm">TestNet</div>
-              {activeAddress && (
-                <div className="badge badge-success badge-xs sm:badge-sm hidden sm:inline-flex">{formatAddress(activeAddress)}</div>
-              )}
-            </div>
+    <div className="max-w-4xl mx-auto pb-20 space-y-8">
+
+      {/* ── Header ───────────────────────────────────────────── */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pt-4 pb-6 border-b border-zinc-800">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => navigate('/ticketing')}
+            className="p-2 text-zinc-400 hover:text-white bg-zinc-900 border border-zinc-800 rounded-lg hover:bg-zinc-800 transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <div>
+            <h1 className="text-2xl md:text-3xl font-display font-semibold text-white flex items-center gap-3">
+              <Ticket className="w-7 h-7 text-indigo-500" />
+              Create Event
+            </h1>
+            <p className="text-zinc-500 text-sm mt-0.5">Deploy a new ticketing smart contract on Algorand</p>
           </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <ImpactBadge label="TestNet" color="indigo" size="sm" />
+          {activeAddress && (
+            <span className="hidden sm:inline-flex px-2.5 py-1 text-xs font-mono text-zinc-400 bg-zinc-900 border border-zinc-800 rounded-lg">
+              {formatAddress(activeAddress)}
+            </span>
+          )}
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <div className="card bg-white/95 backdrop-blur shadow-2xl border-2 border-pink-200 hover:border-pink-400 transition-all duration-300">
-          <div className="card-body">
-            <h2 className="card-title text-xl md:text-2xl lg:text-3xl mb-4 md:mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              🎭 Event Details
-            </h2>
-            <div className="alert alert-info bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 shadow-lg mb-4 md:mb-6">
-              <span className="text-xs sm:text-sm"><strong>⛓️ Fully Decentralized:</strong> Each event deploys its own smart contract. Ticket NFTs minted automatically on purchase!</span>
+      {/* ── Info banner ──────────────────────────────────────── */}
+      <div className="flex items-start gap-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl p-4">
+        <Zap className="w-5 h-5 text-indigo-400 shrink-0 mt-0.5" />
+        <div>
+          <h3 className="text-white font-medium text-sm">Fully Decentralized</h3>
+          <p className="text-zinc-400 text-sm mt-0.5">
+            Each event deploys its own smart contract. Ticket NFTs are minted automatically on purchase!
+          </p>
+        </div>
+      </div>
+
+      {/* ── Main Form Card ───────────────────────────────────── */}
+      <Card className="border-zinc-800">
+        <div className="space-y-8">
+
+          <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-indigo-400" />
+            Event Details
+          </h2>
+
+          {/* Form Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {/* Event Title */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Event Title <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm"
+                value={newEvent.title}
+                onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                placeholder="e.g., Campus Tech Concert"
+              />
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Event Title *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered"
-                  value={newEvent.title}
-                  onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
-                  placeholder="e.g., Campus Tech Concert"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Venue *</span>
-                </label>
-                <input
-                  type="text"
-                  className="input input-bordered"
-                  value={newEvent.venue}
-                  onChange={(e) => setNewEvent({...newEvent, venue: e.target.value})}
-                  placeholder="e.g., University Auditorium"
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Event Date & Time *</span>
-                </label>
-                <input
-                  type="datetime-local"
-                  className="input input-bordered"
-                  value={newEvent.date}
-                  onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Sale End Date & Time *</span>
-                </label>
-                <input
-                  type="datetime-local"
-                  className="input input-bordered"
-                  value={newEvent.saleEndDate}
-                  onChange={(e) => setNewEvent({...newEvent, saleEndDate: e.target.value})}
-                />
-                <label className="label">
-                  <span className="label-text-alt text-info">⏰ Ticket sales stop at this time (before event starts)</span>
-                </label>
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Ticket Price (ALGO) *</span>
-                </label>
+
+            {/* Venue */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                <MapPin className="w-3 h-3 inline mr-1" />Venue <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="text"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm"
+                value={newEvent.venue}
+                onChange={(e) => setNewEvent({...newEvent, venue: e.target.value})}
+                placeholder="e.g., University Auditorium"
+              />
+            </div>
+
+            {/* Event Date */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Event Date &amp; Time <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="datetime-local"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm [color-scheme:dark]"
+                value={newEvent.date}
+                onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+              />
+            </div>
+
+            {/* Sale End Date */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Sale End Date &amp; Time <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="datetime-local"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm [color-scheme:dark]"
+                value={newEvent.saleEndDate}
+                onChange={(e) => setNewEvent({...newEvent, saleEndDate: e.target.value})}
+              />
+              <p className="text-xs text-zinc-600 flex items-center gap-1">
+                <Info className="w-3 h-3" /> Ticket sales stop at this time (before event starts)
+              </p>
+            </div>
+
+            {/* Ticket Price */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Ticket Price (ALGO) <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
                 <input
                   type="number"
                   step="0.1"
                   min="0.1"
-                  className="input input-bordered"
+                  className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm font-mono"
                   value={newEvent.ticketPrice}
                   onChange={(e) => setNewEvent({...newEvent, ticketPrice: e.target.value})}
                 />
-              </div>
-              
-              <div className="form-control">
-                <label className="label">
-                  <span className="label-text font-semibold">Max Tickets *</span>
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  className="input input-bordered"
-                  value={newEvent.maxSupply}
-                  onChange={(e) => setNewEvent({...newEvent, maxSupply: e.target.value})}
-                />
-              </div>
-              
-              <div className="form-control md:col-span-2">
-                <label className="label">
-                  <span className="label-text font-semibold">Description *</span>
-                </label>
-                <textarea
-                  className="textarea textarea-bordered h-24"
-                  value={newEvent.description}
-                  onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
-                  placeholder="Describe your event..."
-                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-500 text-xs font-medium">ALGO</div>
               </div>
             </div>
 
-            <div className="divider"></div>
-            
-            {/* Multi-Organizer Section */}
-            <div className="alert alert-success mb-4">
-              <div>
-                <h3 className="font-bold text-lg">👥 Add Co-Organizers (Optional)</h3>
-                <p className="text-sm mt-1">Add wallet addresses of people who can also scan tickets and manage the event (max 10)</p>
-                <p className="text-xs mt-1 opacity-75">⚠️ Leave blank to skip. Each organizer costs ~0.02 ALGO for box storage.</p>
-              </div>
-            </div>
-            
-            <div className="space-y-3">
-              {organizers.map((addr, index) => (
-                <div key={index} className="flex gap-2">
-                  <input
-                    type="text"
-                    className="input input-bordered flex-1 font-mono text-sm"
-                    value={addr}
-                    onChange={(e) => {
-                      const newOrganizers = [...organizers]
-                      newOrganizers[index] = e.target.value
-                      setOrganizers(newOrganizers)
-                    }}
-                    placeholder="Algorand wallet address (58 characters) - leave blank to skip"
-                  />
-                  {organizers.length > 1 && (
-                    <button
-                      type="button"
-                      className="btn btn-error btn-outline"
-                      onClick={() => setOrganizers(organizers.filter((_, i) => i !== index))}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              
-              {organizers.length < 10 && (
-                <button
-                  type="button"
-                  className="btn btn-outline btn-success btn-sm"
-                  onClick={() => setOrganizers([...organizers, ''])}
-                >
-                  + Add Another Organizer
-                </button>
-              )}
-              
-              <p className="text-xs text-gray-500 mt-2">
-                💡 Tip: All organizers will have permission to scan tickets and verify entry at your event. Leave all fields empty if you don't need co-organizers right now.
-              </p>
+            {/* Max Tickets */}
+            <div className="space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Max Tickets <span className="text-red-400">*</span>
+              </label>
+              <input
+                type="number"
+                min="1"
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm font-mono"
+                value={newEvent.maxSupply}
+                onChange={(e) => setNewEvent({...newEvent, maxSupply: e.target.value})}
+              />
             </div>
 
-            <div className="divider"></div>
-
-            <button 
-              className={`btn btn-lg w-full mt-6 text-lg shadow-2xl hover:shadow-pink-500/50 transition-all duration-300 ${creating ? 'loading' : 'bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:scale-105 border-0 text-white'}`}
-              onClick={createEvent}
-              disabled={creating || !activeAddress || !newEvent.title || !newEvent.description}
-            >
-              {creating ? 'Deploying Contract...' : '🎭 Deploy Event Contract'}
-            </button>
-
-            {!activeAddress && (
-              <div className="alert alert-warning mt-4">
-                <span>⚠️ Please connect your wallet to create an event</span>
-              </div>
-            )}
+            {/* Description */}
+            <div className="md:col-span-2 space-y-1.5">
+              <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                Description <span className="text-red-400">*</span>
+              </label>
+              <textarea
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm h-24 resize-none"
+                value={newEvent.description}
+                onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                placeholder="Describe your event..."
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </Card>
+
+      {/* ── Co-Organizers Section ─────────────────────────────── */}
+      <Card className="border-zinc-800">
+        <div className="space-y-5">
+          <div>
+            <h2 className="text-lg font-semibold text-white flex items-center gap-2">
+              <Users className="w-5 h-5 text-indigo-400" />
+              Co-Organizers
+              <span className="text-xs font-normal text-zinc-500 ml-1">(Optional)</span>
+            </h2>
+            <p className="text-sm text-zinc-500 mt-1">
+              Add wallet addresses of people who can also scan tickets and manage the event (max 10).
+              Each costs ~0.02 ALGO for box storage.
+            </p>
+          </div>
+
+          <div className="space-y-3">
+            {organizers.map((addr, index) => (
+              <div key={index} className="flex gap-2">
+                <input
+                  type="text"
+                  className="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-2.5 text-white placeholder-zinc-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-sm font-mono"
+                  value={addr}
+                  onChange={(e) => {
+                    const newOrganizers = [...organizers]
+                    newOrganizers[index] = e.target.value
+                    setOrganizers(newOrganizers)
+                  }}
+                  placeholder="Algorand wallet address (58 characters) — leave blank to skip"
+                />
+                {organizers.length > 1 && (
+                  <button
+                    type="button"
+                    className="px-3 py-2 text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl hover:bg-red-500/20 transition-colors text-sm font-medium"
+                    onClick={() => setOrganizers(organizers.filter((_, i) => i !== index))}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ))}
+            
+            {organizers.length < 10 && (
+              <button
+                type="button"
+                className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-xl hover:bg-emerald-500/20 transition-colors"
+                onClick={() => setOrganizers([...organizers, ''])}
+              >
+                <Plus className="w-4 h-4" /> Add Another Organizer
+              </button>
+            )}
+
+            <p className="text-xs text-zinc-600 mt-1">
+              All organizers will have permission to scan tickets and verify entry at your event.
+            </p>
+          </div>
+        </div>
+      </Card>
+
+      {/* ── Deploy Button ────────────────────────────────────── */}
+      <BrandButton
+        fullWidth
+        size="lg"
+        onClick={createEvent}
+        disabled={creating || !activeAddress || !newEvent.title || !newEvent.description}
+        isLoading={creating}
+      >
+        {creating ? (
+          <>
+            <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+            Deploying Contract...
+          </>
+        ) : (
+          <>
+            <Zap className="w-5 h-5 mr-2" />
+            Deploy Event Contract
+          </>
+        )}
+      </BrandButton>
+
+      {!activeAddress && (
+        <div className="flex items-start gap-3 bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+          <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-sm text-amber-300">Please connect your wallet to create an event</p>
+        </div>
+      )}
     </div>
   )
 }

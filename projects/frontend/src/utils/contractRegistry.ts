@@ -29,10 +29,10 @@
 import algosdk from 'algosdk'
 import { getIndexerConfigFromViteEnvironment } from './network/getAlgoClientConfigs'
 
-const FUNDRAISER_LOCAL_KEY = 'campuschain_fundraiser_local_v3'
-const TICKETING_LOCAL_KEY = 'campuschain_ticketing_local_v3'
-const FUNDRAISER_CACHE_KEY = 'campuschain_fundraiser_cache_v3'
-const TICKETING_CACHE_KEY = 'campuschain_ticketing_cache_v3'
+const FUNDRAISER_LOCAL_KEY = 'citadel_fundraiser_local_v3'
+const TICKETING_LOCAL_KEY = 'citadel_ticketing_local_v3'
+const FUNDRAISER_CACHE_KEY = 'citadel_fundraiser_cache_v3'
+const TICKETING_CACHE_KEY = 'citadel_ticketing_cache_v3'
 const CACHE_DURATION = 2 * 1000 // 2 seconds for faster cross-device sync
 const MAX_RETRY_ATTEMPTS = 3
 const QUERY_LIMIT = 1000
