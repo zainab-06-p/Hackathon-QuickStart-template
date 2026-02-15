@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Rocket, Menu, X, LayoutDashboard, Search, Activity, ShoppingBag, Trophy, Ticket } from 'lucide-react';
+import { Rocket, Menu, X, LayoutDashboard, Search, Activity, ShoppingBag, Trophy, Ticket, Database } from 'lucide-react';
 import { useWallet } from '@txnlab/use-wallet-react';
 import { WalletId } from '@txnlab/use-wallet';
 import { BrandButton } from './Base/BrandButton';
@@ -27,6 +27,7 @@ export const Navbar: React.FC = () => {
     { name: 'Market', path: '/marketplace', icon: ShoppingBag },
     { name: 'Events', path: '/ticketing', icon: Ticket },
     { name: 'Leaderboard', path: '/leaderboard', icon: Trophy },
+    { name: 'Explorer', path: '/explorer', icon: Database },
   ];
 
   return (
